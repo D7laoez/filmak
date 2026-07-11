@@ -347,6 +347,16 @@ function Row({
                   <Star className="w-3 h-3 fill-primary text-primary" />
                   {m.rating}
                 </div>
+                <FavoriteButton
+                  movie={{
+                    id: m.id,
+                    title: m.title,
+                    poster: m.poster,
+                    year: m.year,
+                    rating: m.rating,
+                  }}
+                  variant="icon"
+                />
               </div>
               <div className="mt-2">
                 <h3 className="text-sm font-medium truncate group-hover:text-primary transition">
