@@ -14,41 +14,33 @@ type Rec = {
 export const recommendMovies = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ prompt: z.string().min(2).max(500) }).parse(d))
   .handler(async ({ data }): Promise<{ recommendations: Rec[]; intro: string }> => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!geminiKey) throw new Error("GEMINI_API_KEY missing");
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
+    const systemPrompt =
+      'أنت خبير أفلام ومرشح ذكي. المستخدم يصف ما يريد مشاهدته، ورد بـ JSON فقط بهذا الشكل: {"intro": "جملة قصيرة", "movies": [{"title": "العنوان بالإنجليزية", "year": "YYYY", "reason": "لماذا يناسبه بالعربية في جملة قصيرة"}]}. اذكر 6 أفلام حقيقية معروفة على TMDB. عناوين الأفلام بالإنجليزية دائماً.';
+
+    const aiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: "user", parts: [{ text: data.prompt }] }],
+          generationConfig: { responseMimeType: "application/json" },
+        }),
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content:
-              "أنت خبير أفلام ومرشح ذكي. المستخدم يصف ما يريد مشاهدته، ورد بـ JSON فقط بهذا الشكل: {\"intro\": \"جملة قصيرة\", \"movies\": [{\"title\": \"العنوان بالإنجليزية\", \"year\": \"YYYY\", \"reason\": \"لماذا يناسبه بالعربية في جملة قصيرة\"}]}. اذكر 6 أفلام حقيقية معروفة على TMDB. عناوين الأفلام بالإنجليزية دائماً.",
-          },
-          { role: "user", content: data.prompt },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
+    );
 
     if (!aiRes.ok) {
       const text = await aiRes.text();
       if (aiRes.status === 429) throw new Error("تم تجاوز الحد المسموح، حاول بعد دقيقة");
-      if (aiRes.status === 402)
-        throw new Error(
-          "انتهى رصيد الذكاء الاصطناعي للمساحة. أضف رصيد من إعدادات Lovable → Plans & credits ثم أعد المحاولة.",
-        );
-      throw new Error(`AI error: ${text}`);
+      throw new Error(`Gemini error: ${text}`);
     }
 
     const aiJson = await aiRes.json();
-    const content = aiJson.choices?.[0]?.message?.content || "{}";
+    const content = aiJson.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     let parsed: { intro?: string; movies?: { title: string; year?: string; reason: string }[] };
     try {
       parsed = JSON.parse(content);
