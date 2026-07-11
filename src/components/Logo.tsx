@@ -1,4 +1,3 @@
-import logoAsset from "@/assets/filmak-logo.png.asset.json";
 import { useLocale } from "@/lib/i18n";
 
 type Props = {
@@ -18,7 +17,7 @@ export function Logo({
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <img
-        src={logoAsset.url}
+        src="/favicon.png"
         alt={t("brand")}
         width={size}
         height={size}
