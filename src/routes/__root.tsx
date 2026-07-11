@@ -11,37 +11,22 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Toaster } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { LocaleProvider } from "@/lib/i18n";
-import { useT } from "@/lib/i18n";
-import { getRequestOrigin } from "@/lib/origin.functions";
 
 function NotFoundComponent() {
-  const t = useT();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <img
-          src="/icon-192.png"
-          srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          decoding="async"
-          alt={t("brand")}
-          className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 opacity-90"
-        />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">
-          {t("page_not_found_title")}
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t("page_not_found_sub")}
+          The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {t("go_home")}
+            Go home
           </Link>
         </div>
       </div>
@@ -52,7 +37,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  const t = useT();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -60,22 +44,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <img
-          src="/icon-192.png"
-          srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          decoding="async"
-          alt={t("brand")}
-          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
-        />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          {t("error_title")}
+          This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("error_sub")}</p>
-        {import.meta.env.DEV && (
-          <p className="mt-2 text-xs text-muted-foreground/70 font-mono">
-            {error.message}
-          </p>
-        )}
+        <p className="mt-2 text-sm text-muted-foreground">
+          Something went wrong on our end. You can try refreshing or head back home.
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -84,13 +58,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {t("retry")}
+            Try again
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            {t("go_home")}
+            Go home
           </a>
         </div>
       </div>
@@ -99,68 +73,36 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: async () => {
-    const origin = await getRequestOrigin();
-    return { origin };
-  },
-  head: ({ loaderData }) => {
-    const origin = loaderData?.origin ?? "";
-    const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
-    return {
+  head: () => ({
     meta: [
       { charSet: "utf-8" },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1, viewport-fit=cover",
-      },
-      { name: "theme-color", content: "#0b0b12" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "فيلمك" },
-      { title: "فيلمك — Filmak · AI movie recommender" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
       {
         name: "description",
         content:
-          "اكتشف أفلاماً ومسلسلات تناسب مزاجك بالذكاء الاصطناعي. Discover movies and series that match your mood with AI, in Arabic and English.",
+          "اكتشف أفلاماً تناسب مزاجك في ثوانٍ. صف ما تريد مشاهدته وسيرشح لك الذكاء الاصطناعي أفلاماً مع رابط المشاهدة القانوني.",
       },
-      { property: "og:title", content: "فيلمك — Filmak" },
+      { property: "og:title", content: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
       {
         property: "og:description",
-        content:
-          "Describe what you want to watch, and AI finds the best movies and series for you. متاح بالعربية والإنجليزية.",
+        content: "اكتشف أفلاماً تناسب مزاجك في ثوانٍ. صف ما تريد مشاهدته وسيرشح لك الذكاء الاصطناعي أفلاماً مع رابط المشاهدة القانوني.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "فيلمك — Filmak" },
-      { property: "og:image", content: ogImage },
-      { property: "og:image:secure_url", content: ogImage },
-      { property: "og:image:type", content: "image/png" },
-      { property: "og:image:alt", content: "فيلمك — Filmak" },
-      { property: "og:image:width", content: "512" },
-      { property: "og:image:height", content: "512" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "فيلمك — Filmak" },
-      {
-        name: "twitter:description",
-        content:
-          "AI movie & series recommendations in Arabic and English.",
-      },
-      { name: "twitter:image", content: ogImage },
+      { name: "twitter:title", content: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
+      { name: "twitter:description", content: "اكتشف أفلاماً تناسب مزاجك في ثوانٍ. صف ما تريد مشاهدته وسيرشح لك الذكاء الاصطناعي أفلاماً مع رابط المشاهدة القانوني." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/bxKQdY5ldDW878ZJ5fxZpH87kAv2/social-images/social-1783752465837-Untitled.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/bxKQdY5ldDW878ZJ5fxZpH87kAv2/social-images/social-1783752465837-Untitled.webp" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/icon-32.png", sizes: "32x32", type: "image/png" },
-      { rel: "icon", href: "/icon-16.png", sizes: "16x16", type: "image/png" },
-      { rel: "icon", href: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { rel: "icon", href: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
-  };
-  },
+  }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -169,7 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
@@ -183,24 +125,11 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocaleProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" theme="dark" richColors />
-      </LocaleProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
     </QueryClientProvider>
   );
 }
