@@ -28,7 +28,7 @@ export const Route = createFileRoute("/movie/$id")({
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
             alt={t("brand")}
-            className="w-16 h-16 mx-auto mb-4 opacity-90"
+            className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
           />
           <h1 className="text-2xl font-bold mb-2">{t("error_load_movie")}</h1>
           <p className="text-muted-foreground mb-4 text-sm">{error.message}</p>
@@ -73,7 +73,7 @@ function NotFoundInline() {
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
           alt={t("brand")}
-          className="w-16 h-16 mx-auto mb-4 opacity-90"
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-xl font-bold mb-2">{t("page_not_found_title")}</h1>
         <Link

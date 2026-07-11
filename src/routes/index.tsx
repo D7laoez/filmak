@@ -56,7 +56,7 @@ export const Route = createFileRoute("/")({
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
           alt="Filmak"
-          className="w-16 h-16 mx-auto mb-4 opacity-90"
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-2xl font-bold mb-2">Error / حدث خطأ</h1>
         <p className="text-muted-foreground text-sm">{error.message}</p>
@@ -410,7 +410,7 @@ function Row({
           decoding="async"
             alt=""
             aria-hidden="true"
-            className="w-14 h-14 opacity-70 mb-3"
+            className="w-14 h-14 md:w-16 md:h-16 opacity-70 mb-3"
           />
           <p className="text-sm font-medium">{emptyLabel}</p>
           {emptySub && (

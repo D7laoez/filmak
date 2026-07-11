@@ -27,7 +27,7 @@ function NotFoundComponent() {
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
           alt={t("brand")}
-          className="w-20 h-20 mx-auto mb-4 opacity-90"
+          className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
@@ -65,7 +65,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
           alt={t("brand")}
-          className="w-16 h-16 mx-auto mb-4 opacity-90"
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("error_title")}
