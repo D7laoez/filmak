@@ -10,7 +10,7 @@ import {
 
 export type Locale = "ar" | "en";
 
-const DICT = {
+const DICT: Record<Locale, Dict> = {
   ar: {
     brand: "فيلمك",
     tagline_ai: "مدعوم بالذكاء الاصطناعي",
@@ -153,9 +153,68 @@ const DICT = {
       "Family-friendly Indian films",
     ] as string[],
   },
-} as const;
+};
 
-export type Dict = (typeof DICT)["ar"];
+export type Dict = {
+  brand: string;
+  tagline_ai: string;
+  hero_1: string;
+  hero_2: string;
+  hero_sub: string;
+  prompt_placeholder: string;
+  recommend_btn: string;
+  search_placeholder: string;
+  login: string;
+  logout: string;
+  my_favorites: string;
+  logout_toast: string;
+  search_results: string;
+  trending: string;
+  now_playing: string;
+  upcoming: string;
+  top_rated: string;
+  popular: string;
+  tv_series: string;
+  movie: string;
+  loading: string;
+  footer: string;
+  back: string;
+  watch_trailer: string;
+  where_to_watch: string;
+  by_subscription: string;
+  rent: string;
+  buy: string;
+  view_all_tmdb: string;
+  cast: string;
+  similar: string;
+  minutes_short: string;
+  not_found: string;
+  error_load_movie: string;
+  retry: string;
+  favorites_title: string;
+  favorites_empty: string;
+  discover: string;
+  add_fav: string;
+  in_fav: string;
+  added_fav: string;
+  removed_fav: string;
+  signin: string;
+  signup: string;
+  auth_sub: string;
+  continue_google: string;
+  continue_apple: string;
+  or: string;
+  email: string;
+  password: string;
+  signin_btn: string;
+  signup_btn: string;
+  check_email: string;
+  no_account: string;
+  have_account: string;
+  error_generic: string;
+  lang_switch: string;
+  suggestions: string[];
+};
 export type TKey = keyof Dict;
 
 type Ctx = {
