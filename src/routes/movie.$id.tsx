@@ -121,7 +121,7 @@ function Content() {
               ) : null}
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {data.genres.map((g) => (
+              {data.genres.map((g: string) => (
                 <span
                   key={g}
                   className="text-xs px-3 py-1 rounded-full bg-secondary border border-border"
@@ -176,7 +176,7 @@ function Content() {
           <section className="mt-12">
             <h2 className="text-xl font-bold mb-4">طاقم التمثيل</h2>
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
-              {data.cast.map((c) => (
+              {data.cast.map((c: { name: string; character: string; profile: string | null }) => (
                 <div key={c.name} className="text-center">
                   {c.profile ? (
                     <img
@@ -200,7 +200,7 @@ function Content() {
           <section className="mt-12 mb-16">
             <h2 className="text-xl font-bold mb-4">أفلام مشابهة</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.similar.map((m) => (
+              {data.similar.map((m: { id: number; title: string; poster: string | null; year: string; rating: number }) => (
                 <Link
                   key={m.id}
                   to="/movie/$id"
