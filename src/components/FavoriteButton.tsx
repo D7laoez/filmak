@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { listFavorites, addFavorite, removeFavorite } from "@/lib/favorites.functions";
 import { toast } from "sonner";
+import { useLocale } from "@/lib/i18n";
 
 type Props = {
   movie: {
@@ -20,6 +21,7 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { t, dir } = useLocale();
 
   const favs = useQuery({
     queryKey: ["favorites"],
@@ -46,7 +48,7 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["favorites"] });
-      toast.success(isFav ? "أُزيل من المفضلة" : "أُضيف إلى المفضلة");
+      toast.success(isFav ? t("removed_fav") : t("added_fav"));
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -65,8 +67,8 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
     return (
       <button
         onClick={onClick}
-        aria-label={isFav ? "إزالة من المفضلة" : "أضف إلى المفضلة"}
-        className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur flex items-center justify-center hover:bg-black/80 transition"
+        aria-label={isFav ? t("removed_fav") : t("add_fav")}
+        className={`absolute top-2 ${dir === "rtl" ? "left-2" : "right-2"} w-8 h-8 rounded-full bg-black/60 backdrop-blur flex items-center justify-center hover:bg-black/80 transition`}
       >
         {toggle.isPending ? (
           <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -94,7 +96,7 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
       ) : (
         <Heart className={`w-4 h-4 ${isFav ? "fill-primary" : ""}`} />
       )}
-      {isFav ? "في المفضلة" : "أضف إلى المفضلة"}
+      {isFav ? t("in_fav") : t("add_fav")}
     </button>
   );
 }
