@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LocaleProvider, useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
+import { ThemeProvider } from "@/lib/theme";
 
 function NotFoundComponent() {
   const t = useT();
@@ -172,11 +173,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocaleProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-center" theme="dark" richColors />
-      </LocaleProvider>
+      <ThemeProvider>
+        <LocaleProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Toaster position="top-center" theme="dark" richColors />
+        </LocaleProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
