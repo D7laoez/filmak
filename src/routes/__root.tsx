@@ -23,7 +23,9 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt={t("brand")}
           className="w-20 h-20 mx-auto mb-4 opacity-90"
         />
@@ -59,7 +61,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt={t("brand")}
           className="w-16 h-16 mx-auto mb-4 opacity-90"
         />

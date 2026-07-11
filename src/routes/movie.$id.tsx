@@ -24,7 +24,9 @@ export const Route = createFileRoute("/movie/$id")({
       <div className="min-h-screen flex items-center justify-center p-6 text-center">
         <div>
           <img
-            src="/favicon.png"
+            src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
             alt={t("brand")}
             className="w-16 h-16 mx-auto mb-4 opacity-90"
           />
@@ -67,7 +69,9 @@ function NotFoundInline() {
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt={t("brand")}
           className="w-16 h-16 mx-auto mb-4 opacity-90"
         />
