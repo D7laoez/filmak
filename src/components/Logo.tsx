@@ -17,12 +17,14 @@ export function Logo({
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <img
-        src="/favicon.png"
+        src="/icon-192.png"
+        srcSet="/icon-192.png 1x, /icon-512.png 2x"
         alt={t("brand")}
         width={size}
         height={size}
         style={{ width: size, height: size }}
         className="object-contain shrink-0"
+        decoding="async"
       />
       {withWordmark && <span className={wordmarkClassName}>{t("brand")}</span>}
     </span>
