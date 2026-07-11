@@ -77,14 +77,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
+      {
+        name: "description",
+        content:
+          "اكتشف أفلاماً تناسب مزاجك في ثوانٍ. صف ما تريد مشاهدته وسيرشح لك الذكاء الاصطناعي أفلاماً مع رابط المشاهدة القانوني.",
+      },
+      { property: "og:title", content: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
+      {
+        property: "og:description",
+        content: "صف ما تريد مشاهدته والذكاء الاصطناعي يجد لك أفضل الأفلام.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
