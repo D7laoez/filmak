@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, Bookmark, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
-import { listFavorites, addFavorite, removeFavorite } from "@/lib/favorites.functions";
+import { listMyItems, upsertItem, removeItem, type MediaType } from "@/lib/user-lists.functions";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 
@@ -15,43 +15,65 @@ type Props = {
     rating: number;
   };
   variant?: "icon" | "full";
+  mediaType?: MediaType;
 };
 
-export function FavoriteButton({ movie, variant = "full" }: Props) {
+export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { t } = useLocale();
 
-  const favs = useQuery({
-    queryKey: ["favorites"],
-    queryFn: () => listFavorites(),
+  const items = useQuery({
+    queryKey: ["user-lists"],
+    queryFn: () => listMyItems({ data: {} }),
     enabled: !!user,
   });
 
-  const isFav = !!favs.data?.some((f) => f.movie_id === movie.id);
+  const match = items.data?.find(
+    (f) => f.media_id === movie.id && f.media_type === mediaType,
+  );
+  const status = match?.status ?? null;
+  const isFav = status === "favorite";
 
-  const toggle = useMutation({
-    mutationFn: async () => {
-      if (isFav) {
-        return removeFavorite({ data: { movie_id: movie.id } });
+  const setStatus = useMutation({
+    mutationFn: async (next: "favorite" | "watchlist" | "watched" | null) => {
+      // If clicking the same status, remove; else upsert (and remove other statuses of same media so it lives in exactly one list)
+      const same = match && next === match.status;
+      if (same || next === null) {
+        return removeItem({
+          data: { media_type: mediaType, media_id: movie.id, status: match!.status },
+        });
       }
-      return addFavorite({
+      // Remove other statuses first, then upsert new
+      if (match && match.status !== next) {
+        await removeItem({
+          data: { media_type: mediaType, media_id: movie.id, status: match.status },
+        });
+      }
+      return upsertItem({
         data: {
-          movie_id: movie.id,
+          media_type: mediaType,
+          media_id: movie.id,
+          status: next,
           title: movie.title,
           poster: movie.poster,
           year: movie.year || null,
-          rating: movie.rating || null,
+          tmdb_rating: movie.rating || null,
         },
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["favorites"] });
-      toast.success(isFav ? t("removed_fav") : t("added_fav"));
+    onSuccess: (_res, next) => {
+      qc.invalidateQueries({ queryKey: ["user-lists"] });
+      const same = match && next === match.status;
+      if (same || next === null) toast.success(t("removed_fav"));
+      else if (next === "favorite") toast.success(t("added_fav"));
+      else if (next === "watchlist") toast.success(t("added_watchlist"));
+      else if (next === "watched") toast.success(t("marked_watched"));
     },
     onError: (e) => toast.error((e as Error).message),
   });
+  const toggle = { mutate: () => setStatus.mutate("favorite"), isPending: setStatus.isPending };
 
   function onClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -61,6 +83,13 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
       return;
     }
     toggle.mutate();
+  }
+
+  function pick(e: React.MouseEvent, next: "watchlist" | "watched") {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) { navigate({ to: "/auth" }); return; }
+    setStatus.mutate(next);
   }
 
   if (variant === "icon") {
@@ -82,21 +111,47 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
   }
 
   return (
-    <button
-      onClick={onClick}
-      disabled={toggle.isPending}
-      className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-        isFav
-          ? "bg-primary/10 text-primary border border-primary/30"
-          : "bg-secondary border border-border hover:bg-secondary/70"
-      }`}
-    >
-      {toggle.isPending ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <Heart className={`w-4 h-4 ${isFav ? "fill-primary" : ""}`} />
-      )}
-      {isFav ? t("in_fav") : t("add_fav")}
-    </button>
+    <div className="inline-flex items-center gap-2">
+      <button
+        onClick={onClick}
+        disabled={setStatus.isPending}
+        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+          isFav
+            ? "bg-primary/10 text-primary border border-primary/30"
+            : "bg-secondary border border-border hover:bg-secondary/70"
+        }`}
+      >
+        {setStatus.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Heart className={`w-4 h-4 ${isFav ? "fill-primary" : ""}`} />}
+        {isFav ? t("in_fav") : t("add_fav")}
+      </button>
+      <button
+        onClick={(e) => pick(e, "watchlist")}
+        disabled={setStatus.isPending}
+        aria-label={t("add_watchlist")}
+        title={t("add_watchlist")}
+        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+          status === "watchlist"
+            ? "bg-accent/20 text-accent border border-accent/40"
+            : "bg-secondary border border-border hover:bg-secondary/70"
+        }`}
+      >
+        <Bookmark className={`w-4 h-4 ${status === "watchlist" ? "fill-accent" : ""}`} />
+        <span className="hidden sm:inline">{status === "watchlist" ? t("in_watchlist") : t("add_watchlist")}</span>
+      </button>
+      <button
+        onClick={(e) => pick(e, "watched")}
+        disabled={setStatus.isPending}
+        aria-label={t("mark_watched")}
+        title={t("mark_watched")}
+        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+          status === "watched"
+            ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/40"
+            : "bg-secondary border border-border hover:bg-secondary/70"
+        }`}
+      >
+        <CheckCircle2 className="w-4 h-4" />
+        <span className="hidden sm:inline">{status === "watched" ? t("watched") : t("mark_watched")}</span>
+      </button>
+    </div>
   );
 }
