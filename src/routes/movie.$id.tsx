@@ -4,22 +4,23 @@ import { Suspense } from "react";
 import { ArrowRight, Star, Clock, Calendar, Play, Loader2, Film } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
   loader: async ({ context, params }) => {
     const id = Number(params.id);
     await context.queryClient.ensureQueryData({
-      queryKey: ["movie", id],
-      queryFn: () => getMovieDetails({ data: { id } }),
+      queryKey: ["movie", id, "ar"],
+      queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
     });
   },
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 text-center" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center p-6 text-center">
         <div>
-          <h1 className="text-2xl font-bold mb-2">تعذّر تحميل الفلم</h1>
+          <h1 className="text-2xl font-bold mb-2">Error</h1>
           <p className="text-muted-foreground mb-4">{error.message}</p>
           <button
             onClick={() => {
@@ -28,13 +29,13 @@ export const Route = createFileRoute("/movie/$id")({
             }}
             className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
           >
-            حاول مجدداً
+            Retry
           </button>
         </div>
       </div>
     );
   },
-  notFoundComponent: () => <div className="p-8">غير موجود</div>,
+  notFoundComponent: () => <div className="p-8">404</div>,
 });
 
 function MoviePage() {
@@ -54,13 +55,14 @@ function MoviePage() {
 function Content() {
   const { id } = Route.useParams();
   const numId = Number(id);
+  const { locale, dir, t } = useLocale();
   const { data } = useSuspenseQuery({
-    queryKey: ["movie", numId],
-    queryFn: () => getMovieDetails({ data: { id: numId } }),
+    queryKey: ["movie", numId, locale],
+    queryFn: () => getMovieDetails({ data: { id: numId, lang: locale } }),
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background text-foreground">
+    <div dir={dir} className="min-h-screen bg-background text-foreground">
       {/* Backdrop hero */}
       <div className="relative h-[50vh] min-h-[400px] w-full">
         {data.backdrop && (
@@ -78,7 +80,7 @@ function Content() {
               className="inline-flex items-center gap-2 bg-black/50 backdrop-blur rounded-full px-3 py-1.5 text-sm hover:bg-black/70 transition"
             >
               <ArrowRight className="w-4 h-4" />
-              رجوع
+              {t("back")}
             </Link>
           </div>
         </div>
@@ -117,7 +119,7 @@ function Content() {
               {data.runtime ? (
                 <span className="flex items-center gap-1 text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  {data.runtime} د
+                  {data.runtime} {t("minutes_short")}
                 </span>
               ) : null}
             </div>
@@ -142,7 +144,7 @@ function Content() {
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-medium hover:opacity-90 transition"
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  شاهد الإعلان الرسمي
+                  {t("watch_trailer")}
                 </a>
                 <FavoriteButton
                   movie={{
@@ -175,14 +177,14 @@ function Content() {
         {data.watch && (
           <section className="mt-12">
             <h2 className="text-xl font-bold mb-4">
-              أين تشاهد الفلم
+              {t("where_to_watch")}
               {data.watchCountry && (
-                <span className="text-sm text-muted-foreground mr-2">({data.watchCountry})</span>
+                <span className="text-sm text-muted-foreground mx-2">({data.watchCountry})</span>
               )}
             </h2>
-            <ProviderGroup label="بالاشتراك" items={data.watch.flatrate} />
-            <ProviderGroup label="تأجير" items={data.watch.rent} />
-            <ProviderGroup label="شراء" items={data.watch.buy} />
+            <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} />
+            <ProviderGroup label={t("rent")} items={data.watch.rent} />
+            <ProviderGroup label={t("buy")} items={data.watch.buy} />
             {data.watch.link && (
               <a
                 href={data.watch.link}
@@ -190,7 +192,7 @@ function Content() {
                 rel="noopener noreferrer"
                 className="text-primary text-sm underline"
               >
-                عرض كل الخيارات على TMDB
+                {t("view_all_tmdb")}
               </a>
             )}
           </section>
@@ -199,7 +201,7 @@ function Content() {
         {/* Cast */}
         {data.cast.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-xl font-bold mb-4">طاقم التمثيل</h2>
+            <h2 className="text-xl font-bold mb-4">{t("cast")}</h2>
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
               {data.cast.map((c: { name: string; character: string; profile: string | null }) => (
                 <div key={c.name} className="text-center">
@@ -223,7 +225,7 @@ function Content() {
         {/* Similar */}
         {data.similar.length > 0 && (
           <section className="mt-12 mb-16">
-            <h2 className="text-xl font-bold mb-4">أفلام مشابهة</h2>
+            <h2 className="text-xl font-bold mb-4">{t("similar")}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {data.similar.map((m: { id: number; title: string; poster: string | null; year: string; rating: number }) => (
                 <Link

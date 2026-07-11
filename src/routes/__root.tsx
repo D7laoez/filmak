@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { LocaleProvider } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -79,16 +80,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
+      { title: "فيلمك — Filmak · AI movie recommender" },
       {
         name: "description",
         content:
-          "اكتشف أفلاماً تناسب مزاجك في ثوانٍ. صف ما تريد مشاهدته وسيرشح لك الذكاء الاصطناعي أفلاماً مع رابط المشاهدة القانوني.",
+          "اكتشف أفلاماً ومسلسلات تناسب مزاجك بالذكاء الاصطناعي. Discover movies and series that match your mood with AI, in Arabic and English.",
       },
-      { property: "og:title", content: "سينمائي — مرشح الأفلام بالذكاء الاصطناعي" },
+      { property: "og:title", content: "فيلمك — Filmak" },
       {
         property: "og:description",
-        content: "صف ما تريد مشاهدته والذكاء الاصطناعي يجد لك أفضل الأفلام.",
+        content:
+          "Describe what you want to watch, and AI finds the best movies and series for you. متاح بالعربية والإنجليزية.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -109,7 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <head>
         <HeadContent />
       </head>
@@ -136,9 +138,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" theme="dark" richColors />
+      <LocaleProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" theme="dark" richColors />
+      </LocaleProvider>
     </QueryClientProvider>
   );
 }

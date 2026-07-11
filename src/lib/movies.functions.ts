@@ -23,54 +23,84 @@ function toCard(m: any): MovieCard {
   };
 }
 
-export const getTrending = createServerFn({ method: "GET" }).handler(async () => {
-  const { tmdbGet } = await import("./tmdb.server");
-  const data = await tmdbGet<{ results: any[] }>("/trending/movie/week");
-  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
-});
+const langSchema = z.enum(["ar", "en"]).default("ar");
+const langOnly = (d: unknown) =>
+  z.object({ lang: langSchema }).parse(d ?? {});
 
-export const getTopRated = createServerFn({ method: "GET" }).handler(async () => {
-  const { tmdbGet } = await import("./tmdb.server");
-  const data = await tmdbGet<{ results: any[] }>("/movie/top_rated");
-  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
-});
-
-export const getPopular = createServerFn({ method: "GET" }).handler(async () => {
-  const { tmdbGet } = await import("./tmdb.server");
-  const data = await tmdbGet<{ results: any[] }>("/movie/popular");
-  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
-});
-
-export const getNowPlaying = createServerFn({ method: "GET" }).handler(async () => {
-  const { tmdbGet } = await import("./tmdb.server");
-  const data = await tmdbGet<{ results: any[] }>("/movie/now_playing", { region: "SA" });
-  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
-});
-
-export const getUpcoming = createServerFn({ method: "GET" }).handler(async () => {
-  const { tmdbGet } = await import("./tmdb.server");
-  const data = await tmdbGet<{ results: any[] }>("/movie/upcoming", { region: "SA" });
-  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
-});
-
-export const searchMovies = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ q: z.string().min(1) }).parse(d))
+export const getTrending = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const res = await tmdbGet<{ results: any[] }>("/search/movie", { query: data.q });
+    const r = await tmdbGet<{ results: any[] }>("/trending/movie/week", {}, data.lang);
+    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+  });
+
+export const getTopRated = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ results: any[] }>("/movie/top_rated", {}, data.lang);
+    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+  });
+
+export const getPopular = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ results: any[] }>("/movie/popular", {}, data.lang);
+    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+  });
+
+export const getNowPlaying = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ results: any[] }>(
+      "/movie/now_playing",
+      { region: data.lang === "en" ? "US" : "SA" },
+      data.lang,
+    );
+    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+  });
+
+export const getUpcoming = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ results: any[] }>(
+      "/movie/upcoming",
+      { region: data.lang === "en" ? "US" : "SA" },
+      data.lang,
+    );
+    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+  });
+
+export const searchMovies = createServerFn({ method: "GET" })
+  .inputValidator((d) =>
+    z.object({ q: z.string().min(1), lang: langSchema }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const res = await tmdbGet<{ results: any[] }>(
+      "/search/movie",
+      { query: data.q },
+      data.lang,
+    );
     return res.results.filter((m) => m.poster_path).slice(0, 24).map(toCard);
   });
 
 export const getMovieDetails = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ id: z.number() }).parse(d))
+  .inputValidator((d) =>
+    z.object({ id: z.number(), lang: langSchema }).parse(d),
+  )
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const [details, videos, providers, credits, similar] = await Promise.all([
-      tmdbGet<any>(`/movie/${data.id}`),
-      tmdbGet<any>(`/movie/${data.id}/videos`, { language: "en-US" }),
-      tmdbGet<any>(`/movie/${data.id}/watch/providers`),
-      tmdbGet<any>(`/movie/${data.id}/credits`),
-      tmdbGet<any>(`/movie/${data.id}/similar`),
+      tmdbGet<any>(`/movie/${data.id}`, {}, data.lang),
+      tmdbGet<any>(`/movie/${data.id}/videos`, { language: "en-US" }, data.lang),
+      tmdbGet<any>(`/movie/${data.id}/watch/providers`, {}, data.lang),
+      tmdbGet<any>(`/movie/${data.id}/credits`, {}, data.lang),
+      tmdbGet<any>(`/movie/${data.id}/similar`, {}, data.lang),
     ]);
 
     const trailer = (videos.results || []).find(

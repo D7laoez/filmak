@@ -17,59 +17,77 @@ import { supabase } from "@/integrations/supabase/client";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useLocale } from "@/lib/i18n";
+import { Languages } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Home,
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData({
-        queryKey: ["trending"],
-        queryFn: () => getTrending(),
+        queryKey: ["trending", "ar"],
+        queryFn: () => getTrending({ data: { lang: "ar" } }),
       }),
       context.queryClient.ensureQueryData({
-        queryKey: ["top-rated"],
-        queryFn: () => getTopRated(),
+        queryKey: ["top-rated", "ar"],
+        queryFn: () => getTopRated({ data: { lang: "ar" } }),
       }),
       context.queryClient.ensureQueryData({
-        queryKey: ["popular"],
-        queryFn: () => getPopular(),
+        queryKey: ["popular", "ar"],
+        queryFn: () => getPopular({ data: { lang: "ar" } }),
       }),
       context.queryClient.ensureQueryData({
-        queryKey: ["now-playing"],
-        queryFn: () => getNowPlaying(),
+        queryKey: ["now-playing", "ar"],
+        queryFn: () => getNowPlaying({ data: { lang: "ar" } }),
       }),
       context.queryClient.ensureQueryData({
-        queryKey: ["upcoming"],
-        queryFn: () => getUpcoming(),
+        queryKey: ["upcoming", "ar"],
+        queryFn: () => getUpcoming({ data: { lang: "ar" } }),
       }),
     ]);
   },
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
-        <h1 className="text-2xl font-bold mb-2">حدث خطأ</h1>
+        <h1 className="text-2xl font-bold mb-2">Error / حدث خطأ</h1>
         <p className="text-muted-foreground">{error.message}</p>
       </div>
     </div>
   ),
-  notFoundComponent: () => <div className="p-8">غير موجود</div>,
+  notFoundComponent: () => <div className="p-8">404</div>,
 });
 
 function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const trending = useQuery({ queryKey: ["trending"], queryFn: () => getTrending() });
-  const topRated = useQuery({ queryKey: ["top-rated"], queryFn: () => getTopRated() });
-  const popular = useQuery({ queryKey: ["popular"], queryFn: () => getPopular() });
-  const nowPlaying = useQuery({ queryKey: ["now-playing"], queryFn: () => getNowPlaying() });
-  const upcoming = useQuery({ queryKey: ["upcoming"], queryFn: () => getUpcoming() });
+  const { locale, dir, t, toggle } = useLocale();
+  const trending = useQuery({
+    queryKey: ["trending", locale],
+    queryFn: () => getTrending({ data: { lang: locale } }),
+  });
+  const topRated = useQuery({
+    queryKey: ["top-rated", locale],
+    queryFn: () => getTopRated({ data: { lang: locale } }),
+  });
+  const popular = useQuery({
+    queryKey: ["popular", locale],
+    queryFn: () => getPopular({ data: { lang: locale } }),
+  });
+  const nowPlaying = useQuery({
+    queryKey: ["now-playing", locale],
+    queryFn: () => getNowPlaying({ data: { lang: locale } }),
+  });
+  const upcoming = useQuery({
+    queryKey: ["upcoming", locale],
+    queryFn: () => getUpcoming({ data: { lang: locale } }),
+  });
 
   const [searchQ, setSearchQ] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
   const searchRes = useQuery({
-    queryKey: ["search", activeSearch],
-    queryFn: () => searchMovies({ data: { q: activeSearch } }),
+    queryKey: ["search", activeSearch, locale],
+    queryFn: () => searchMovies({ data: { q: activeSearch, lang: locale } }),
     enabled: activeSearch.length > 0,
   });
 
@@ -78,30 +96,22 @@ function Home() {
     mutationFn: (p: string) => recommendMovies({ data: { prompt: p } }),
   });
 
-  const suggestions = [
-    "فلم إثارة نفسي مثل Inception بس أقصر",
-    "افلام مصرية مضحكة قديمة",
-    "مسلسلات تركية رومانسية",
-    "مسلسلات كورية إثارة وغموض",
-    "أفلام رعب حديثة مو مبتذلة",
-    "أنمي أكشن قوي",
-    "افلام هندية عائلية",
-  ];
+  const suggestions = t("suggestions");
 
   async function handleSignOut() {
     await qc.cancelQueries();
     qc.clear();
     await supabase.auth.signOut();
-    toast.success("تم تسجيل الخروج");
+    toast.success(t("logout_toast"));
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background text-foreground">
+    <div dir={dir} className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Film className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">سينمائي</span>
+            <span className="text-xl font-bold">{t("brand")}</span>
           </Link>
           <form
             onSubmit={(e: FormEvent) => {
@@ -110,15 +120,25 @@ function Home() {
             }}
             className="relative flex-1 max-w-md mx-4"
           >
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search
+              className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+            />
             <input
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
-              placeholder="ابحث عن فلم…"
-              className="w-full bg-secondary/60 border border-border rounded-full pr-10 pl-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder={t("search_placeholder")}
+              className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
             />
           </form>
           <div className="flex items-center gap-2">
+            <button
+              onClick={toggle}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+              aria-label="Switch language"
+            >
+              <Languages className="w-4 h-4" />
+              {t("lang_switch")}
+            </button>
             {user ? (
               <>
                 <Link
@@ -126,12 +146,12 @@ function Home() {
                   className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
                 >
                   <Heart className="w-4 h-4 text-primary" />
-                  <span className="hidden sm:inline">مفضلتي</span>
+                  <span className="hidden sm:inline">{t("my_favorites")}</span>
                 </Link>
                 <button
                   onClick={handleSignOut}
                   className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                  aria-label="تسجيل الخروج"
+                  aria-label={t("logout")}
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -142,7 +162,7 @@ function Home() {
                 className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
               >
                 <User className="w-4 h-4" />
-                <span className="hidden sm:inline">دخول</span>
+                <span className="hidden sm:inline">{t("login")}</span>
               </button>
             )}
           </div>
@@ -155,17 +175,17 @@ function Home() {
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
-            مدعوم بالذكاء الاصطناعي
+            {t("tagline_ai")}
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            صف الفلم اللي في بالك
+            {t("hero_1")}
             <br />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              ونجيبه لك
+              {t("hero_2")}
             </span>
           </h1>
           <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-            بدل ما تضيع ساعة تدور، اكتب مزاجك أو نوع الفلم اللي تحبه واتركنا نرشح لك.
+            {t("hero_sub")}
           </p>
 
           <form
@@ -181,20 +201,20 @@ function Home() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={3}
-                placeholder="مثال: أبي فلم إثارة نفسي مثل Inception بس أقصر…"
+                placeholder={t("prompt_placeholder")}
                 className="w-full bg-card border border-border rounded-2xl p-4 pb-14 text-base outline-none focus:ring-2 focus:ring-primary/50 resize-none"
               />
               <button
                 type="submit"
                 disabled={recMutation.isPending || prompt.trim().length < 2}
-                className="absolute bottom-3 left-3 inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
+                className={`absolute bottom-3 ${dir === "rtl" ? "left-3" : "right-3"} inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition`}
               >
                 {recMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Sparkles className="w-4 h-4" />
                 )}
-                رشّح لي
+                {t("recommend_btn")}
               </button>
             </div>
 
@@ -219,7 +239,7 @@ function Home() {
           )}
 
           {recMutation.data && (
-            <div className="mt-10 text-right">
+            <div className={`mt-10 ${dir === "rtl" ? "text-right" : "text-left"}`}>
               {recMutation.data.intro && (
                 <p className="text-muted-foreground mb-4">{recMutation.data.intro}</p>
               )}
@@ -250,7 +270,7 @@ function Home() {
                             }`}
                           >
                             {isTv ? <Tv className="w-3 h-3" /> : <Film className="w-3 h-3" />}
-                            {isTv ? "مسلسل" : "فلم"}
+                            {isTv ? t("tv_series") : t("movie")}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-primary mb-2">
@@ -295,7 +315,7 @@ function Home() {
 
       {activeSearch && (
         <Row
-          title={`نتائج البحث: "${activeSearch}"`}
+          title={`${t("search_results")}: "${activeSearch}"`}
           icon={<Search className="w-5 h-5" />}
           movies={searchRes.data ?? []}
           loading={searchRes.isLoading}
@@ -303,33 +323,33 @@ function Home() {
       )}
 
       <Row
-        title="رائجة هذا الأسبوع"
+        title={t("trending")}
         icon={<Flame className="w-5 h-5 text-accent" />}
         movies={trending.data ?? []}
       />
       <Row
-        title="الجديد في السينما"
+        title={t("now_playing")}
         icon={<Clapperboard className="w-5 h-5 text-accent" />}
         movies={nowPlaying.data ?? []}
       />
       <Row
-        title="قريباً"
+        title={t("upcoming")}
         icon={<CalendarClock className="w-5 h-5 text-primary" />}
         movies={upcoming.data ?? []}
       />
       <Row
-        title="الأعلى تقييماً"
+        title={t("top_rated")}
         icon={<Award className="w-5 h-5 text-primary" />}
         movies={topRated.data ?? []}
       />
       <Row
-        title="شائعة الآن"
+        title={t("popular")}
         icon={<TrendingUp className="w-5 h-5" />}
         movies={popular.data ?? []}
       />
 
       <footer className="border-t border-border/40 mt-16 py-8 text-center text-xs text-muted-foreground">
-        This product uses the TMDB API but is not endorsed or certified by TMDB.
+        {t("footer")}
       </footer>
     </div>
   );
@@ -346,6 +366,7 @@ function Row({
   movies: MovieCard[];
   loading?: boolean;
 }) {
+  const t = useLocale().t;
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
       <h2 className="flex items-center gap-2 text-xl font-bold mb-4">
@@ -354,7 +375,7 @@ function Row({
       </h2>
       {loading ? (
         <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="w-4 h-4 animate-spin" /> يحمّل…
+          <Loader2 className="w-4 h-4 animate-spin" /> {t("loading")}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
