@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock } from "lucide-react";
 import {
   getTrending,
   getTopRated,
   getPopular,
+  getNowPlaying,
+  getUpcoming,
   searchMovies,
   type MovieCard,
 } from "@/lib/movies.functions";
@@ -27,6 +29,14 @@ export const Route = createFileRoute("/")({
         queryKey: ["popular"],
         queryFn: () => getPopular(),
       }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["now-playing"],
+        queryFn: () => getNowPlaying(),
+      }),
+      context.queryClient.ensureQueryData({
+        queryKey: ["upcoming"],
+        queryFn: () => getUpcoming(),
+      }),
     ]);
   },
   errorComponent: ({ error }) => (
@@ -44,6 +54,8 @@ function Home() {
   const trending = useQuery({ queryKey: ["trending"], queryFn: () => getTrending() });
   const topRated = useQuery({ queryKey: ["top-rated"], queryFn: () => getTopRated() });
   const popular = useQuery({ queryKey: ["popular"], queryFn: () => getPopular() });
+  const nowPlaying = useQuery({ queryKey: ["now-playing"], queryFn: () => getNowPlaying() });
+  const upcoming = useQuery({ queryKey: ["upcoming"], queryFn: () => getUpcoming() });
 
   const [searchQ, setSearchQ] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
@@ -216,6 +228,16 @@ function Home() {
         title="رائجة هذا الأسبوع"
         icon={<Flame className="w-5 h-5 text-accent" />}
         movies={trending.data ?? []}
+      />
+      <Row
+        title="الجديد في السينما"
+        icon={<Clapperboard className="w-5 h-5 text-accent" />}
+        movies={nowPlaying.data ?? []}
+      />
+      <Row
+        title="قريباً"
+        icon={<CalendarClock className="w-5 h-5 text-primary" />}
+        movies={upcoming.data ?? []}
       />
       <Row
         title="الأعلى تقييماً"
