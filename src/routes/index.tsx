@@ -11,6 +11,8 @@ import {
   getNowPlaying,
   getUpcoming,
   searchMovies,
+  getGenres,
+  getMoviesByGenre,
   type MovieCard,
 } from "@/lib/movies.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
@@ -99,6 +101,25 @@ function Home() {
     queryFn: () => searchMovies({ data: { q: activeSearch, lang: locale } }),
     enabled: activeSearch.length > 0,
   });
+
+  const genres = useQuery({
+    queryKey: ["genres", locale],
+    queryFn: () => getGenres({ data: { lang: locale } }),
+  });
+  const [genreId, setGenreId] = useState<number | null>(null);
+  const [sort, setSort] = useState<
+    "popularity.desc" | "vote_average.desc" | "primary_release_date.desc"
+  >("popularity.desc");
+  const genreRes = useQuery({
+    queryKey: ["by-genre", genreId, sort, locale],
+    queryFn: () =>
+      getMoviesByGenre({
+        data: { genreId: genreId as number, lang: locale, sort, page: 1 },
+      }),
+    enabled: genreId !== null,
+  });
+  const activeGenreName =
+    genres.data?.find((g) => g.id === genreId)?.name ?? "";
 
   const [prompt, setPrompt] = useState("");
   const recMutation = useMutation({
