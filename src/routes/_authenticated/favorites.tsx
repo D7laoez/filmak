@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Heart, Star, Film, Loader2 } from "lucide-react";
+import { Heart, Star, Film } from "lucide-react";
 import { listFavorites } from "@/lib/favorites.functions";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
+import { Spinner } from "@/components/Spinner";
 
 export const Route = createFileRoute("/_authenticated/favorites")({
   component: FavoritesPage,
@@ -33,12 +34,17 @@ function FavoritesPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" /> {t("loading")}
+          <div className="py-12 flex items-center justify-center">
+            <Spinner size={64} label={t("loading")} />
           </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-16">
-            <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+            <img
+              src="/favicon.png"
+              alt={t("brand")}
+              className="w-16 h-16 mx-auto mb-3 opacity-80"
+            />
+            <Heart className="w-6 h-6 mx-auto text-primary mb-3 fill-primary" />
             <p className="text-muted-foreground mb-4">
               {t("favorites_empty")}
             </p>
