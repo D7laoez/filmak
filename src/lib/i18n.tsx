@@ -88,6 +88,12 @@ const DICT: Record<Locale, Dict> = {
     error_sub: "حاول تحديث الصفحة، وإذا رجع الخطأ راسلنا.",
     no_results: "ما لقينا نتائج",
     no_results_sub: "جرّب كلمات ثانية أو اختصر البحث.",
+    browse_by_genre: "تصفح حسب التصنيف",
+    all_genres: "الكل",
+    sort_popular: "الأكثر شعبية",
+    sort_rating: "الأعلى تقييماً",
+    sort_newest: "الأحدث",
+    genre_results: "أفلام تصنيف",
   },
   en: {
     brand: "Filmak",
@@ -167,6 +173,12 @@ const DICT: Record<Locale, Dict> = {
     error_sub: "Try refreshing the page. If it keeps failing, let us know.",
     no_results: "No results found",
     no_results_sub: "Try different words or shorten your search.",
+    browse_by_genre: "Browse by genre",
+    all_genres: "All",
+    sort_popular: "Most popular",
+    sort_rating: "Top rated",
+    sort_newest: "Newest",
+    genre_results: "Movies in",
   },
 };
 
@@ -236,6 +248,12 @@ export type Dict = {
   error_sub: string;
   no_results: string;
   no_results_sub: string;
+  browse_by_genre: string;
+  all_genres: string;
+  sort_popular: string;
+  sort_rating: string;
+  sort_newest: string;
+  genre_results: string;
 };
 export type TKey = keyof Dict;
 
