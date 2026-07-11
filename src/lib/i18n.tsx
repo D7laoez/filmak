@@ -214,6 +214,13 @@ export type Dict = {
   error_generic: string;
   lang_switch: string;
   suggestions: string[];
+  page_not_found_title: string;
+  page_not_found_sub: string;
+  go_home: string;
+  error_title: string;
+  error_sub: string;
+  no_results: string;
+  no_results_sub: string;
 };
 export type TKey = keyof Dict;
 
