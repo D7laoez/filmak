@@ -330,6 +330,12 @@ function Home() {
           icon={<Search className="w-5 h-5" />}
           movies={searchRes.data ?? []}
           loading={searchRes.isLoading}
+          emptyLabel={
+            !searchRes.isLoading && (searchRes.data ?? []).length === 0
+              ? t("no_results")
+              : undefined
+          }
+          emptySub={t("no_results_sub")}
         />
       )}
 
@@ -371,11 +377,15 @@ function Row({
   icon,
   movies,
   loading,
+  emptyLabel,
+  emptySub,
 }: {
   title: string;
   icon?: React.ReactNode;
   movies: MovieCard[];
   loading?: boolean;
+  emptyLabel?: string | false;
+  emptySub?: string;
 }) {
   const t = useLocale().t;
   return (
@@ -385,8 +395,21 @@ function Row({
         {title}
       </h2>
       {loading ? (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="w-4 h-4 animate-spin" /> {t("loading")}
+        <div className="py-10 flex items-center justify-center">
+          <Spinner size={56} label={t("loading")} />
+        </div>
+      ) : emptyLabel ? (
+        <div className="py-12 flex flex-col items-center justify-center text-center">
+          <img
+            src="/favicon.png"
+            alt=""
+            aria-hidden="true"
+            className="w-14 h-14 opacity-70 mb-3"
+          />
+          <p className="text-sm font-medium">{emptyLabel}</p>
+          {emptySub && (
+            <p className="text-xs text-muted-foreground mt-1">{emptySub}</p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
