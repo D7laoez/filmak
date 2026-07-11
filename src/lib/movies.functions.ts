@@ -89,6 +89,47 @@ export const searchMovies = createServerFn({ method: "GET" })
     return res.results.filter((m) => m.poster_path).slice(0, 24).map(toCard);
   });
 
+export const getGenres = createServerFn({ method: "GET" })
+  .inputValidator(langOnly)
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ genres: { id: number; name: string }[] }>(
+      "/genre/movie/list",
+      {},
+      data.lang,
+    );
+    return r.genres;
+  });
+
+export const getMoviesByGenre = createServerFn({ method: "GET" })
+  .inputValidator((d) =>
+    z
+      .object({
+        genreId: z.number(),
+        lang: langSchema,
+        sort: z
+          .enum(["popularity.desc", "vote_average.desc", "primary_release_date.desc"])
+          .default("popularity.desc"),
+        page: z.number().int().min(1).max(20).default(1),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const r = await tmdbGet<{ results: any[] }>(
+      "/discover/movie",
+      {
+        with_genres: String(data.genreId),
+        sort_by: data.sort,
+        "vote_count.gte": data.sort === "vote_average.desc" ? "200" : "50",
+        include_adult: "false",
+        page: String(data.page),
+      },
+      data.lang,
+    );
+    return r.results.filter((m) => m.poster_path).slice(0, 24).map(toCard);
+  });
+
 export const getMovieDetails = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z.object({ id: z.number(), lang: langSchema }).parse(d),
