@@ -484,6 +484,7 @@ function Row({
   loading,
   emptyLabel,
   emptySub,
+  type = "movie",
 }: {
   title: string;
   icon?: React.ReactNode;
@@ -491,6 +492,7 @@ function Row({
   loading?: boolean;
   emptyLabel?: string | false;
   emptySub?: string;
+  type?: "movie" | "tv";
 }) {
   const t = useLocale().t;
   return (
@@ -523,7 +525,7 @@ function Row({
           {movies.map((m) => (
             <Link
               key={m.id}
-              to="/movie/$id"
+              to={type === "tv" ? "/tv/$id" : "/movie/$id"}
               params={{ id: String(m.id) }}
               className="group block"
             >
@@ -567,4 +569,8 @@ function Row({
       )}
     </section>
   );
+}
+
+function tvToCard(t: TvCard): MovieCard {
+  return t as unknown as MovieCard;
 }
