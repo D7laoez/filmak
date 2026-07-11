@@ -4,18 +4,50 @@ import { Suspense } from "react";
 import { ArrowRight, Star, Clock, Calendar, Play, Film } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { ShareButton } from "@/components/ShareButton";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { useT } from "@/lib/i18n";
+import { getRequestOrigin } from "@/lib/origin.functions";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
   loader: async ({ context, params }) => {
     const id = Number(params.id);
-    await context.queryClient.ensureQueryData({
-      queryKey: ["movie", id, "ar"],
-      queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
-    });
+    const [movie, origin] = await Promise.all([
+      context.queryClient.ensureQueryData({
+        queryKey: ["movie", id, "ar"],
+        queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
+      }),
+      getRequestOrigin(),
+    ]);
+    return { movie, origin };
+  },
+  head: ({ params, loaderData }) => {
+    const origin = loaderData?.origin ?? "";
+    const movie = loaderData?.movie;
+    const backdrop = movie?.backdrop ?? movie?.poster ?? `${origin}/icon-512.png`;
+    const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
+    const title = movie ? `${movie.title} — فيلمك` : "فيلمك";
+    const desc = movie?.overview?.slice(0, 200) ?? "";
+    const url = origin ? `${origin}/movie/${params.id}` : `/movie/${params.id}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "video.movie" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: abs },
+        { property: "og:image:secure_url", content: abs },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: abs },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
   },
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
@@ -190,10 +222,11 @@ function Content() {
                     rating: data.rating,
                   }}
                 />
+                <ShareButton title={data.title} text={data.overview?.slice(0, 120)} />
               </div>
             )}
             {!data.trailerKey && (
-              <div className="mt-6">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <FavoriteButton
                   movie={{
                     id: data.id,
@@ -203,6 +236,7 @@ function Content() {
                     rating: data.rating,
                   }}
                 />
+                <ShareButton title={data.title} text={data.overview?.slice(0, 120)} />
               </div>
             )}
           </div>

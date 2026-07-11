@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
+import { Route as GenreIdRouteImport } from './routes/genre.$id'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 
 const AuthRoute = AuthRouteImport.update({
@@ -40,6 +41,11 @@ const MovieIdRoute = MovieIdRouteImport.update({
   path: '/movie/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GenreIdRoute = GenreIdRouteImport.update({
+  id: '/genre/$id',
+  path: '/genre/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -50,6 +56,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/tv/$id': typeof TvIdRoute
 }
@@ -57,6 +64,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/tv/$id': typeof TvIdRoute
 }
@@ -66,20 +74,28 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/tv/$id': typeof TvIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/favorites' | '/movie/$id' | '/tv/$id'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/favorites'
+    | '/genre/$id'
+    | '/movie/$id'
+    | '/tv/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/favorites' | '/movie/$id' | '/tv/$id'
+  to: '/' | '/auth' | '/favorites' | '/genre/$id' | '/movie/$id' | '/tv/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/favorites'
+    | '/genre/$id'
     | '/movie/$id'
     | '/tv/$id'
   fileRoutesById: FileRoutesById
@@ -88,6 +104,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  GenreIdRoute: typeof GenreIdRoute
   MovieIdRoute: typeof MovieIdRoute
   TvIdRoute: typeof TvIdRoute
 }
@@ -129,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MovieIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/genre/$id': {
+      id: '/genre/$id'
+      path: '/genre/$id'
+      fullPath: '/genre/$id'
+      preLoaderRoute: typeof GenreIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -154,6 +178,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  GenreIdRoute: GenreIdRoute,
   MovieIdRoute: MovieIdRoute,
   TvIdRoute: TvIdRoute,
 }
