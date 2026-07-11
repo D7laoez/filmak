@@ -68,7 +68,7 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
       <button
         onClick={onClick}
         aria-label={isFav ? t("removed_fav") : t("add_fav")}
-        className={`absolute top-2 ${dir === "rtl" ? "left-2" : "right-2"} w-8 h-8 rounded-full bg-black/60 backdrop-blur flex items-center justify-center hover:bg-black/80 transition`}
+        className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur flex items-center justify-center hover:bg-black/80 transition"
       >
         {toggle.isPending ? (
           <Loader2 className="w-4 h-4 animate-spin text-white" />
