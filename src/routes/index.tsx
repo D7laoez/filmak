@@ -52,9 +52,11 @@ export const Route = createFileRoute("/")({
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt="Filmak"
-          className="w-16 h-16 mx-auto mb-4 opacity-90"
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-2xl font-bold mb-2">Error / حدث خطأ</h1>
         <p className="text-muted-foreground text-sm">{error.message}</p>
@@ -180,7 +182,9 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-accent/5 to-transparent pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
           <img
-            src="/favicon.png"
+            src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
             alt={t("brand")}
             className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 drop-shadow-[0_8px_32px_rgba(168,85,247,0.35)]"
           />
@@ -401,10 +405,12 @@ function Row({
       ) : emptyLabel ? (
         <div className="py-12 flex flex-col items-center justify-center text-center">
           <img
-            src="/favicon.png"
+            src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
             alt=""
             aria-hidden="true"
-            className="w-14 h-14 opacity-70 mb-3"
+            className="w-14 h-14 md:w-16 md:h-16 opacity-70 mb-3"
           />
           <p className="text-sm font-medium">{emptyLabel}</p>
           {emptySub && (

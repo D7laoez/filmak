@@ -40,9 +40,11 @@ function FavoritesPage() {
         ) : !data || data.length === 0 ? (
           <div className="text-center py-16">
             <img
-              src="/favicon.png"
+              src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
               alt={t("brand")}
-              className="w-16 h-16 mx-auto mb-3 opacity-80"
+              className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 opacity-80"
             />
             <Heart className="w-6 h-6 mx-auto text-primary mb-3 fill-primary" />
             <p className="text-muted-foreground mb-4">

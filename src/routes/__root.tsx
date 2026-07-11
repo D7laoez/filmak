@@ -23,9 +23,11 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt={t("brand")}
-          className="w-20 h-20 mx-auto mb-4 opacity-90"
+          className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
@@ -59,9 +61,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <img
-          src="/favicon.png"
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
           alt={t("brand")}
-          className="w-16 h-16 mx-auto mb-4 opacity-90"
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           {t("error_title")}
@@ -101,7 +105,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   },
   head: ({ loaderData }) => {
     const origin = loaderData?.origin ?? "";
-    const ogImage = origin ? `${origin}/favicon.png` : "/favicon.png";
+    const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
     return {
     meta: [
       { charSet: "utf-8" },
@@ -129,6 +133,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "فيلمك — Filmak" },
       { property: "og:image", content: ogImage },
+      { property: "og:image:secure_url", content: ogImage },
+      { property: "og:image:type", content: "image/png" },
       { property: "og:image:alt", content: "فيلمك — Filmak" },
       { property: "og:image:width", content: "512" },
       { property: "og:image:height", content: "512" },
@@ -146,8 +152,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "icon", href: "/icon-32.png", sizes: "32x32", type: "image/png" },
+      { rel: "icon", href: "/icon-16.png", sizes: "16x16", type: "image/png" },
+      { rel: "icon", href: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { rel: "icon", href: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   };

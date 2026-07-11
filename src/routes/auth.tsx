@@ -76,7 +76,7 @@ function AuthPage() {
     >
       <div className="w-full max-w-md">
         <Link to="/" className="flex flex-col items-center justify-center gap-3 mb-8">
-          <img src="/favicon.png" alt={t("brand")} className="w-16 h-16" />
+          <img src="/icon-192.png" srcSet="/icon-192.png 1x, /icon-512.png 2x" decoding="async" alt={t("brand")} className="w-14 h-14 md:w-16 md:h-16" />
           <span className="text-2xl font-bold">{t("brand")}</span>
         </Link>
 
