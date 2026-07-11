@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags } from "lucide-react";
@@ -12,9 +12,18 @@ import {
   getUpcoming,
   searchMovies,
   getGenres,
-  getMoviesByGenre,
   type MovieCard,
 } from "@/lib/movies.functions";
+import {
+  getTrendingTv,
+  getPopularTv,
+  getTopRatedTv,
+  getOnAirTv,
+  getAiringTodayTv,
+  searchTv,
+  getTvGenres,
+  type TvCard,
+} from "@/lib/tv.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +32,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -102,24 +112,47 @@ function Home() {
     enabled: activeSearch.length > 0,
   });
 
-  const genres = useQuery({
+  const [tab, setTab] = useState<"movie" | "tv">("movie");
+  const searchTvRes = useQuery({
+    queryKey: ["search-tv", activeSearch, locale],
+    queryFn: () => searchTv({ data: { q: activeSearch, lang: locale } }),
+    enabled: activeSearch.length > 0 && tab === "tv",
+  });
+
+  const movieGenres = useQuery({
     queryKey: ["genres", locale],
     queryFn: () => getGenres({ data: { lang: locale } }),
   });
-  const [genreId, setGenreId] = useState<number | null>(null);
-  const [sort, setSort] = useState<
-    "popularity.desc" | "vote_average.desc" | "primary_release_date.desc"
-  >("popularity.desc");
-  const genreRes = useQuery({
-    queryKey: ["by-genre", genreId, sort, locale],
-    queryFn: () =>
-      getMoviesByGenre({
-        data: { genreId: genreId as number, lang: locale, sort, page: 1 },
-      }),
-    enabled: genreId !== null,
+  const tvGenres = useQuery({
+    queryKey: ["tv-genres", locale],
+    queryFn: () => getTvGenres({ data: { lang: locale } }),
   });
-  const activeGenreName =
-    genres.data?.find((g) => g.id === genreId)?.name ?? "";
+
+  const trendingTv = useQuery({
+    queryKey: ["trending-tv", locale],
+    queryFn: () => getTrendingTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const popularTv = useQuery({
+    queryKey: ["popular-tv", locale],
+    queryFn: () => getPopularTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const topRatedTv = useQuery({
+    queryKey: ["top-rated-tv", locale],
+    queryFn: () => getTopRatedTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const onAirTv = useQuery({
+    queryKey: ["on-air-tv", locale],
+    queryFn: () => getOnAirTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const airingTodayTv = useQuery({
+    queryKey: ["airing-today-tv", locale],
+    queryFn: () => getAiringTodayTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
 
   const [prompt, setPrompt] = useState("");
   const recMutation = useMutation({
@@ -168,10 +201,12 @@ function Home() {
               <Languages className="w-4 h-4" />
               {t("lang_switch")}
             </button>
+            <ThemeToggle />
             {user ? (
               <>
                 <Link
                   to="/favorites"
+                  search={{ tab: "favorite" }}
                   className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
                 >
                   <Heart className="w-4 h-4 text-primary" />
@@ -353,10 +388,18 @@ function Home() {
         <Row
           title={`${t("search_results")}: "${activeSearch}"`}
           icon={<Search className="w-5 h-5" />}
-          movies={searchRes.data ?? []}
-          loading={searchRes.isLoading}
+          movies={
+            tab === "tv"
+              ? (searchTvRes.data ?? []).map(tvToCard)
+              : (searchRes.data ?? [])
+          }
+          loading={tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading}
+          type={tab}
           emptyLabel={
-            !searchRes.isLoading && (searchRes.data ?? []).length === 0
+            !(tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading) &&
+            (tab === "tv"
+              ? (searchTvRes.data ?? []).length === 0
+              : (searchRes.data ?? []).length === 0)
               ? t("no_results")
               : undefined
           }
@@ -364,106 +407,68 @@ function Home() {
         />
       )}
 
-      {/* Genres */}
+      {/* Tabs: Movies / Series */}
       <section className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-          <h2 className="flex items-center gap-2 text-xl font-bold">
-            <Tags className="w-5 h-5 text-primary" />
-            {t("browse_by_genre")}
-          </h2>
-          {genreId !== null && (
-            <div className="flex items-center gap-1.5 text-xs">
-              {(
-                [
-                  ["popularity.desc", t("sort_popular")],
-                  ["vote_average.desc", t("sort_rating")],
-                  ["primary_release_date.desc", t("sort_newest")],
-                ] as const
-              ).map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => setSort(val)}
-                  className={`px-3 py-1.5 rounded-full border transition ${
-                    sort === val
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-secondary/60 border-border hover:bg-secondary"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2 border-b border-border/50 mb-6">
           <button
-            onClick={() => setGenreId(null)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition ${
-              genreId === null
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-secondary/60 border-border hover:bg-secondary"
+            onClick={() => setTab("movie")}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+              tab === "movie"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t("all_genres")}
+            <Film className="w-4 h-4" />
+            {t("tab_movies")}
           </button>
-          {(genres.data ?? []).map((g) => (
-            <button
+          <button
+            onClick={() => setTab("tv")}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+              tab === "tv"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            {t("tab_series")}
+          </button>
+        </div>
+
+        {/* Genre chips → link to /genre/$id */}
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+          <Tags className="w-4 h-4 text-primary" />
+          {t("browse_by_genre")}
+        </div>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {((tab === "tv" ? tvGenres.data : movieGenres.data) ?? []).map((g) => (
+            <Link
               key={g.id}
-              onClick={() => setGenreId(g.id)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                genreId === g.id
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-secondary/60 border-border hover:bg-secondary"
-              }`}
+              to="/genre/$id"
+              params={{ id: String(g.id) }}
+              search={{ type: tab, sort: "popularity.desc", page: 1 }}
+              className="text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
               {g.name}
-            </button>
+            </Link>
           ))}
         </div>
       </section>
 
-      {genreId !== null && (
-        <Row
-          title={`${t("genre_results")} ${activeGenreName}`}
-          icon={<Tags className="w-5 h-5 text-primary" />}
-          movies={genreRes.data ?? []}
-          loading={genreRes.isLoading}
-          emptyLabel={
-            !genreRes.isLoading && (genreRes.data ?? []).length === 0
-              ? t("no_results")
-              : undefined
-          }
-          emptySub={t("no_results_sub")}
-        />
-      )}
-
-      {genreId === null && (
+      {tab === "movie" ? (
         <>
-      <Row
-        title={t("trending")}
-        icon={<Flame className="w-5 h-5 text-accent" />}
-        movies={trending.data ?? []}
-      />
-      <Row
-        title={t("now_playing")}
-        icon={<Clapperboard className="w-5 h-5 text-accent" />}
-        movies={nowPlaying.data ?? []}
-      />
-      <Row
-        title={t("upcoming")}
-        icon={<CalendarClock className="w-5 h-5 text-primary" />}
-        movies={upcoming.data ?? []}
-      />
-      <Row
-        title={t("top_rated")}
-        icon={<Award className="w-5 h-5 text-primary" />}
-        movies={topRated.data ?? []}
-      />
-      <Row
-        title={t("popular")}
-        icon={<TrendingUp className="w-5 h-5" />}
-        movies={popular.data ?? []}
-      />
+          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={trending.data ?? []} />
+          <Row title={t("now_playing")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={nowPlaying.data ?? []} />
+          <Row title={t("upcoming")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={upcoming.data ?? []} />
+          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={topRated.data ?? []} />
+          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={popular.data ?? []} />
+        </>
+      ) : (
+        <>
+          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={(trendingTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("airing_today")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={(airingTodayTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("on_the_air")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={(onAirTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={(topRatedTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={(popularTv.data ?? []).map(tvToCard)} type="tv" />
         </>
       )}
 
@@ -481,6 +486,7 @@ function Row({
   loading,
   emptyLabel,
   emptySub,
+  type = "movie",
 }: {
   title: string;
   icon?: React.ReactNode;
@@ -488,6 +494,7 @@ function Row({
   loading?: boolean;
   emptyLabel?: string | false;
   emptySub?: string;
+  type?: "movie" | "tv";
 }) {
   const t = useLocale().t;
   return (
@@ -520,7 +527,7 @@ function Row({
           {movies.map((m) => (
             <Link
               key={m.id}
-              to="/movie/$id"
+              to={type === "tv" ? "/tv/$id" : "/movie/$id"}
               params={{ id: String(m.id) }}
               className="group block"
             >
@@ -564,4 +571,8 @@ function Row({
       )}
     </section>
   );
+}
+
+function tvToCard(t: TvCard): MovieCard {
+  return t as unknown as MovieCard;
 }

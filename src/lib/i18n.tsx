@@ -94,6 +94,45 @@ const DICT: Record<Locale, Dict> = {
     sort_rating: "الأعلى تقييماً",
     sort_newest: "الأحدث",
     genre_results: "أفلام تصنيف",
+    tab_movies: "أفلام",
+    tab_series: "مسلسلات",
+    airing_today: "تُعرض اليوم",
+    on_the_air: "على الشاشة",
+    seasons: "مواسم",
+    episodes: "حلقات",
+    share: "مشاركة",
+    copied: "تم نسخ الرابط",
+    load_more: "عرض المزيد",
+    year: "السنة",
+    min_rating: "الحد الأدنى للتقييم",
+    original_language: "اللغة الأصلية",
+    any: "الكل",
+    filters: "الفلاتر",
+    lang_ar: "عربي",
+    lang_en: "إنجليزي",
+    lang_ko: "كوري",
+    lang_ja: "ياباني",
+    lang_tr: "تركي",
+    lang_hi: "هندي",
+    lang_fr: "فرنسي",
+    lang_es: "إسباني",
+    add_watchlist: "أضف للمشاهدة لاحقاً",
+    in_watchlist: "في المشاهدة لاحقاً",
+    added_watchlist: "أُضيف لقائمة المشاهدة",
+    mark_watched: "شاهدته",
+    watched: "شاهدته",
+    marked_watched: "تم التعليم كمشاهد",
+    tab_favorites: "المفضلة",
+    tab_watchlist: "شاهد لاحقاً",
+    tab_watched: "شاهدته",
+    my_stats: "إحصائياتي",
+    stats_title: "إحصائياتك الشخصية",
+    total_items: "إجمالي العناصر",
+    average_rating: "متوسط تقييمك",
+    top_year: "أكثر سنة عندك",
+    movies_count: "أفلام",
+    tv_count: "مسلسلات",
+    your_rating: "تقييمك",
   },
   en: {
     brand: "Filmak",
@@ -179,6 +218,45 @@ const DICT: Record<Locale, Dict> = {
     sort_rating: "Top rated",
     sort_newest: "Newest",
     genre_results: "Movies in",
+    tab_movies: "Movies",
+    tab_series: "Series",
+    airing_today: "Airing today",
+    on_the_air: "On the air",
+    seasons: "seasons",
+    episodes: "episodes",
+    share: "Share",
+    copied: "Link copied",
+    load_more: "Load more",
+    year: "Year",
+    min_rating: "Min rating",
+    original_language: "Original language",
+    any: "Any",
+    filters: "Filters",
+    lang_ar: "Arabic",
+    lang_en: "English",
+    lang_ko: "Korean",
+    lang_ja: "Japanese",
+    lang_tr: "Turkish",
+    lang_hi: "Hindi",
+    lang_fr: "French",
+    lang_es: "Spanish",
+    add_watchlist: "Add to watchlist",
+    in_watchlist: "In watchlist",
+    added_watchlist: "Added to watchlist",
+    mark_watched: "Mark watched",
+    watched: "Watched",
+    marked_watched: "Marked as watched",
+    tab_favorites: "Favorites",
+    tab_watchlist: "Watch later",
+    tab_watched: "Watched",
+    my_stats: "My stats",
+    stats_title: "Your personal stats",
+    total_items: "Total items",
+    average_rating: "Your average rating",
+    top_year: "Top year",
+    movies_count: "Movies",
+    tv_count: "Series",
+    your_rating: "Your rating",
   },
 };
 
@@ -254,6 +332,45 @@ export type Dict = {
   sort_rating: string;
   sort_newest: string;
   genre_results: string;
+  tab_movies: string;
+  tab_series: string;
+  airing_today: string;
+  on_the_air: string;
+  seasons: string;
+  episodes: string;
+  share: string;
+  copied: string;
+  load_more: string;
+  year: string;
+  min_rating: string;
+  original_language: string;
+  any: string;
+  filters: string;
+  lang_ar: string;
+  lang_en: string;
+  lang_ko: string;
+  lang_ja: string;
+  lang_tr: string;
+  lang_hi: string;
+  lang_fr: string;
+  lang_es: string;
+  add_watchlist: string;
+  in_watchlist: string;
+  added_watchlist: string;
+  mark_watched: string;
+  watched: string;
+  marked_watched: string;
+  tab_favorites: string;
+  tab_watchlist: string;
+  tab_watched: string;
+  my_stats: string;
+  stats_title: string;
+  total_items: string;
+  average_rating: string;
+  top_year: string;
+  movies_count: string;
+  tv_count: string;
+  your_rating: string;
 };
 export type TKey = keyof Dict;
 
