@@ -47,6 +47,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_lists: {
+        Row: {
+          created_at: string
+          id: string
+          media_id: number
+          media_type: string
+          note: string | null
+          poster: string | null
+          rating: number | null
+          status: string
+          title: string
+          tmdb_rating: number | null
+          updated_at: string
+          user_id: string
+          year: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          media_id: number
+          media_type: string
+          note?: string | null
+          poster?: string | null
+          rating?: number | null
+          status: string
+          title: string
+          tmdb_rating?: number | null
+          updated_at?: string
+          user_id: string
+          year?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          media_id?: number
+          media_type?: string
+          note?: string | null
+          poster?: string | null
+          rating?: number | null
+          status?: string
+          title?: string
+          tmdb_rating?: number | null
+          updated_at?: string
+          user_id?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
