@@ -21,7 +21,7 @@ export function FavoriteButton({ movie, variant = "full" }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { t, dir } = useLocale();
+  const { t } = useLocale();
 
   const favs = useQuery({
     queryKey: ["favorites"],
