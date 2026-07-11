@@ -386,10 +386,18 @@ function Home() {
         <Row
           title={`${t("search_results")}: "${activeSearch}"`}
           icon={<Search className="w-5 h-5" />}
-          movies={searchRes.data ?? []}
-          loading={searchRes.isLoading}
+          movies={
+            tab === "tv"
+              ? (searchTvRes.data ?? []).map(tvToCard)
+              : (searchRes.data ?? [])
+          }
+          loading={tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading}
+          type={tab}
           emptyLabel={
-            !searchRes.isLoading && (searchRes.data ?? []).length === 0
+            !(tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading) &&
+            (tab === "tv"
+              ? (searchTvRes.data ?? []).length === 0
+              : (searchRes.data ?? []).length === 0)
               ? t("no_results")
               : undefined
           }
@@ -397,106 +405,68 @@ function Home() {
         />
       )}
 
-      {/* Genres */}
+      {/* Tabs: Movies / Series */}
       <section className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-          <h2 className="flex items-center gap-2 text-xl font-bold">
-            <Tags className="w-5 h-5 text-primary" />
-            {t("browse_by_genre")}
-          </h2>
-          {genreId !== null && (
-            <div className="flex items-center gap-1.5 text-xs">
-              {(
-                [
-                  ["popularity.desc", t("sort_popular")],
-                  ["vote_average.desc", t("sort_rating")],
-                  ["primary_release_date.desc", t("sort_newest")],
-                ] as const
-              ).map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => setSort(val)}
-                  className={`px-3 py-1.5 rounded-full border transition ${
-                    sort === val
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-secondary/60 border-border hover:bg-secondary"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2 border-b border-border/50 mb-6">
           <button
-            onClick={() => setGenreId(null)}
-            className={`text-xs px-3 py-1.5 rounded-full border transition ${
-              genreId === null
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-secondary/60 border-border hover:bg-secondary"
+            onClick={() => setTab("movie")}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+              tab === "movie"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t("all_genres")}
+            <Film className="w-4 h-4" />
+            {t("tab_movies")}
           </button>
-          {(genres.data ?? []).map((g) => (
-            <button
+          <button
+            onClick={() => setTab("tv")}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+              tab === "tv"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            {t("tab_series")}
+          </button>
+        </div>
+
+        {/* Genre chips → link to /genre/$id */}
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+          <Tags className="w-4 h-4 text-primary" />
+          {t("browse_by_genre")}
+        </div>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {((tab === "tv" ? tvGenres.data : movieGenres.data) ?? []).map((g) => (
+            <Link
               key={g.id}
-              onClick={() => setGenreId(g.id)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                genreId === g.id
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-secondary/60 border-border hover:bg-secondary"
-              }`}
+              to="/genre/$id"
+              params={{ id: String(g.id) }}
+              search={{ type: tab, sort: "popularity.desc", page: 1 }}
+              className="text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
               {g.name}
-            </button>
+            </Link>
           ))}
         </div>
       </section>
 
-      {genreId !== null && (
-        <Row
-          title={`${t("genre_results")} ${activeGenreName}`}
-          icon={<Tags className="w-5 h-5 text-primary" />}
-          movies={genreRes.data ?? []}
-          loading={genreRes.isLoading}
-          emptyLabel={
-            !genreRes.isLoading && (genreRes.data ?? []).length === 0
-              ? t("no_results")
-              : undefined
-          }
-          emptySub={t("no_results_sub")}
-        />
-      )}
-
-      {genreId === null && (
+      {tab === "movie" ? (
         <>
-      <Row
-        title={t("trending")}
-        icon={<Flame className="w-5 h-5 text-accent" />}
-        movies={trending.data ?? []}
-      />
-      <Row
-        title={t("now_playing")}
-        icon={<Clapperboard className="w-5 h-5 text-accent" />}
-        movies={nowPlaying.data ?? []}
-      />
-      <Row
-        title={t("upcoming")}
-        icon={<CalendarClock className="w-5 h-5 text-primary" />}
-        movies={upcoming.data ?? []}
-      />
-      <Row
-        title={t("top_rated")}
-        icon={<Award className="w-5 h-5 text-primary" />}
-        movies={topRated.data ?? []}
-      />
-      <Row
-        title={t("popular")}
-        icon={<TrendingUp className="w-5 h-5" />}
-        movies={popular.data ?? []}
-      />
+          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={trending.data ?? []} />
+          <Row title={t("now_playing")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={nowPlaying.data ?? []} />
+          <Row title={t("upcoming")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={upcoming.data ?? []} />
+          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={topRated.data ?? []} />
+          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={popular.data ?? []} />
+        </>
+      ) : (
+        <>
+          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={(trendingTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("airing_today")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={(airingTodayTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("on_the_air")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={(onAirTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={(topRatedTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={(popularTv.data ?? []).map(tvToCard)} type="tv" />
         </>
       )}
 
