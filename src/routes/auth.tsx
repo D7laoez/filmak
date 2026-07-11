@@ -4,6 +4,7 @@ import { Film, Loader2, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useLocale } from "@/lib/i18n";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -74,8 +75,8 @@ function AuthPage() {
       className="min-h-screen flex items-center justify-center bg-background text-foreground px-4"
     >
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <Film className="w-7 h-7 text-primary" />
+        <Link to="/" className="flex flex-col items-center justify-center gap-3 mb-8">
+          <img src="/favicon.png" alt={t("brand")} className="w-16 h-16" />
           <span className="text-2xl font-bold">{t("brand")}</span>
         </Link>
 
