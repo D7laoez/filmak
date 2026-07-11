@@ -224,36 +224,69 @@ function Home() {
                 <p className="text-muted-foreground mb-4">{recMutation.data.intro}</p>
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recMutation.data.recommendations.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/movie/$id"
-                    params={{ id: String(r.id) }}
-                    className="group flex gap-4 bg-card border border-border rounded-xl p-3 hover:border-primary/50 transition"
-                  >
-                    {r.poster ? (
-                      <img
-                        src={r.poster}
-                        alt={r.title}
-                        className="w-20 h-28 object-cover rounded-md shrink-0"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-20 h-28 rounded-md bg-muted shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold truncate">{r.title}</h3>
-                        <span className="text-xs text-muted-foreground">{r.year}</span>
+                {recMutation.data.recommendations.map((r) => {
+                  const isTv = r.mediaType === "tv";
+                  const body = (
+                    <>
+                      {r.poster ? (
+                        <img
+                          src={r.poster}
+                          alt={r.title}
+                          className="w-20 h-28 object-cover rounded-md shrink-0"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-20 h-28 rounded-md bg-muted shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className="font-semibold truncate">{r.title}</h3>
+                          <span className="text-xs text-muted-foreground">{r.year}</span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                              isTv
+                                ? "bg-accent/20 text-accent border border-accent/40"
+                                : "bg-primary/15 text-primary border border-primary/30"
+                            }`}
+                          >
+                            {isTv ? <Tv className="w-3 h-3" /> : <Film className="w-3 h-3" />}
+                            {isTv ? "مسلسل" : "فلم"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-primary mb-2">
+                          <Star className="w-3 h-3 fill-primary" />
+                          {r.rating}
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-3">{r.reason}</p>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-primary mb-2">
-                        <Star className="w-3 h-3 fill-primary" />
-                        {r.rating}
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3">{r.reason}</p>
-                    </div>
-                  </Link>
-                ))}
+                    </>
+                  );
+                  const cls =
+                    "group flex gap-4 bg-card border border-border rounded-xl p-3 hover:border-primary/50 transition";
+                  if (isTv) {
+                    return (
+                      <a
+                        key={`tv-${r.id}`}
+                        href={`https://www.themoviedb.org/tv/${r.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cls}
+                      >
+                        {body}
+                      </a>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={`movie-${r.id}`}
+                      to="/movie/$id"
+                      params={{ id: String(r.id) }}
+                      className={cls}
+                    >
+                      {body}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
