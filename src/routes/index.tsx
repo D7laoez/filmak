@@ -1,7 +1,7 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User } from "lucide-react";
 import {
   getTrending,
   getTopRated,
@@ -12,6 +12,11 @@ import {
   type MovieCard,
 } from "@/lib/movies.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -51,6 +56,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const trending = useQuery({ queryKey: ["trending"], queryFn: () => getTrending() });
   const topRated = useQuery({ queryKey: ["top-rated"], queryFn: () => getTopRated() });
   const popular = useQuery({ queryKey: ["popular"], queryFn: () => getPopular() });
@@ -78,14 +86,21 @@ function Home() {
     "أفلام أكشن قوية بمشاهد قتال",
   ];
 
+  async function handleSignOut() {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    toast.success("تم تسجيل الخروج");
+  }
+
   return (
     <div dir="rtl" className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <Film className="w-6 h-6 text-primary" />
             <span className="text-xl font-bold">سينمائي</span>
-          </div>
+          </Link>
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
@@ -101,6 +116,34 @@ function Home() {
               className="w-full bg-secondary/60 border border-border rounded-full pr-10 pl-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50"
             />
           </form>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                <Link
+                  to="/favorites"
+                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+                >
+                  <Heart className="w-4 h-4 text-primary" />
+                  <span className="hidden sm:inline">مفضلتي</span>
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+                  aria-label="تسجيل الخروج"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate({ to: "/auth" })}
+                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
+              >
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">دخول</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -304,6 +347,16 @@ function Row({
                   <Star className="w-3 h-3 fill-primary text-primary" />
                   {m.rating}
                 </div>
+                <FavoriteButton
+                  movie={{
+                    id: m.id,
+                    title: m.title,
+                    poster: m.poster,
+                    year: m.year,
+                    rating: m.rating,
+                  }}
+                  variant="icon"
+                />
               </div>
               <div className="mt-2">
                 <h3 className="text-sm font-medium truncate group-hover:text-primary transition">
