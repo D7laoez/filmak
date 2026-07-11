@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv } from "lucide-react";
 import {
   getTrending,
   getTopRated,
@@ -80,10 +80,12 @@ function Home() {
 
   const suggestions = [
     "فلم إثارة نفسي مثل Inception بس أقصر",
-    "أفلام عائلية مضحكة للأطفال",
+    "افلام مصرية مضحكة قديمة",
+    "مسلسلات تركية رومانسية",
+    "مسلسلات كورية إثارة وغموض",
     "أفلام رعب حديثة مو مبتذلة",
-    "أفلام رومانسية هادئة قبل النوم",
-    "أفلام أكشن قوية بمشاهد قتال",
+    "أنمي أكشن قوي",
+    "افلام هندية عائلية",
   ];
 
   async function handleSignOut() {
