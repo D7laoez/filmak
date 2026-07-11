@@ -364,6 +364,81 @@ function Home() {
         />
       )}
 
+      {/* Genres */}
+      <section className="max-w-7xl mx-auto px-4 pt-8">
+        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+          <h2 className="flex items-center gap-2 text-xl font-bold">
+            <Tags className="w-5 h-5 text-primary" />
+            {t("browse_by_genre")}
+          </h2>
+          {genreId !== null && (
+            <div className="flex items-center gap-1.5 text-xs">
+              {(
+                [
+                  ["popularity.desc", t("sort_popular")],
+                  ["vote_average.desc", t("sort_rating")],
+                  ["primary_release_date.desc", t("sort_newest")],
+                ] as const
+              ).map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setSort(val)}
+                  className={`px-3 py-1.5 rounded-full border transition ${
+                    sort === val
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-secondary/60 border-border hover:bg-secondary"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setGenreId(null)}
+            className={`text-xs px-3 py-1.5 rounded-full border transition ${
+              genreId === null
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-secondary/60 border-border hover:bg-secondary"
+            }`}
+          >
+            {t("all_genres")}
+          </button>
+          {(genres.data ?? []).map((g) => (
+            <button
+              key={g.id}
+              onClick={() => setGenreId(g.id)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                genreId === g.id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-secondary/60 border-border hover:bg-secondary"
+              }`}
+            >
+              {g.name}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {genreId !== null && (
+        <Row
+          title={`${t("genre_results")} ${activeGenreName}`}
+          icon={<Tags className="w-5 h-5 text-primary" />}
+          movies={genreRes.data ?? []}
+          loading={genreRes.isLoading}
+          emptyLabel={
+            !genreRes.isLoading && (genreRes.data ?? []).length === 0
+              ? t("no_results")
+              : undefined
+          }
+          emptySub={t("no_results_sub")}
+        />
+      )}
+
+      {genreId === null && (
+        <>
       <Row
         title={t("trending")}
         icon={<Flame className="w-5 h-5 text-accent" />}
@@ -389,6 +464,8 @@ function Home() {
         icon={<TrendingUp className="w-5 h-5" />}
         movies={popular.data ?? []}
       />
+        </>
+      )}
 
       <footer className="border-t border-border/40 mt-16 py-8 text-center text-xs text-muted-foreground">
         {t("footer")}
