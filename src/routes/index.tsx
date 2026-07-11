@@ -201,6 +201,7 @@ function Home() {
               <Languages className="w-4 h-4" />
               {t("lang_switch")}
             </button>
+            <ThemeToggle />
             {user ? (
               <>
                 <Link
