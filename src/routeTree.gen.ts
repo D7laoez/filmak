@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 
@@ -27,6 +28,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TvIdRoute = TvIdRouteImport.update({
+  id: '/tv/$id',
+  path: '/tv/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieIdRoute = MovieIdRouteImport.update({
@@ -45,12 +51,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/movie/$id': typeof MovieIdRoute
+  '/tv/$id': typeof TvIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/movie/$id': typeof MovieIdRoute
+  '/tv/$id': typeof TvIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/movie/$id': typeof MovieIdRoute
+  '/tv/$id': typeof TvIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/favorites' | '/movie/$id'
+  fullPaths: '/' | '/auth' | '/favorites' | '/movie/$id' | '/tv/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/favorites' | '/movie/$id'
+  to: '/' | '/auth' | '/favorites' | '/movie/$id' | '/tv/$id'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/favorites'
     | '/movie/$id'
+    | '/tv/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -79,6 +89,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   MovieIdRoute: typeof MovieIdRoute
+  TvIdRoute: typeof TvIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -102,6 +113,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tv/$id': {
+      id: '/tv/$id'
+      path: '/tv/$id'
+      fullPath: '/tv/$id'
+      preLoaderRoute: typeof TvIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$id': {
@@ -137,6 +155,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   MovieIdRoute: MovieIdRoute,
+  TvIdRoute: TvIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
