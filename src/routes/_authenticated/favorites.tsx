@@ -2,24 +2,26 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, Star, Film, Loader2 } from "lucide-react";
 import { listFavorites } from "@/lib/favorites.functions";
+import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/favorites")({
   component: FavoritesPage,
 });
 
 function FavoritesPage() {
+  const { dir, t } = useLocale();
   const { data, isLoading } = useQuery({
     queryKey: ["favorites"],
     queryFn: () => listFavorites(),
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background text-foreground">
+    <div dir={dir} className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <Film className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">سينمائي</span>
+            <span className="text-xl font-bold">{t("brand")}</span>
           </Link>
         </div>
       </header>
@@ -27,24 +29,24 @@ function FavoritesPage() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center gap-2 mb-6">
           <Heart className="w-6 h-6 fill-primary text-primary" />
-          <h1 className="text-2xl font-bold">أفلامي المفضلة</h1>
+          <h1 className="text-2xl font-bold">{t("favorites_title")}</h1>
         </div>
 
         {isLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" /> يحمّل…
+            <Loader2 className="w-4 h-4 animate-spin" /> {t("loading")}
           </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-16">
             <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
             <p className="text-muted-foreground mb-4">
-              ما عندك أفلام مفضلة بعد. تصفح واضغط القلب على أي فلم لحفظه هنا.
+              {t("favorites_empty")}
             </p>
             <Link
               to="/"
               className="inline-block bg-primary text-primary-foreground rounded-xl px-5 py-2.5 text-sm font-medium"
             >
-              اكتشف أفلاماً
+              {t("discover")}
             </Link>
           </div>
         ) : (
