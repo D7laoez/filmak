@@ -206,6 +206,7 @@ function Home() {
               <>
                 <Link
                   to="/favorites"
+                  search={{ tab: "favorite" }}
                   className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
                 >
                   <Heart className="w-4 h-4 text-primary" />
