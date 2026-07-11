@@ -1,10 +1,12 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
-import { ArrowRight, Star, Clock, Calendar, Play, Loader2, Film } from "lucide-react";
+import { ArrowRight, Star, Clock, Calendar, Play, Film } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useLocale } from "@/lib/i18n";
+import { Spinner } from "@/components/Spinner";
+import { useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -17,11 +19,17 @@ export const Route = createFileRoute("/movie/$id")({
   },
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
+    const t = useT();
     return (
       <div className="min-h-screen flex items-center justify-center p-6 text-center">
         <div>
-          <h1 className="text-2xl font-bold mb-2">Error</h1>
-          <p className="text-muted-foreground mb-4">{error.message}</p>
+          <img
+            src="/favicon.png"
+            alt={t("brand")}
+            className="w-16 h-16 mx-auto mb-4 opacity-90"
+          />
+          <h1 className="text-2xl font-bold mb-2">{t("error_load_movie")}</h1>
+          <p className="text-muted-foreground mb-4 text-sm">{error.message}</p>
           <button
             onClick={() => {
               router.invalidate();
@@ -29,26 +37,49 @@ export const Route = createFileRoute("/movie/$id")({
             }}
             className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
           >
-            Retry
+            {t("retry")}
           </button>
         </div>
       </div>
     );
   },
-  notFoundComponent: () => <div className="p-8">404</div>,
+  notFoundComponent: NotFoundInline,
 });
 
 function MoviePage() {
+  const t = useT();
   return (
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <Spinner size={64} label={t("loading")} />
         </div>
       }
     >
       <Content />
     </Suspense>
+  );
+}
+
+function NotFoundInline() {
+  const t = useT();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 text-center">
+      <div>
+        <img
+          src="/favicon.png"
+          alt={t("brand")}
+          className="w-16 h-16 mx-auto mb-4 opacity-90"
+        />
+        <h1 className="text-xl font-bold mb-2">{t("page_not_found_title")}</h1>
+        <Link
+          to="/"
+          className="inline-block mt-2 bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
+        >
+          {t("go_home")}
+        </Link>
+      </div>
+    </div>
   );
 }
 
