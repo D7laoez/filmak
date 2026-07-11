@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-r
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import {
   getTrending,
   getTopRated,
@@ -110,8 +111,7 @@ function Home() {
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Film className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">{t("brand")}</span>
+            <Logo size={32} />
           </Link>
           <form
             onSubmit={(e: FormEvent) => {
