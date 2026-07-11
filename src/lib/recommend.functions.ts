@@ -3,6 +3,7 @@ import { z } from "zod";
 
 type Rec = {
   id: number;
+  mediaType: "movie" | "tv";
   title: string;
   poster: string | null;
   year: string;
@@ -11,57 +12,169 @@ type Rec = {
   reason: string;
 };
 
+type Intent = {
+  kinds: ("movie" | "tv")[];
+  country: string | null; // ISO 3166-1 alpha-2, e.g. EG, SA, US, KR, JP, IN, TR
+  language: string | null; // ISO 639-1, e.g. ar, en, ko, ja, tr, hi
+  genres: string[];
+  min_year: number | null;
+  max_year: number | null;
+  mood: string | null;
+};
+
 export const recommendMovies = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ prompt: z.string().min(2).max(500) }).parse(d))
   .handler(async ({ data }): Promise<{ recommendations: Rec[]; intro: string }> => {
-    const systemPrompt =
-      'أنت خبير أفلام ومرشح ذكي. المستخدم يصف ما يريد مشاهدته، ورد بـ JSON فقط بهذا الشكل: {"intro": "جملة قصيرة", "movies": [{"title": "العنوان بالإنجليزية", "year": "YYYY", "reason": "لماذا يناسبه بالعربية في جملة قصيرة"}]}. اذكر 6 أفلام حقيقية معروفة على TMDB. عناوين الأفلام بالإنجليزية دائماً.';
-
-    const content = await callAIWithFallback(systemPrompt, data.prompt);
-    let parsed: { intro?: string; movies?: { title: string; year?: string; reason: string }[] };
-    try {
-      parsed = JSON.parse(extractJson(content));
-    } catch {
-      parsed = { movies: [] };
-    }
-
     const tmdbKey = process.env.TMDB_API_KEY;
     if (!tmdbKey) throw new Error("TMDB_API_KEY missing");
 
-    const list = parsed.movies || [];
+    const systemPrompt = `أنت خبير سينما ومسلسلات عالمي. مهمتك فهم رغبة المستخدم بدقة ثم ترشيح أعمال حقيقية موجودة على TMDB.
+
+حلّل الطلب أولاً ثم أعد JSON فقط بهذا الشكل حرفياً:
+{
+  "intent": {
+    "kinds": ["movie"] أو ["tv"] أو ["movie","tv"],
+    "country": رمز الدولة ISO مثل "EG" "SA" "US" "KR" "JP" "TR" "IN" أو null,
+    "language": رمز اللغة ISO مثل "ar" "en" "ko" "ja" "tr" "hi" أو null,
+    "genres": ["comedy","action",...],
+    "min_year": رقم أو null,
+    "max_year": رقم أو null,
+    "mood": "وصف قصير للمزاج" أو null
+  },
+  "intro": "جملة قصيرة تشرح الاختيار بالعربية",
+  "items": [
+    { "kind": "movie" أو "tv", "title": "العنوان بالإنجليزية", "year": "YYYY", "reason": "سبب مناسبته بالعربية" }
+  ]
+}
+
+قواعد صارمة:
+- إذا طلب "فلم/افلام" فقط → kinds = ["movie"] ولا تضف مسلسلات.
+- إذا طلب "مسلسل/مسلسلات" فقط → kinds = ["tv"] ولا تضف أفلام.
+- إذا طلب "شي/عمل" أو ذكر الاثنين → kinds = ["movie","tv"] وامزج بينهما.
+- إذا ذكر جنسية أو لهجة (مصري، سوري، خليجي، تركي، كوري، هندي، ياباني) اضبط country و language بدقة.
+  - مصري → country "EG" language "ar"
+  - سوري/لبناني/خليجي/عربي → language "ar" مع country مناسبة
+  - تركي → country "TR" language "tr"
+  - كوري → country "KR" language "ko"
+  - ياباني → country "JP" language "ja"
+  - هندي/بوليوود → country "IN" language "hi"
+- التزم بالمزاج (مضحك، رعب، رومانسي، إثارة، أكشن، درامي، إلخ).
+- 8 اقتراحات على الأقل من أعمال حقيقية معروفة على TMDB.
+- عناوين الأعمال بالإنجليزية دائماً (كما تظهر في TMDB).
+- لا تضف أي نص خارج JSON.`;
+
+    const content = await callAIWithFallback(systemPrompt, data.prompt);
+    let parsed: {
+      intent?: Partial<Intent>;
+      intro?: string;
+      items?: { kind?: "movie" | "tv"; title: string; year?: string; reason: string }[];
+      // legacy fallback
+      movies?: { title: string; year?: string; reason: string }[];
+    };
+    try {
+      parsed = JSON.parse(extractJson(content));
+    } catch {
+      parsed = {};
+    }
+
+    const intent: Intent = {
+      kinds: parsed.intent?.kinds?.length ? parsed.intent.kinds : ["movie", "tv"],
+      country: parsed.intent?.country ?? null,
+      language: parsed.intent?.language ?? null,
+      genres: parsed.intent?.genres ?? [],
+      min_year: parsed.intent?.min_year ?? null,
+      max_year: parsed.intent?.max_year ?? null,
+      mood: parsed.intent?.mood ?? null,
+    };
+
+    const raw = parsed.items?.length
+      ? parsed.items
+      : (parsed.movies || []).map((m) => ({ ...m, kind: "movie" as const }));
+
+    // Enforce intent.kinds
+    const items = raw.filter((it) => {
+      const k = it.kind || "movie";
+      return intent.kinds.includes(k);
+    });
+
     const results = await Promise.all(
-      list.map(async (m) => {
-        try {
-          const url = new URL("https://api.themoviedb.org/3/search/movie");
-          url.searchParams.set("api_key", tmdbKey);
-          url.searchParams.set("language", "ar");
-          url.searchParams.set("query", m.title);
-          if (m.year) url.searchParams.set("year", m.year);
-          const r = await fetch(url.toString());
-          if (!r.ok) return null;
-          const j = await r.json();
-          const hit = j.results?.[0];
-          if (!hit) return null;
-          return {
-            id: hit.id,
-            title: hit.title || hit.original_title,
-            poster: hit.poster_path ? `https://image.tmdb.org/t/p/w500${hit.poster_path}` : null,
-            year: (hit.release_date || "").slice(0, 4),
-            rating: Math.round((hit.vote_average || 0) * 10) / 10,
-            overview: hit.overview || "",
-            reason: m.reason,
-          } satisfies Rec;
-        } catch {
-          return null;
-        }
+      items.map(async (m) => {
+        const kind: "movie" | "tv" = m.kind || "movie";
+        const hit = await tmdbSearchBest(tmdbKey, kind, m.title, m.year, intent);
+        if (!hit) return null;
+        const dateField = kind === "movie" ? hit.release_date : hit.first_air_date;
+        return {
+          id: hit.id,
+          mediaType: kind,
+          title: hit.title || hit.name || hit.original_title || hit.original_name,
+          poster: hit.poster_path ? `https://image.tmdb.org/t/p/w500${hit.poster_path}` : null,
+          year: (dateField || "").slice(0, 4),
+          rating: Math.round((hit.vote_average || 0) * 10) / 10,
+          overview: hit.overview || "",
+          reason: m.reason,
+        } satisfies Rec;
       }),
     );
 
+    // Deduplicate by mediaType+id
+    const seen = new Set<string>();
+    const dedup = results.filter((r): r is Rec => {
+      if (!r || !r.poster) return false;
+      const key = `${r.mediaType}:${r.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
     return {
       intro: parsed.intro || "",
-      recommendations: results.filter((r): r is Rec => r !== null && r.poster !== null),
+      recommendations: dedup,
     };
   });
+
+async function tmdbSearchBest(
+  key: string,
+  kind: "movie" | "tv",
+  title: string,
+  year: string | undefined,
+  intent: Intent,
+): Promise<any | null> {
+  try {
+    const url = new URL(`https://api.themoviedb.org/3/search/${kind}`);
+    url.searchParams.set("api_key", key);
+    url.searchParams.set("language", "ar");
+    url.searchParams.set("query", title);
+    url.searchParams.set("include_adult", "false");
+    if (year) {
+      if (kind === "movie") url.searchParams.set("year", year);
+      else url.searchParams.set("first_air_date_year", year);
+    }
+    const r = await fetch(url.toString());
+    if (!r.ok) return null;
+    const j = await r.json();
+    const list: any[] = (j.results || []).filter((x: any) => x.poster_path);
+    if (list.length === 0) return null;
+
+    // Score candidates by language/country match + popularity
+    const scored = list.map((it) => {
+      let score = it.popularity || 0;
+      if (intent.language && it.original_language === intent.language) score += 100;
+      if (intent.country) {
+        const countries: string[] = it.origin_country || [];
+        if (countries.includes(intent.country)) score += 150;
+      }
+      if (year) {
+        const d = it.release_date || it.first_air_date || "";
+        if (d.startsWith(year)) score += 30;
+      }
+      return { it, score };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    return scored[0].it;
+  } catch {
+    return null;
+  }
+}
 
 function extractJson(text: string): string {
   const t = text.trim();
