@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ArrowRight, Star, Clock, Calendar, Play, Loader2, Film } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -133,15 +134,39 @@ function Content() {
             <p className="text-base leading-relaxed max-w-3xl">{data.overview}</p>
 
             {data.trailerKey && (
-              <a
-                href={`https://www.youtube.com/watch?v=${data.trailerKey}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-6 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-medium hover:opacity-90 transition"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                شاهد الإعلان الرسمي
-              </a>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href={`https://www.youtube.com/watch?v=${data.trailerKey}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-medium hover:opacity-90 transition"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  شاهد الإعلان الرسمي
+                </a>
+                <FavoriteButton
+                  movie={{
+                    id: data.id,
+                    title: data.title,
+                    poster: data.poster,
+                    year: data.year,
+                    rating: data.rating,
+                  }}
+                />
+              </div>
+            )}
+            {!data.trailerKey && (
+              <div className="mt-6">
+                <FavoriteButton
+                  movie={{
+                    id: data.id,
+                    title: data.title,
+                    poster: data.poster,
+                    year: data.year,
+                    rating: data.rating,
+                  }}
+                />
+              </div>
             )}
           </div>
         </div>
