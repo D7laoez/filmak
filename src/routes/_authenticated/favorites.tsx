@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Heart, Star, Film, Loader2 } from "lucide-react";
 import { listFavorites } from "@/lib/favorites.functions";
 import { useLocale } from "@/lib/i18n";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/_authenticated/favorites")({
   component: FavoritesPage,
@@ -20,8 +21,7 @@ function FavoritesPage() {
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Film className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">{t("brand")}</span>
+            <Logo size={32} />
           </Link>
         </div>
       </header>

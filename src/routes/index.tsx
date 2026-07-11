@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-r
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import {
   getTrending,
   getTopRated,
@@ -110,8 +111,7 @@ function Home() {
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Film className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold">{t("brand")}</span>
+            <Logo size={32} />
           </Link>
           <form
             onSubmit={(e: FormEvent) => {
@@ -173,6 +173,11 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-accent/5 to-transparent pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
+          <img
+            src="/favicon.png"
+            alt={t("brand")}
+            className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 drop-shadow-[0_8px_32px_rgba(168,85,247,0.35)]"
+          />
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             {t("tagline_ai")}
