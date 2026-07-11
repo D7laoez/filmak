@@ -159,6 +159,14 @@ const DICT: Record<Locale, Dict> = {
       "Strong action anime",
       "Family-friendly Indian films",
     ] as string[],
+    page_not_found_title: "Page not found",
+    page_not_found_sub:
+      "The link you opened doesn't lead anywhere. Head back to the home page to start over.",
+    go_home: "Back to home",
+    error_title: "Something went wrong",
+    error_sub: "Try refreshing the page. If it keeps failing, let us know.",
+    no_results: "No results found",
+    no_results_sub: "Try different words or shorten your search.",
   },
 };
 
