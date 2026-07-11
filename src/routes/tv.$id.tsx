@@ -140,7 +140,7 @@ function Content() {
                   <Play className="w-4 h-4 fill-current" />{t("watch_trailer")}
                 </a>
               )}
-              <FavoriteButton movie={{ id: data.id, title: data.title, poster: data.poster, year: data.year, rating: data.rating }} />
+              <FavoriteButton mediaType="tv" movie={{ id: data.id, title: data.title, poster: data.poster, year: data.year, rating: data.rating }} />
               <ShareButton title={data.title} text={data.overview?.slice(0, 120)} />
             </div>
           </div>
