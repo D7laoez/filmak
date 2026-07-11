@@ -94,6 +94,28 @@ const DICT: Record<Locale, Dict> = {
     sort_rating: "الأعلى تقييماً",
     sort_newest: "الأحدث",
     genre_results: "أفلام تصنيف",
+    tab_movies: "أفلام",
+    tab_series: "مسلسلات",
+    airing_today: "تُعرض اليوم",
+    on_the_air: "على الشاشة",
+    seasons: "مواسم",
+    episodes: "حلقات",
+    share: "مشاركة",
+    copied: "تم نسخ الرابط",
+    load_more: "عرض المزيد",
+    year: "السنة",
+    min_rating: "الحد الأدنى للتقييم",
+    original_language: "اللغة الأصلية",
+    any: "الكل",
+    filters: "الفلاتر",
+    lang_ar: "عربي",
+    lang_en: "إنجليزي",
+    lang_ko: "كوري",
+    lang_ja: "ياباني",
+    lang_tr: "تركي",
+    lang_hi: "هندي",
+    lang_fr: "فرنسي",
+    lang_es: "إسباني",
   },
   en: {
     brand: "Filmak",
@@ -179,6 +201,28 @@ const DICT: Record<Locale, Dict> = {
     sort_rating: "Top rated",
     sort_newest: "Newest",
     genre_results: "Movies in",
+    tab_movies: "Movies",
+    tab_series: "Series",
+    airing_today: "Airing today",
+    on_the_air: "On the air",
+    seasons: "seasons",
+    episodes: "episodes",
+    share: "Share",
+    copied: "Link copied",
+    load_more: "Load more",
+    year: "Year",
+    min_rating: "Min rating",
+    original_language: "Original language",
+    any: "Any",
+    filters: "Filters",
+    lang_ar: "Arabic",
+    lang_en: "English",
+    lang_ko: "Korean",
+    lang_ja: "Japanese",
+    lang_tr: "Turkish",
+    lang_hi: "Hindi",
+    lang_fr: "French",
+    lang_es: "Spanish",
   },
 };
 
@@ -254,6 +298,28 @@ export type Dict = {
   sort_rating: string;
   sort_newest: string;
   genre_results: string;
+  tab_movies: string;
+  tab_series: string;
+  airing_today: string;
+  on_the_air: string;
+  seasons: string;
+  episodes: string;
+  share: string;
+  copied: string;
+  load_more: string;
+  year: string;
+  min_rating: string;
+  original_language: string;
+  any: string;
+  filters: string;
+  lang_ar: string;
+  lang_en: string;
+  lang_ko: string;
+  lang_ja: string;
+  lang_tr: string;
+  lang_hi: string;
+  lang_fr: string;
+  lang_es: string;
 };
 export type TKey = keyof Dict;
 
