@@ -81,6 +81,13 @@ const DICT: Record<Locale, Dict> = {
       "أنمي أكشن قوي",
       "افلام هندية عائلية",
     ] as string[],
+    page_not_found_title: "الصفحة غير موجودة",
+    page_not_found_sub: "الرابط اللي فتحته ما يقود لأي صفحة. رجّع للرئيسية وابدأ من هناك.",
+    go_home: "الرجوع للرئيسية",
+    error_title: "صار خطأ ما توقعناه",
+    error_sub: "حاول تحديث الصفحة، وإذا رجع الخطأ راسلنا.",
+    no_results: "ما لقينا نتائج",
+    no_results_sub: "جرّب كلمات ثانية أو اختصر البحث.",
   },
   en: {
     brand: "Filmak",
