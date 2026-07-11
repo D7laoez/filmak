@@ -39,8 +39,11 @@ export const recommendMovies = createServerFn({ method: "POST" })
 
     if (!aiRes.ok) {
       const text = await aiRes.text();
-      if (aiRes.status === 429) throw new Error("تم تجاوز الحد المسموح، حاول بعد قليل");
-      if (aiRes.status === 402) throw new Error("رصيد الذكاء الاصطناعي منتهي");
+      if (aiRes.status === 429) throw new Error("تم تجاوز الحد المسموح، حاول بعد دقيقة");
+      if (aiRes.status === 402)
+        throw new Error(
+          "انتهى رصيد الذكاء الاصطناعي للمساحة. أضف رصيد من إعدادات Lovable → Plans & credits ثم أعد المحاولة.",
+        );
       throw new Error(`AI error: ${text}`);
     }
 
