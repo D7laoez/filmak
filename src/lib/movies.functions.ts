@@ -26,19 +26,31 @@ function toCard(m: any): MovieCard {
 export const getTrending = createServerFn({ method: "GET" }).handler(async () => {
   const { tmdbGet } = await import("./tmdb.server");
   const data = await tmdbGet<{ results: any[] }>("/trending/movie/week");
-  return data.results.slice(0, 18).map(toCard);
+  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
 });
 
 export const getTopRated = createServerFn({ method: "GET" }).handler(async () => {
   const { tmdbGet } = await import("./tmdb.server");
   const data = await tmdbGet<{ results: any[] }>("/movie/top_rated");
-  return data.results.slice(0, 18).map(toCard);
+  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
 });
 
 export const getPopular = createServerFn({ method: "GET" }).handler(async () => {
   const { tmdbGet } = await import("./tmdb.server");
   const data = await tmdbGet<{ results: any[] }>("/movie/popular");
-  return data.results.slice(0, 18).map(toCard);
+  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+});
+
+export const getNowPlaying = createServerFn({ method: "GET" }).handler(async () => {
+  const { tmdbGet } = await import("./tmdb.server");
+  const data = await tmdbGet<{ results: any[] }>("/movie/now_playing", { region: "SA" });
+  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+});
+
+export const getUpcoming = createServerFn({ method: "GET" }).handler(async () => {
+  const { tmdbGet } = await import("./tmdb.server");
+  const data = await tmdbGet<{ results: any[] }>("/movie/upcoming", { region: "SA" });
+  return data.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
 });
 
 export const searchMovies = createServerFn({ method: "GET" })
@@ -46,7 +58,7 @@ export const searchMovies = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const res = await tmdbGet<{ results: any[] }>("/search/movie", { query: data.q });
-    return res.results.slice(0, 24).map(toCard);
+    return res.results.filter((m) => m.poster_path).slice(0, 24).map(toCard);
   });
 
 export const getMovieDetails = createServerFn({ method: "GET" })

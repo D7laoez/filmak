@@ -59,7 +59,7 @@ export const recommendMovies = createServerFn({ method: "POST" })
 
     return {
       intro: parsed.intro || "",
-      recommendations: results.filter((r): r is Rec => r !== null),
+      recommendations: results.filter((r): r is Rec => r !== null && r.poster !== null),
     };
   });
 
