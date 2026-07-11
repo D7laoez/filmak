@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags } from "lucide-react";
@@ -12,9 +12,18 @@ import {
   getUpcoming,
   searchMovies,
   getGenres,
-  getMoviesByGenre,
   type MovieCard,
 } from "@/lib/movies.functions";
+import {
+  getTrendingTv,
+  getPopularTv,
+  getTopRatedTv,
+  getOnAirTv,
+  getAiringTodayTv,
+  searchTv,
+  getTvGenres,
+  type TvCard,
+} from "@/lib/tv.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +32,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -102,24 +112,47 @@ function Home() {
     enabled: activeSearch.length > 0,
   });
 
-  const genres = useQuery({
+  const [tab, setTab] = useState<"movie" | "tv">("movie");
+  const searchTvRes = useQuery({
+    queryKey: ["search-tv", activeSearch, locale],
+    queryFn: () => searchTv({ data: { q: activeSearch, lang: locale } }),
+    enabled: activeSearch.length > 0 && tab === "tv",
+  });
+
+  const movieGenres = useQuery({
     queryKey: ["genres", locale],
     queryFn: () => getGenres({ data: { lang: locale } }),
   });
-  const [genreId, setGenreId] = useState<number | null>(null);
-  const [sort, setSort] = useState<
-    "popularity.desc" | "vote_average.desc" | "primary_release_date.desc"
-  >("popularity.desc");
-  const genreRes = useQuery({
-    queryKey: ["by-genre", genreId, sort, locale],
-    queryFn: () =>
-      getMoviesByGenre({
-        data: { genreId: genreId as number, lang: locale, sort, page: 1 },
-      }),
-    enabled: genreId !== null,
+  const tvGenres = useQuery({
+    queryKey: ["tv-genres", locale],
+    queryFn: () => getTvGenres({ data: { lang: locale } }),
   });
-  const activeGenreName =
-    genres.data?.find((g) => g.id === genreId)?.name ?? "";
+
+  const trendingTv = useQuery({
+    queryKey: ["trending-tv", locale],
+    queryFn: () => getTrendingTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const popularTv = useQuery({
+    queryKey: ["popular-tv", locale],
+    queryFn: () => getPopularTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const topRatedTv = useQuery({
+    queryKey: ["top-rated-tv", locale],
+    queryFn: () => getTopRatedTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const onAirTv = useQuery({
+    queryKey: ["on-air-tv", locale],
+    queryFn: () => getOnAirTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
+  const airingTodayTv = useQuery({
+    queryKey: ["airing-today-tv", locale],
+    queryFn: () => getAiringTodayTv({ data: { lang: locale } }),
+    enabled: tab === "tv",
+  });
 
   const [prompt, setPrompt] = useState("");
   const recMutation = useMutation({
