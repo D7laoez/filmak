@@ -116,6 +116,23 @@ const DICT: Record<Locale, Dict> = {
     lang_hi: "هندي",
     lang_fr: "فرنسي",
     lang_es: "إسباني",
+    add_watchlist: "أضف للمشاهدة لاحقاً",
+    in_watchlist: "في المشاهدة لاحقاً",
+    added_watchlist: "أُضيف لقائمة المشاهدة",
+    mark_watched: "شاهدته",
+    watched: "شاهدته",
+    marked_watched: "تم التعليم كمشاهد",
+    tab_favorites: "المفضلة",
+    tab_watchlist: "شاهد لاحقاً",
+    tab_watched: "شاهدته",
+    my_stats: "إحصائياتي",
+    stats_title: "إحصائياتك الشخصية",
+    total_items: "إجمالي العناصر",
+    average_rating: "متوسط تقييمك",
+    top_year: "أكثر سنة عندك",
+    movies_count: "أفلام",
+    tv_count: "مسلسلات",
+    your_rating: "تقييمك",
   },
   en: {
     brand: "Filmak",
@@ -223,6 +240,23 @@ const DICT: Record<Locale, Dict> = {
     lang_hi: "Hindi",
     lang_fr: "French",
     lang_es: "Spanish",
+    add_watchlist: "Add to watchlist",
+    in_watchlist: "In watchlist",
+    added_watchlist: "Added to watchlist",
+    mark_watched: "Mark watched",
+    watched: "Watched",
+    marked_watched: "Marked as watched",
+    tab_favorites: "Favorites",
+    tab_watchlist: "Watch later",
+    tab_watched: "Watched",
+    my_stats: "My stats",
+    stats_title: "Your personal stats",
+    total_items: "Total items",
+    average_rating: "Your average rating",
+    top_year: "Top year",
+    movies_count: "Movies",
+    tv_count: "Series",
+    your_rating: "Your rating",
   },
 };
 
@@ -320,6 +354,23 @@ export type Dict = {
   lang_hi: string;
   lang_fr: string;
   lang_es: string;
+  add_watchlist: string;
+  in_watchlist: string;
+  added_watchlist: string;
+  mark_watched: string;
+  watched: string;
+  marked_watched: string;
+  tab_favorites: string;
+  tab_watchlist: string;
+  tab_watched: string;
+  my_stats: string;
+  stats_title: string;
+  total_items: string;
+  average_rating: string;
+  top_year: string;
+  movies_count: string;
+  tv_count: string;
+  your_rating: string;
 };
 export type TKey = keyof Dict;
 
