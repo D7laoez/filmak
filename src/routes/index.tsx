@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { Spinner } from "@/components/Spinner";
 import {
   getTrending,
   getTopRated,
@@ -50,8 +51,13 @@ export const Route = createFileRoute("/")({
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
+        <img
+          src="/favicon.png"
+          alt="Filmak"
+          className="w-16 h-16 mx-auto mb-4 opacity-90"
+        />
         <h1 className="text-2xl font-bold mb-2">Error / حدث خطأ</h1>
-        <p className="text-muted-foreground">{error.message}</p>
+        <p className="text-muted-foreground text-sm">{error.message}</p>
       </div>
     </div>
   ),
