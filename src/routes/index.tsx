@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { Spinner } from "@/components/Spinner";
 import {
   getTrending,
   getTopRated,
@@ -50,8 +51,13 @@ export const Route = createFileRoute("/")({
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
       <div>
+        <img
+          src="/favicon.png"
+          alt="Filmak"
+          className="w-16 h-16 mx-auto mb-4 opacity-90"
+        />
         <h1 className="text-2xl font-bold mb-2">Error / حدث خطأ</h1>
-        <p className="text-muted-foreground">{error.message}</p>
+        <p className="text-muted-foreground text-sm">{error.message}</p>
       </div>
     </div>
   ),
@@ -324,6 +330,12 @@ function Home() {
           icon={<Search className="w-5 h-5" />}
           movies={searchRes.data ?? []}
           loading={searchRes.isLoading}
+          emptyLabel={
+            !searchRes.isLoading && (searchRes.data ?? []).length === 0
+              ? t("no_results")
+              : undefined
+          }
+          emptySub={t("no_results_sub")}
         />
       )}
 
@@ -365,11 +377,15 @@ function Row({
   icon,
   movies,
   loading,
+  emptyLabel,
+  emptySub,
 }: {
   title: string;
   icon?: React.ReactNode;
   movies: MovieCard[];
   loading?: boolean;
+  emptyLabel?: string | false;
+  emptySub?: string;
 }) {
   const t = useLocale().t;
   return (
@@ -379,8 +395,21 @@ function Row({
         {title}
       </h2>
       {loading ? (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="w-4 h-4 animate-spin" /> {t("loading")}
+        <div className="py-10 flex items-center justify-center">
+          <Spinner size={56} label={t("loading")} />
+        </div>
+      ) : emptyLabel ? (
+        <div className="py-12 flex flex-col items-center justify-center text-center">
+          <img
+            src="/favicon.png"
+            alt=""
+            aria-hidden="true"
+            className="w-14 h-14 opacity-70 mb-3"
+          />
+          <p className="text-sm font-medium">{emptyLabel}</p>
+          {emptySub && (
+            <p className="text-xs text-muted-foreground mt-1">{emptySub}</p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">

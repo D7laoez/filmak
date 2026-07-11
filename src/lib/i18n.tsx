@@ -81,6 +81,13 @@ const DICT: Record<Locale, Dict> = {
       "أنمي أكشن قوي",
       "افلام هندية عائلية",
     ] as string[],
+    page_not_found_title: "الصفحة غير موجودة",
+    page_not_found_sub: "الرابط اللي فتحته ما يقود لأي صفحة. رجّع للرئيسية وابدأ من هناك.",
+    go_home: "الرجوع للرئيسية",
+    error_title: "صار خطأ ما توقعناه",
+    error_sub: "حاول تحديث الصفحة، وإذا رجع الخطأ راسلنا.",
+    no_results: "ما لقينا نتائج",
+    no_results_sub: "جرّب كلمات ثانية أو اختصر البحث.",
   },
   en: {
     brand: "Filmak",
@@ -152,6 +159,14 @@ const DICT: Record<Locale, Dict> = {
       "Strong action anime",
       "Family-friendly Indian films",
     ] as string[],
+    page_not_found_title: "Page not found",
+    page_not_found_sub:
+      "The link you opened doesn't lead anywhere. Head back to the home page to start over.",
+    go_home: "Back to home",
+    error_title: "Something went wrong",
+    error_sub: "Try refreshing the page. If it keeps failing, let us know.",
+    no_results: "No results found",
+    no_results_sub: "Try different words or shorten your search.",
   },
 };
 
@@ -214,6 +229,13 @@ export type Dict = {
   error_generic: string;
   lang_switch: string;
   suggestions: string[];
+  page_not_found_title: string;
+  page_not_found_sub: string;
+  go_home: string;
+  error_title: string;
+  error_sub: string;
+  no_results: string;
+  no_results_sub: string;
 };
 export type TKey = keyof Dict;
 
