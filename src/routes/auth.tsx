@@ -3,6 +3,7 @@ import { useState, type FormEvent, useEffect } from "react";
 import { Film, Loader2, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { dir, t } = useLocale();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +38,7 @@ function AuthPage() {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        setNotice("تحقق من بريدك لتأكيد الحساب، ثم سجّل الدخول");
+        setNotice(t("check_email"));
         setMode("signin");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -68,21 +70,21 @@ function AuthPage() {
 
   return (
     <div
-      dir="rtl"
+      dir={dir}
       className="min-h-screen flex items-center justify-center bg-background text-foreground px-4"
     >
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <Film className="w-7 h-7 text-primary" />
-          <span className="text-2xl font-bold">سينمائي</span>
+          <span className="text-2xl font-bold">{t("brand")}</span>
         </Link>
 
         <div className="bg-card border border-border rounded-2xl p-6 shadow-lg">
           <h1 className="text-2xl font-bold mb-1">
-            {mode === "signin" ? "تسجيل الدخول" : "إنشاء حساب"}
+            {mode === "signin" ? t("signin") : t("signup")}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
-            احفظ أفلامك المفضلة وشاهدها لاحقاً
+            {t("auth_sub")}
           </p>
 
           <div className="flex flex-col gap-2 mb-4">
@@ -92,7 +94,7 @@ function AuthPage() {
               className="flex items-center justify-center gap-3 bg-white text-black rounded-xl py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
             >
               <GoogleIcon />
-              متابعة مع Google
+              {t("continue_google")}
             </button>
             <button
               onClick={() => handleOAuth("apple")}
@@ -100,38 +102,38 @@ function AuthPage() {
               className="flex items-center justify-center gap-3 bg-black text-white border border-border rounded-xl py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
             >
               <AppleIcon />
-              متابعة مع Apple
+              {t("continue_apple")}
             </button>
           </div>
 
           <div className="flex items-center gap-3 my-5 text-xs text-muted-foreground">
             <span className="flex-1 h-px bg-border" />
-            أو
+            {t("or")}
             <span className="flex-1 h-px bg-border" />
           </div>
 
           <form onSubmit={handleEmail} className="space-y-3">
             <div className="relative">
-              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="البريد الإلكتروني"
-                className="w-full bg-secondary/60 border border-border rounded-xl pr-10 pl-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder={t("email")}
+                className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
               />
             </div>
             <div className="relative">
-              <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Lock className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
               <input
                 type="password"
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="كلمة السر (٦ أحرف على الأقل)"
-                className="w-full bg-secondary/60 border border-border rounded-xl pr-10 pl-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder={t("password")}
+                className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
               />
             </div>
             <button
@@ -140,7 +142,7 @@ function AuthPage() {
               className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin" ? "دخول" : "إنشاء الحساب"}
+              {mode === "signin" ? t("signin_btn") : t("signup_btn")}
             </button>
           </form>
 
@@ -155,7 +157,7 @@ function AuthPage() {
             }}
             className="w-full text-sm text-muted-foreground mt-5 hover:text-foreground transition"
           >
-            {mode === "signin" ? "ما عندك حساب؟ إنشاء حساب جديد" : "عندك حساب؟ سجّل الدخول"}
+            {mode === "signin" ? t("no_account") : t("have_account")}
           </button>
         </div>
       </div>
