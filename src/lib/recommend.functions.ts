@@ -100,7 +100,11 @@ Strict rules:
 - عناوين الأعمال بالإنجليزية دائماً (كما تظهر في TMDB).
 - لا تضف أي نص خارج JSON.`;
 
-    const content = await callAIWithFallback(systemPrompt, data.prompt);
+    const userPrompt =
+      lang === "en"
+        ? `Respond in English only. User request: ${data.prompt}`
+        : `أجب بالعربية فقط. طلب المستخدم: ${data.prompt}`;
+    const content = await callAIWithFallback(systemPrompt, userPrompt);
     let parsed: {
       intent?: Partial<Intent>;
       intro?: string;
