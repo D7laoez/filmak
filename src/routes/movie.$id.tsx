@@ -27,6 +27,7 @@ import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
 import { TrailerModal } from "@/components/TrailerModal";
 import { MediaLightbox } from "@/components/MediaLightbox";
+import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
