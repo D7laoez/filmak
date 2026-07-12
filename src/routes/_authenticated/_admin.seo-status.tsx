@@ -17,7 +17,7 @@ import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-export const Route = createFileRoute("/_authenticated/seo-status")({
+export const Route = createFileRoute("/_authenticated/_admin/seo-status")({
   loader: async () => {
     const { isAdmin } = await checkIsAdmin();
     if (!isAdmin) throw notFound({ routeId: rootRouteId });

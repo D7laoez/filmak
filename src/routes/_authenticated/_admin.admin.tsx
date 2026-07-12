@@ -29,7 +29,7 @@ import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/_admin/admin")({
   loader: async () => {
     const { isAdmin } = await checkIsAdmin();
     if (!isAdmin) throw notFound({ routeId: rootRouteId });
