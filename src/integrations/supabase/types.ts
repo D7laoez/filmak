@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          hit_count: number
+          lang: string
+          last_hit_at: string
+          prompt: string
+          response: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          hit_count?: number
+          lang: string
+          last_hit_at?: string
+          prompt: string
+          response: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          hit_count?: number
+          lang?: string
+          last_hit_at?: string
+          prompt?: string
+          response?: Json
+        }
+        Relationships: []
+      }
+      ai_rate_limits: {
+        Row: {
+          count: number
+          day: string
+          ip: string
+        }
+        Insert: {
+          count?: number
+          day?: string
+          ip: string
+        }
+        Update: {
+          count?: number
+          day?: string
+          ip?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string

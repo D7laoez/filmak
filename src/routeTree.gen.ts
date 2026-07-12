@@ -16,6 +16,7 @@ import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as GenreIdRouteImport } from './routes/genre.$id'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 
@@ -53,6 +54,11 @@ const GenreIdRoute = GenreIdRouteImport.update({
   path: '/genre/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/stats'
+    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/stats'
+    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/favorites'
     | '/_authenticated/stats'
+    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -134,6 +146,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   GenreIdRoute: typeof GenreIdRoute
   MovieIdRoute: typeof MovieIdRoute
   PersonIdRoute: typeof PersonIdRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenreIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/stats': {
       id: '/_authenticated/stats'
       path: '/stats'
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   GenreIdRoute: GenreIdRoute,
   MovieIdRoute: MovieIdRoute,
   PersonIdRoute: PersonIdRoute,

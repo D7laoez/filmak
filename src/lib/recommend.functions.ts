@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getRequest } from "@tanstack/react-start/server";
+import { createHash } from "crypto";
 
 type Rec = {
   id: number;
@@ -35,6 +37,77 @@ export const recommendMovies = createServerFn({ method: "POST" })
     const tmdbKey = process.env.TMDB_API_KEY;
     if (!tmdbKey) throw new Error("TMDB_API_KEY missing");
     const lang: "ar" | "en" = data.lang ?? "ar";
+
+    // --- Token conservation: cache + rate limit ---
+    const normalizedPrompt = data.prompt.trim().toLowerCase().replace(/\s+/g, " ");
+    const cacheKey = createHash("sha256")
+      .update(`${lang}::${normalizedPrompt}`)
+      .digest("hex");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // 1) Cache lookup — identical prompt → zero AI cost
+    try {
+      const { data: cached } = await supabaseAdmin
+        .from("ai_cache")
+        .select("response")
+        .eq("cache_key", cacheKey)
+        .maybeSingle();
+      if (cached?.response) {
+        // bump hit stats fire-and-forget
+        supabaseAdmin
+          .from("ai_cache")
+          .update({
+            last_hit_at: new Date().toISOString(),
+            hit_count: ((cached as any).hit_count ?? 1) + 1,
+          })
+          .eq("cache_key", cacheKey)
+          .then(() => {});
+        return cached.response as { recommendations: Rec[]; intro: string };
+      }
+    } catch (e) {
+      console.warn("ai_cache lookup failed", e);
+    }
+
+    // 2) Rate limit per IP per day (default 25/day; adjust with AI_DAILY_LIMIT env)
+    const dailyLimit = Number(process.env.AI_DAILY_LIMIT ?? 25);
+    let ip = "unknown";
+    try {
+      const req = getRequest();
+      ip =
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+        req.headers.get("x-real-ip") ||
+        "unknown";
+    } catch {}
+    if (ip !== "unknown") {
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const { data: rl } = await supabaseAdmin
+          .from("ai_rate_limits")
+          .select("count")
+          .eq("ip", ip)
+          .eq("day", today)
+          .maybeSingle();
+        const current = rl?.count ?? 0;
+        if (current >= dailyLimit) {
+          throw new Error(
+            lang === "en"
+              ? `Daily AI limit reached (${dailyLimit}). Try again tomorrow or browse trending picks below.`
+              : `تجاوزت الحد اليومي (${dailyLimit} طلب). جرّب لاحقاً أو استكشف الأفلام أدناه.`,
+          );
+        }
+        await supabaseAdmin
+          .from("ai_rate_limits")
+          .upsert({ ip, day: today, count: current + 1 }, { onConflict: "ip,day" });
+      } catch (e) {
+        if ((e as Error).message?.startsWith("Daily AI limit") || (e as Error).message?.startsWith("تجاوزت")) {
+          throw e;
+        }
+        console.warn("rate limit check failed", e);
+      }
+    }
+    // --- end token conservation ---
 
     const systemPrompt = lang === "en"
       ? `You are a world-class film and TV expert. Understand the user's request precisely, then recommend REAL titles that exist on TMDB.
@@ -167,10 +240,30 @@ Strict rules:
       return true;
     });
 
-    return {
+    const result = {
       intro: parsed.intro || "",
       recommendations: dedup,
     };
+
+    // Store in cache for future identical prompts (only if we got real results)
+    if (dedup.length >= 3) {
+      try {
+        await supabaseAdmin.from("ai_cache").upsert(
+          {
+            cache_key: cacheKey,
+            lang,
+            prompt: normalizedPrompt,
+            response: result,
+            last_hit_at: new Date().toISOString(),
+          },
+          { onConflict: "cache_key" },
+        );
+      } catch (e) {
+        console.warn("ai_cache write failed", e);
+      }
+    }
+
+    return result;
   });
 
 async function tmdbSearchBest(
