@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, rootRouteId } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -11,19 +11,12 @@ import {
   type InspectionResult,
   type SubmissionRow,
 } from "@/lib/seo-status.functions";
-import { checkIsAdmin } from "@/lib/admin.functions";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/_admin/seo-status")({
-  loader: async () => {
-    const { isAdmin } = await checkIsAdmin();
-    if (!isAdmin) throw notFound({ routeId: rootRouteId });
-    return null;
-  },
-  errorComponent: () => null,
   component: SeoStatusPage,
 });
 
