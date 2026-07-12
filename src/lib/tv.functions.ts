@@ -94,7 +94,7 @@ export const getTvByGenre = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z
       .object({
-        genreId: z.number(),
+        genreIds: z.array(z.number()).min(1),
         lang: langSchema,
         sort: z
           .enum(["popularity.desc", "vote_average.desc", "first_air_date.desc"])
@@ -109,7 +109,7 @@ export const getTvByGenre = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const params: Record<string, string> = {
-      with_genres: String(data.genreId),
+      with_genres: data.genreIds.join(","),
       sort_by: data.sort,
       "vote_count.gte": data.sort === "vote_average.desc" ? "100" : "20",
       include_adult: "false",
