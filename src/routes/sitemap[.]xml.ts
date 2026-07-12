@@ -26,7 +26,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           tmdbList("/tv/top_rated"),
         ]);
 
-        const staticRoutes = ["/", "/auth", "/favorites", "/stats"];
+        const staticRoutes = ["/", "/discover", "/auth", "/favorites", "/stats"];
         const movieIds = new Set([...popularMovies, ...topMovies].map((m) => m.id));
         const tvIds = new Set([...popularTv, ...topTv].map((m) => m.id));
         const genreIds = [28, 35, 18, 27, 10749, 878, 16, 80, 99, 14, 36, 10402, 9648, 10751, 10752, 37];
