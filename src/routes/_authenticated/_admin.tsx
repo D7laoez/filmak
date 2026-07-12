@@ -1,10 +1,14 @@
 import { createFileRoute, Outlet, notFound, rootRouteId } from "@tanstack/react-router";
-import { checkIsAdmin } from "@/lib/admin.functions";
+import { checkIsAdmin, logUnauthorizedAdminAccess } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/_admin")({
-  loader: async () => {
+  loader: async ({ location }) => {
     const { isAdmin } = await checkIsAdmin();
-    if (!isAdmin) throw notFound({ routeId: rootRouteId });
+    if (!isAdmin) {
+      // Fire-and-forget: don't block the 404 response on the log call.
+      void logUnauthorizedAdminAccess({ data: { path: location.pathname } }).catch(() => {});
+      throw notFound({ routeId: rootRouteId });
+    }
     return null;
   },
   errorComponent: () => null,
