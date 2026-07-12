@@ -259,9 +259,31 @@ function GenrePage() {
         )}
       </header>
 
+      {/* Top progress bar shown while any fetch is in flight */}
+      <div
+        aria-hidden
+        className={`fixed top-0 inset-x-0 z-50 h-0.5 overflow-hidden pointer-events-none transition-opacity duration-200 ${
+          pagesResult.isFetching ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="h-full w-1/3 bg-primary animate-[genre-progress_1.1s_ease-in-out_infinite]" />
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 py-6">
         {pagesResult.isLoading && (
-          <div className="py-16 flex items-center justify-center"><Spinner size={64} label={t("loading")} /></div>
+          <div
+            aria-busy="true"
+            aria-live="polite"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+          >
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}>
+                <div className="aspect-[2/3] rounded-lg bg-muted animate-pulse" />
+                <div className="mt-2 h-3.5 rounded bg-muted animate-pulse w-3/4" />
+                <div className="mt-1.5 h-3 rounded bg-muted animate-pulse w-1/3" />
+              </div>
+            ))}
+          </div>
         )}
 
         {!pagesResult.isLoading && (pagesResult.data?.results.length ?? 0) === 0 && (
@@ -273,7 +295,10 @@ function GenrePage() {
         )}
 
         {pagesResult.data && pagesResult.data.results.length > 0 && (
-          <>
+          <div
+            aria-busy={isRefetching || undefined}
+            className={`transition-opacity duration-200 ${isRefetching ? "opacity-60" : "opacity-100"}`}
+          >
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {pagesResult.data.results.map((m) => (
                 <Link
@@ -306,13 +331,21 @@ function GenrePage() {
               <div className="mt-8 flex justify-center">
                 <button
                   onClick={() => setPages(pages + 1)}
-                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2.5 text-sm font-medium hover:opacity-90 transition"
+                  disabled={isRefetching}
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-60 transition"
                 >
-                  {t("load_more")}
+                  {isRefetching ? (
+                    <>
+                      <Spinner size={16} />
+                      {t("loading")}
+                    </>
+                  ) : (
+                    t("load_more")
+                  )}
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
       </main>
     </div>
