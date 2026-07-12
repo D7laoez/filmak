@@ -23,12 +23,49 @@ type Intent = {
 };
 
 export const recommendMovies = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ prompt: z.string().min(2).max(500) }).parse(d))
+  .inputValidator((d) =>
+    z
+      .object({
+        prompt: z.string().min(2).max(500),
+        lang: z.enum(["ar", "en"]).optional(),
+      })
+      .parse(d),
+  )
   .handler(async ({ data }): Promise<{ recommendations: Rec[]; intro: string }> => {
     const tmdbKey = process.env.TMDB_API_KEY;
     if (!tmdbKey) throw new Error("TMDB_API_KEY missing");
+    const lang: "ar" | "en" = data.lang ?? "ar";
 
-    const systemPrompt = `أنت خبير سينما ومسلسلات عالمي. مهمتك فهم رغبة المستخدم بدقة ثم ترشيح أعمال حقيقية موجودة على TMDB.
+    const systemPrompt = lang === "en"
+      ? `You are a world-class film and TV expert. Understand the user's request precisely, then recommend REAL titles that exist on TMDB.
+
+Analyze the request, then respond with JSON ONLY in this exact shape:
+{
+  "intent": {
+    "kinds": ["movie"] or ["tv"] or ["movie","tv"],
+    "country": ISO code like "EG" "SA" "US" "KR" "JP" "TR" "IN" or null,
+    "language": ISO code like "ar" "en" "ko" "ja" "tr" "hi" or null,
+    "genres": ["comedy","action",...],
+    "min_year": number or null,
+    "max_year": number or null,
+    "mood": "short mood description in English" or null
+  },
+  "intro": "one short sentence explaining the pick, in English",
+  "items": [
+    { "kind": "movie" or "tv", "title": "Title in English", "year": "YYYY", "reason": "why it fits, in English" }
+  ]
+}
+
+Strict rules:
+- If the user asks for "movie/movies" only → kinds = ["movie"].
+- If the user asks for "series/show/shows" only → kinds = ["tv"].
+- If either or both → kinds = ["movie","tv"] and mix them.
+- If a nationality/dialect is mentioned (Egyptian, Turkish, Korean, Hindi, Japanese, etc.) set country and language accordingly.
+- Honor mood (funny, horror, romantic, thriller, action, drama, etc.).
+- At least 8 real, well-known titles from TMDB.
+- Titles ALWAYS in English (as shown on TMDB).
+- No text outside the JSON.`
+      : `أنت خبير سينما ومسلسلات عالمي. مهمتك فهم رغبة المستخدم بدقة ثم ترشيح أعمال حقيقية موجودة على TMDB.
 
 حلّل الطلب أولاً ثم أعد JSON فقط بهذا الشكل حرفياً:
 {
@@ -100,7 +137,7 @@ export const recommendMovies = createServerFn({ method: "POST" })
     const results = await Promise.all(
       items.map(async (m) => {
         const kind: "movie" | "tv" = m.kind || "movie";
-        const hit = await tmdbSearchBest(tmdbKey, kind, m.title, m.year, intent);
+        const hit = await tmdbSearchBest(tmdbKey, kind, m.title, m.year, intent, lang);
         if (!hit) return null;
         const dateField = kind === "movie" ? hit.release_date : hit.first_air_date;
         return {
@@ -138,11 +175,12 @@ async function tmdbSearchBest(
   title: string,
   year: string | undefined,
   intent: Intent,
+  lang: "ar" | "en" = "ar",
 ): Promise<any | null> {
   try {
     const url = new URL(`https://api.themoviedb.org/3/search/${kind}`);
     url.searchParams.set("api_key", key);
-    url.searchParams.set("language", "ar");
+    url.searchParams.set("language", lang);
     url.searchParams.set("query", title);
     url.searchParams.set("include_adult", "false");
     if (year) {
