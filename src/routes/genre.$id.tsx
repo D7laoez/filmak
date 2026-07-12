@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { ArrowRight, Star, Tags, Film, Tv as TvIcon, Filter } from "lucide-react";
+import { NavToggles } from "@/components/NavToggles";
 import { getGenres, getMoviesByGenre, type MovieCard } from "@/lib/movies.functions";
 import { getTvGenres, getTvByGenre, type TvCard } from "@/lib/tv.functions";
 import { useLocale, useT } from "@/lib/i18n";
