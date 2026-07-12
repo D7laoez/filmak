@@ -140,15 +140,6 @@ export const getMoviesByGenre = createServerFn({ method: "GET" })
     };
   });
 
-export const getMovieDetails = createServerFn({ method: "GET" })
-  .inputValidator((d) =>
-    z.object({ id: z.number(), lang: langSchema }).parse(d),
-  )
-  .handler(async ({ data }) => {
-    // placeholder — real impl below (this line is unreachable; do not use)
-    return { id: data.id } as never;
-  });
-
 export const discoverMovies = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z
@@ -194,9 +185,7 @@ export const discoverMovies = createServerFn({ method: "GET" })
     };
   });
 
-// The real getMovieDetails is defined below with the same name — TypeScript
-// keeps only the last export, so remove the placeholder above by re-exporting.
-export const getMovieDetailsReal = createServerFn({ method: "GET" })
+export const getMovieDetails = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z.object({ id: z.number(), lang: langSchema }).parse(d),
   )
