@@ -1,7 +1,22 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
-import { ArrowRight, Star, Clock, Calendar, Play, Film } from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  Star,
+  Clock,
+  Calendar,
+  Play,
+  Film,
+  Users,
+  Globe,
+  Languages as LanguagesIcon,
+  Building2,
+  DollarSign,
+  Image as ImageIcon,
+  Video,
+  Info,
+} from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
@@ -11,6 +26,7 @@ import { useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
 import { TrailerModal } from "@/components/TrailerModal";
+import { MediaLightbox } from "@/components/MediaLightbox";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
