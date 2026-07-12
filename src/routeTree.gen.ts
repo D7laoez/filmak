@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -16,10 +18,19 @@ import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as GenreIdRouteImport } from './routes/genre.$id'
-import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -54,11 +65,6 @@ const GenreIdRoute = GenreIdRouteImport.update({
   path: '/genre/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
-  id: '/api/sitemap.xml',
-  path: '/api/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -73,9 +79,10 @@ const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/discover': typeof DiscoverRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -84,9 +91,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/discover': typeof DiscoverRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -97,9 +105,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/discover': typeof DiscoverRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -110,9 +119,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/discover'
+    | '/sitemap.xml'
     | '/favorites'
     | '/stats'
-    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -121,9 +131,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/discover'
+    | '/sitemap.xml'
     | '/favorites'
     | '/stats'
-    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -133,9 +144,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/discover'
+    | '/sitemap.xml'
     | '/_authenticated/favorites'
     | '/_authenticated/stats'
-    | '/api/sitemap.xml'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -146,7 +158,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
+  DiscoverRoute: typeof DiscoverRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   GenreIdRoute: typeof GenreIdRoute
   MovieIdRoute: typeof MovieIdRoute
   PersonIdRoute: typeof PersonIdRoute
@@ -155,6 +168,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -204,13 +231,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenreIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/sitemap.xml': {
-      id: '/api/sitemap.xml'
-      path: '/api/sitemap.xml'
-      fullPath: '/api/sitemap.xml'
-      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/stats': {
       id: '/_authenticated/stats'
       path: '/stats'
@@ -245,7 +265,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
+  DiscoverRoute: DiscoverRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   GenreIdRoute: GenreIdRoute,
   MovieIdRoute: MovieIdRoute,
   PersonIdRoute: PersonIdRoute,

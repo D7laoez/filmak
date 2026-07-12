@@ -140,6 +140,51 @@ export const getMoviesByGenre = createServerFn({ method: "GET" })
     };
   });
 
+export const discoverMovies = createServerFn({ method: "GET" })
+  .inputValidator((d) =>
+    z
+      .object({
+        lang: langSchema,
+        genreIds: z.array(z.number()).default([]),
+        sort: z
+          .enum([
+            "popularity.desc",
+            "vote_average.desc",
+            "primary_release_date.desc",
+            "primary_release_date.asc",
+            "revenue.desc",
+          ])
+          .default("popularity.desc"),
+        page: z.number().int().min(1).max(20).default(1),
+        minRating: z.number().min(0).max(10).default(0),
+        year: z.number().int().min(1900).max(2100).nullable().default(null),
+        lang_original: z.string().nullable().default(null),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { tmdbGet } = await import("./tmdb.server");
+    const params: Record<string, string> = {
+      sort_by: data.sort,
+      "vote_count.gte": data.sort === "vote_average.desc" ? "300" : "50",
+      include_adult: "false",
+      page: String(data.page),
+    };
+    if (data.genreIds.length) params.with_genres = data.genreIds.join(",");
+    if (data.minRating > 0) params["vote_average.gte"] = String(data.minRating);
+    if (data.year) params["primary_release_year"] = String(data.year);
+    if (data.lang_original) params["with_original_language"] = data.lang_original;
+    const r = await tmdbGet<{ results: any[]; total_pages: number }>(
+      "/discover/movie",
+      params,
+      data.lang,
+    );
+    return {
+      results: r.results.filter((m) => m.poster_path).map(toCard),
+      totalPages: Math.min(r.total_pages, 20),
+    };
+  });
+
 export const getMovieDetails = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z.object({ id: z.number(), lang: langSchema }).parse(d),
