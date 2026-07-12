@@ -1,6 +1,6 @@
 {
-  "name": "فيلمك — Filmak",
-  "short_name": "فيلمك",
+  "name": "فلمك — Filmak",
+  "short_name": "فلمك",
   "description": "AI movie & series recommendations in Arabic and English.",
   "start_url": "/",
   "scope": "/",
