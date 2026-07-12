@@ -19,10 +19,11 @@ import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as GenreIdRouteImport } from './routes/genre.$id'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
-import { Route as AuthenticatedSeoStatusRouteImport } from './routes/_authenticated/seo-status'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
 import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
+import { Route as AuthenticatedAdminSeoStatusRouteImport } from './routes/_authenticated/_admin.seo-status'
+import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin.admin'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -73,19 +74,13 @@ const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSeoStatusRoute = AuthenticatedSeoStatusRouteImport.update({
-  id: '/seo-status',
-  path: '/seo-status',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+  id: '/_admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
@@ -93,20 +88,31 @@ const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
   path: '/api/public/indexnow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminSeoStatusRoute =
+  AuthenticatedAdminSeoStatusRouteImport.update({
+    id: '/seo-status',
+    path: '/seo-status',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
-  '/seo-status': typeof AuthenticatedSeoStatusRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
+  '/admin': typeof AuthenticatedAdminAdminRoute
+  '/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
 export interface FileRoutesByTo {
@@ -114,14 +120,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
-  '/seo-status': typeof AuthenticatedSeoStatusRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
+  '/admin': typeof AuthenticatedAdminAdminRoute
+  '/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
 export interface FileRoutesById {
@@ -131,14 +137,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
-  '/_authenticated/seo-status': typeof AuthenticatedSeoStatusRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
+  '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
+  '/_authenticated/_admin/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
 export interface FileRouteTypes {
@@ -148,14 +155,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/sitemap.xml'
-    | '/admin'
     | '/favorites'
-    | '/seo-status'
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
     | '/tv/$id'
+    | '/admin'
+    | '/seo-status'
     | '/api/public/indexnow'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,14 +170,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/sitemap.xml'
-    | '/admin'
     | '/favorites'
-    | '/seo-status'
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
     | '/tv/$id'
+    | '/admin'
+    | '/seo-status'
     | '/api/public/indexnow'
   id:
     | '__root__'
@@ -179,14 +186,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/discover'
     | '/sitemap.xml'
-    | '/_authenticated/admin'
+    | '/_authenticated/_admin'
     | '/_authenticated/favorites'
-    | '/_authenticated/seo-status'
     | '/_authenticated/stats'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
     | '/tv/$id'
+    | '/_authenticated/_admin/admin'
+    | '/_authenticated/_admin/seo-status'
     | '/api/public/indexnow'
   fileRoutesById: FileRoutesById
 }
@@ -275,13 +283,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStatsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/seo-status': {
-      id: '/_authenticated/seo-status'
-      path: '/seo-status'
-      fullPath: '/seo-status'
-      preLoaderRoute: typeof AuthenticatedSeoStatusRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -289,10 +290,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
@@ -303,20 +304,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicIndexnowRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/_admin/seo-status': {
+      id: '/_authenticated/_admin/seo-status'
+      path: '/seo-status'
+      fullPath: '/seo-status'
+      preLoaderRoute: typeof AuthenticatedAdminSeoStatusRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/_admin/admin': {
+      id: '/_authenticated/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
+  AuthenticatedAdminSeoStatusRoute: typeof AuthenticatedAdminSeoStatusRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
+  AuthenticatedAdminSeoStatusRoute: AuthenticatedAdminSeoStatusRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
-  AuthenticatedSeoStatusRoute: typeof AuthenticatedSeoStatusRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
-  AuthenticatedSeoStatusRoute: AuthenticatedSeoStatusRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
 }
 
