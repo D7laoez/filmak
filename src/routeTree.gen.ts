@@ -19,6 +19,7 @@ import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as GenreIdRouteImport } from './routes/genre.$id'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
+import { Route as AuthenticatedSeoStatusRouteImport } from './routes/_authenticated/seo-status'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
 
@@ -71,6 +72,11 @@ const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSeoStatusRoute = AuthenticatedSeoStatusRouteImport.update({
+  id: '/seo-status',
+  path: '/seo-status',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/seo-status': typeof AuthenticatedSeoStatusRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/seo-status': typeof AuthenticatedSeoStatusRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/discover': typeof DiscoverRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/_authenticated/seo-status': typeof AuthenticatedSeoStatusRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/sitemap.xml'
     | '/favorites'
+    | '/seo-status'
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/sitemap.xml'
     | '/favorites'
+    | '/seo-status'
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/sitemap.xml'
     | '/_authenticated/favorites'
+    | '/_authenticated/seo-status'
     | '/_authenticated/stats'
     | '/genre/$id'
     | '/movie/$id'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStatsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seo-status': {
+      id: '/_authenticated/seo-status'
+      path: '/seo-status'
+      fullPath: '/seo-status'
+      preLoaderRoute: typeof AuthenticatedSeoStatusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -270,11 +289,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
+  AuthenticatedSeoStatusRoute: typeof AuthenticatedSeoStatusRoute
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
+  AuthenticatedSeoStatusRoute: AuthenticatedSeoStatusRoute,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
 }
 
