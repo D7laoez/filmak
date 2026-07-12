@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { HeroCarousel } from "@/components/HeroCarousel";
 
 export const Route = createFileRoute("/")({
   component: Home,
