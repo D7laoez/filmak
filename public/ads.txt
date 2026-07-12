@@ -1,0 +1,3 @@
+# Google AdSense ownership record.
+# Replace pub-XXXXXXXXXXXXXXXX with your AdSense publisher ID.
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
