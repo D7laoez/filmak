@@ -12,7 +12,7 @@ export type Locale = "ar" | "en";
 
 const DICT: Record<Locale, Dict> = {
   ar: {
-    brand: "فيلمك",
+    brand: "فلمك",
     tagline_ai: "مدعوم بالذكاء الاصطناعي",
     hero_1: "صف الفلم اللي في بالك",
     hero_2: "ونجيبه لك",
