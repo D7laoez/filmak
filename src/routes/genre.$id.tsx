@@ -117,6 +117,7 @@ function GenrePage() {
               <Filter className="w-3.5 h-3.5" />
               {t("filters")}
             </button>
+            <NavToggles />
           </div>
         </div>
 
