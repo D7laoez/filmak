@@ -21,6 +21,24 @@ export const checkIsAdmin = createServerFn({ method: "GET" })
     return { isAdmin: !!data };
   });
 
+/**
+ * Logs an unauthorized attempt to access an admin-only route.
+ * Intentionally minimal: no email, no full user id, no request body — just
+ * enough to spot patterns in worker logs.
+ */
+export const logUnauthorizedAdminAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { path: string }) => ({
+    path: typeof data?.path === "string" ? data.path.slice(0, 128) : "unknown",
+  }))
+  .handler(async ({ context, data }) => {
+    const userPrefix = context.userId.slice(0, 8);
+    console.warn(
+      `[admin-guard] unauthorized access attempt path=${data.path} user=${userPrefix} at=${new Date().toISOString()}`,
+    );
+    return { ok: true as const };
+  });
+
 export type AdminUserRow = {
   id: string;
   email: string | null;
