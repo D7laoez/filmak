@@ -130,6 +130,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "فيلمك — Filmak" },
       { name: "twitter:description", content: "AI movie & series recommendations in Arabic and English." },
       { name: "twitter:image", content: ogImage },
+      { name: "google-site-verification", content: "Ba8-EE-ouLI8m2vv00Ci4LWeeHuGdKKhDu4iW-sSwHg" },
       ...(adsenseClient ? [{ name: "google-adsense-account", content: adsenseClient }] : []),
     ],
     links: [
