@@ -253,7 +253,6 @@ function Content() {
                 <span className="text-sm text-muted-foreground mx-2">({data.watchCountry})</span>
               )}
             </h2>
-            <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} />
             <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} link={data.watch.link} />
             <ProviderGroup label={t("rent")} items={data.watch.rent} link={data.watch.link} />
             <ProviderGroup label={t("buy")} items={data.watch.buy} link={data.watch.link} />
@@ -339,9 +338,11 @@ function Content() {
 function ProviderGroup({
   label,
   items,
+  link,
 }: {
   label: string;
   items: { name: string; logo: string }[];
+  link?: string;
 }) {
   if (!items || items.length === 0) return null;
   return (
@@ -349,13 +350,27 @@ function ProviderGroup({
       <p className="text-sm text-muted-foreground mb-2">{label}</p>
       <div className="flex flex-wrap gap-3">
         {items.map((p) => (
-          <div
-            key={p.name}
-            className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2"
-          >
-            <img src={p.logo} alt={p.name} className="w-8 h-8 rounded" />
-            <span className="text-sm">{p.name}</span>
-          </div>
+          link ? (
+            <a
+              key={p.name}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={p.name}
+              className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 hover:border-primary/50 hover:bg-secondary transition"
+            >
+              <img src={p.logo} alt={p.name} className="w-8 h-8 rounded" />
+              <span className="text-sm">{p.name}</span>
+            </a>
+          ) : (
+            <div
+              key={p.name}
+              className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2"
+            >
+              <img src={p.logo} alt={p.name} className="w-8 h-8 rounded" />
+              <span className="text-sm">{p.name}</span>
+            </div>
+          )
         ))}
       </div>
     </div>
