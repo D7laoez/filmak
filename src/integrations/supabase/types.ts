@@ -95,6 +95,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sitemap_submissions: {
+        Row: {
+          created_at: string
+          errors: number | null
+          http_status: number | null
+          id: string
+          indexed_urls: number | null
+          message: string | null
+          status: string
+          submitted_by: string | null
+          submitted_urls: number | null
+          warnings: number | null
+        }
+        Insert: {
+          created_at?: string
+          errors?: number | null
+          http_status?: number | null
+          id?: string
+          indexed_urls?: number | null
+          message?: string | null
+          status: string
+          submitted_by?: string | null
+          submitted_urls?: number | null
+          warnings?: number | null
+        }
+        Update: {
+          created_at?: string
+          errors?: number | null
+          http_status?: number | null
+          id?: string
+          indexed_urls?: number | null
+          message?: string | null
+          status?: string
+          submitted_by?: string | null
+          submitted_urls?: number | null
+          warnings?: number | null
+        }
+        Relationships: []
+      }
       user_lists: {
         Row: {
           created_at: string

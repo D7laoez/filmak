@@ -1,9 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowRight, RefreshCw, Search, ExternalLink, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
-import { getSeoStatus, inspectSeoUrl, type InspectionResult } from "@/lib/seo-status.functions";
+import { ArrowRight, RefreshCw, Search, ExternalLink, CheckCircle2, AlertCircle, HelpCircle, Send, Clock } from "lucide-react";
+import {
+  getSeoStatus,
+  inspectSeoUrl,
+  resubmitSitemap,
+  getSubmissionHistory,
+  type InspectionResult,
+  type SubmissionRow,
+} from "@/lib/seo-status.functions";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
@@ -17,6 +24,9 @@ function SeoStatusPage() {
   const { dir } = useLocale();
   const getStatus = useServerFn(getSeoStatus);
   const inspect = useServerFn(inspectSeoUrl);
+  const resubmit = useServerFn(resubmitSitemap);
+  const getHistory = useServerFn(getSubmissionHistory);
+  const qc = useQueryClient();
 
   const status = useQuery({
     queryKey: ["seo-sitemap-status"],
@@ -25,11 +35,26 @@ function SeoStatusPage() {
     staleTime: 60_000,
   });
 
+  const history = useQuery({
+    queryKey: ["seo-submission-history"],
+    queryFn: () => getHistory(),
+    retry: false,
+    staleTime: 30_000,
+  });
+
   const [path, setPath] = useState("/");
   const [result, setResult] = useState<InspectionResult | null>(null);
   const inspectMut = useMutation({
     mutationFn: (p: string) => inspect({ data: { path: p } }),
     onSuccess: (data) => setResult(data),
+  });
+
+  const resubmitMut = useMutation({
+    mutationFn: () => resubmit(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["seo-sitemap-status"] });
+      qc.invalidateQueries({ queryKey: ["seo-submission-history"] });
+    },
   });
 
   const forbidden =
@@ -57,15 +82,48 @@ function SeoStatusPage() {
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <h1 className="text-2xl md:text-3xl font-bold">حالة الفهرسة — Google</h1>
-          <button
-            onClick={() => status.refetch()}
-            disabled={status.isFetching}
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${status.isFetching ? "animate-spin" : ""}`} />
-            تحديث
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                status.refetch();
+                history.refetch();
+              }}
+              disabled={status.isFetching}
+              className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${status.isFetching ? "animate-spin" : ""}`} />
+              تحديث
+            </button>
+            <button
+              onClick={() => resubmitMut.mutate()}
+              disabled={resubmitMut.isPending}
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              <Send className={`w-4 h-4 ${resubmitMut.isPending ? "animate-pulse" : ""}`} />
+              إعادة إرسال Sitemap
+            </button>
+          </div>
         </div>
+
+        {resubmitMut.data && (
+          <div
+            className={`border rounded-2xl p-4 text-sm ${
+              resubmitMut.data.status === "success"
+                ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400"
+                : "border-destructive/40 bg-destructive/5 text-destructive"
+            }`}
+          >
+            {resubmitMut.data.status === "success"
+              ? `تم إرسال الـ sitemap بنجاح (HTTP ${resubmitMut.data.http_status})`
+              : `فشل الإرسال: ${resubmitMut.data.message ?? "خطأ غير معروف"}`}
+          </div>
+        )}
+
+        {resubmitMut.error instanceof Error && (
+          <div className="border border-destructive/40 bg-destructive/5 rounded-2xl p-4 text-sm text-destructive">
+            {resubmitMut.error.message}
+          </div>
+        )}
 
         {forbidden && (
           <div className="border border-destructive/40 bg-destructive/5 rounded-2xl p-6 text-sm">
@@ -145,8 +203,71 @@ function SeoStatusPage() {
 
           {result && !inspectMut.isPending && <InspectionCard data={result} />}
         </section>
+
+        <section className="border border-border rounded-2xl p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">سجل إعادة إرسال Sitemap</h2>
+          </div>
+          {history.isLoading && (
+            <div className="py-6 flex items-center justify-center">
+              <Spinner size={40} label="جاري التحميل" />
+            </div>
+          )}
+          {history.data && history.data.length === 0 && (
+            <p className="text-sm text-muted-foreground">لا توجد عمليات مسجّلة بعد. اضغط "إعادة إرسال Sitemap" لبدء أول عملية.</p>
+          )}
+          {history.data && history.data.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-muted-foreground border-b border-border">
+                    <th className="text-start py-2 px-2">الوقت</th>
+                    <th className="text-start py-2 px-2">الحالة</th>
+                    <th className="text-start py-2 px-2">HTTP</th>
+                    <th className="text-start py-2 px-2">مُرسَلة</th>
+                    <th className="text-start py-2 px-2">مفهرَسة</th>
+                    <th className="text-start py-2 px-2">أخطاء</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.data.map((row) => (
+                    <HistoryRow key={row.id} row={row} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </main>
     </div>
+  );
+}
+
+function HistoryRow({ row }: { row: SubmissionRow }) {
+  const success = row.status === "success";
+  return (
+    <tr className="border-b border-border/40">
+      <td className="py-2 px-2 whitespace-nowrap text-xs">
+        {new Date(row.created_at).toLocaleString()}
+      </td>
+      <td className="py-2 px-2">
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+            success
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "bg-destructive/10 text-destructive"
+          }`}
+        >
+          {success ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+          {success ? "نجاح" : "فشل"}
+        </span>
+      </td>
+      <td className="py-2 px-2 text-xs">{row.http_status ?? "—"}</td>
+      <td className="py-2 px-2 text-xs">{row.submitted_urls ?? "—"}</td>
+      <td className="py-2 px-2 text-xs">{row.indexed_urls ?? "—"}</td>
+      <td className="py-2 px-2 text-xs">{row.errors ?? "—"}</td>
+    </tr>
   );
 }
 
