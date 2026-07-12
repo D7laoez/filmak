@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { z } from "zod";
 import { ArrowRight, Star, Tags, Film, Tv as TvIcon, Filter } from "lucide-react";
 import { NavToggles } from "@/components/NavToggles";
@@ -80,7 +80,10 @@ function GenrePage() {
       }
       return { results: collected, totalPages };
     },
+    placeholderData: keepPreviousData,
   });
+
+  const isRefetching = pagesResult.isFetching && !pagesResult.isLoading;
 
   const updateSearch = (patch: Partial<typeof search>) =>
     navigate({ to: "/genre/$id", params: { id }, search: { ...search, ...patch, page: 1 } });
