@@ -39,10 +39,10 @@ function GenrePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [pages, setPages] = useState<number>(search.page);
 
-  const extraIds = search.ids
+  const extraIds: number[] = (search.ids ?? "")
     .split(",")
-    .map((s) => Number(s))
-    .filter((n) => Number.isFinite(n) && n > 0 && n !== genreId);
+    .map((s: string) => Number(s))
+    .filter((n: number) => Number.isFinite(n) && n > 0 && n !== genreId);
   const selectedIds = [genreId, ...extraIds];
 
   const genres = useQuery({
