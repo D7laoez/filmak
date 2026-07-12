@@ -96,8 +96,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const origin = loaderData?.origin ?? "";
     const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
-    const adsenseClient = (import.meta as unknown as { env: Record<string, string | undefined> })
-      .env.VITE_ADSENSE_CLIENT_ID;
+    const adsenseClient =
+      (import.meta as unknown as { env: Record<string, string | undefined> }).env
+        .VITE_ADSENSE_CLIENT_ID || "ca-pub-2237012686036777";
     return {
     meta: [
       { charSet: "utf-8" },
