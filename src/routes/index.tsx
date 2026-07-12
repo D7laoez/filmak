@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags } from "lucide-react";
+import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import {
@@ -106,6 +107,27 @@ function Home() {
 
   const [searchQ, setSearchQ] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Live search: debounce the input so typing "هوس" shows results instantly.
+  useEffect(() => {
+    const q = searchQ.trim();
+    const h = setTimeout(() => setActiveSearch(q), 250);
+    return () => clearTimeout(h);
+  }, [searchQ]);
+
+  // Prevent body scroll while the mobile search overlay is open.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (mobileSearchOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileSearchOpen]);
+
   const searchRes = useQuery({
     queryKey: ["search", activeSearch, locale],
     queryFn: () => searchMovies({ data: { q: activeSearch, lang: locale } }),
@@ -175,12 +197,10 @@ function Home() {
           <Link to="/" className="flex items-center gap-2">
             <Logo size={32} />
           </Link>
+          {/* Desktop / tablet inline search */}
           <form
-            onSubmit={(e: FormEvent) => {
-              e.preventDefault();
-              setActiveSearch(searchQ.trim());
-            }}
-            className="relative flex-1 max-w-md mx-4"
+            onSubmit={(e: FormEvent) => e.preventDefault()}
+            className="relative flex-1 max-w-md mx-4 hidden sm:block"
           >
             <Search
               className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
@@ -189,10 +209,19 @@ function Home() {
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
               placeholder={t("search_placeholder")}
+              dir="auto"
               className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
             />
           </form>
           <div className="flex items-center gap-2">
+            {/* Mobile-only search trigger */}
+            <button
+              onClick={() => setMobileSearchOpen(true)}
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+              aria-label={t("search_placeholder")}
+            >
+              <Search className="w-4 h-4" />
+            </button>
             <button
               onClick={toggle}
               className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
@@ -232,6 +261,21 @@ function Home() {
           </div>
         </div>
       </header>
+
+      {mobileSearchOpen && (
+        <MobileSearchOverlay
+          value={searchQ}
+          onChange={setSearchQ}
+          onClose={() => setMobileSearchOpen(false)}
+          tab={tab}
+          setTab={setTab}
+          movieResults={searchRes.data ?? []}
+          tvResults={searchTvRes.data ?? []}
+          loading={tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading}
+          dir={dir}
+        />
+      )}
+
 
       {/* Hero + AI */}
       <section className="relative overflow-hidden">
