@@ -490,23 +490,29 @@ function Content() {
               {t("cast")}
             </h2>
             <div className="flex md:grid md:grid-cols-4 lg:grid-cols-8 gap-4 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
-              {data.cast.map((c: { name: string; character: string; profile: string | null }) => (
-                <div key={`${c.name}-${c.character}`} className="text-center shrink-0 w-24 md:w-auto snap-start">
+              {data.cast.map((c: { id?: number; name: string; character: string; profile: string | null }) => (
+                <Link
+                  key={`${c.id ?? c.name}-${c.character}`}
+                  to="/person/$id"
+                  params={{ id: String(c.id ?? "") }}
+                  disabled={!c.id}
+                  className="text-center shrink-0 w-24 md:w-auto snap-start group"
+                >
                   {c.profile ? (
                     <img
                       src={c.profile}
                       alt={c.name}
                       loading="lazy"
-                      className="w-full aspect-square object-cover rounded-full mb-2"
+                      className="w-full aspect-square object-cover rounded-full mb-2 group-hover:ring-2 group-hover:ring-primary/60 transition"
                     />
                   ) : (
                     <div className="w-full aspect-square bg-muted rounded-full mb-2 grid place-items-center">
                       <Users className="w-6 h-6 text-muted-foreground" />
                     </div>
                   )}
-                  <p className="text-sm font-medium truncate">{c.name}</p>
+                  <p className="text-sm font-medium truncate group-hover:text-primary transition">{c.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{c.character}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
