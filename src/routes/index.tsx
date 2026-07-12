@@ -483,14 +483,14 @@ function Home() {
           <Tags className="w-4 h-4 text-primary" />
           {t("browse_by_genre")}
         </div>
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex md:flex-wrap gap-2 mb-2 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {((tab === "tv" ? tvGenres.data : movieGenres.data) ?? []).map((g) => (
             <Link
               key={g.id}
               to="/genre/$id"
               params={{ id: String(g.id) }}
               search={{ type: tab, sort: "popularity.desc", page: 1 }}
-              className="text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
+              className="snap-start shrink-0 text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
               {g.name}
             </Link>

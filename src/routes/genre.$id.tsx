@@ -144,12 +144,31 @@ function GenrePage() {
 
         {/* Genre multi-select chips */}
         {(genres.data?.length ?? 0) > 0 && (
-          <div className="max-w-7xl mx-auto px-4 pb-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="max-w-7xl mx-auto pb-3">
+            <div className="px-4 mb-2 flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Tags className="w-3.5 h-3.5" />
               {t("browse_by_genre")}
-            </span>
-            {genres.data!.map((g) => {
+                {extraIds.length > 0 && (
+                  <span className="ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    +{extraIds.length}
+                  </span>
+                )}
+              </span>
+              {extraIds.length > 0 && (
+                <button
+                  onClick={() => {
+                    updateSearch({ ids: "" });
+                    setPages(1);
+                  }}
+                  className="text-[11px] px-2.5 py-1 rounded-full border border-border/60 text-muted-foreground hover:bg-secondary shrink-0"
+                >
+                  {t("all_genres")}
+                </button>
+              )}
+            </div>
+            <div className="flex md:flex-wrap items-center gap-2 overflow-x-auto md:overflow-visible px-4 pb-1 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {genres.data!.map((g) => {
               const selected = selectedIds.includes(g.id);
               const isPrimary = g.id === genreId;
               return (
@@ -157,7 +176,7 @@ function GenrePage() {
                   key={g.id}
                   onClick={() => toggleExtra(g.id)}
                   disabled={isPrimary}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                  className={`snap-start shrink-0 text-xs px-3 py-1.5 rounded-full border transition ${
                     selected
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-secondary/60 border-border hover:bg-secondary"
@@ -167,36 +186,28 @@ function GenrePage() {
                   {g.name}
                 </button>
               );
-            })}
-            {extraIds.length > 0 && (
-              <button
-                onClick={() => {
-                  updateSearch({ ids: "" });
-                  setPages(1);
-                }}
-                className="text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:bg-secondary"
-              >
-                {t("all_genres")}
-              </button>
-            )}
+              })}
+            </div>
           </div>
         )}
 
         {/* Sort */}
-        <div className="max-w-7xl mx-auto px-4 pb-4 flex flex-wrap items-center gap-2">
-          {sortOptions.map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => updateSearch({ sort: val })}
-              className={`text-xs px-3 py-1.5 rounded-full border transition ${
-                search.sort === val
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-secondary/60 border-border hover:bg-secondary"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="max-w-7xl mx-auto pb-4">
+          <div className="flex md:flex-wrap items-center gap-2 overflow-x-auto md:overflow-visible px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {sortOptions.map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => updateSearch({ sort: val })}
+                className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition ${
+                  search.sort === val
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-secondary/60 border-border hover:bg-secondary"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Filters panel */}
