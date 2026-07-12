@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TvIdRouteImport } from './routes/tv.$id'
+import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as GenreIdRouteImport } from './routes/genre.$id'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
@@ -35,6 +36,11 @@ const IndexRoute = IndexRouteImport.update({
 const TvIdRoute = TvIdRouteImport.update({
   id: '/tv/$id',
   path: '/tv/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonIdRoute = PersonIdRouteImport.update({
+  id: '/person/$id',
+  path: '/person/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieIdRoute = MovieIdRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
+  '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
 }
 export interface FileRoutesByTo {
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
+  '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
 }
 export interface FileRoutesById {
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
+  '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
 }
 export interface FileRouteTypes {
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
+    | '/person/$id'
     | '/tv/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/genre/$id'
     | '/movie/$id'
+    | '/person/$id'
     | '/tv/$id'
   id:
     | '__root__'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stats'
     | '/genre/$id'
     | '/movie/$id'
+    | '/person/$id'
     | '/tv/$id'
   fileRoutesById: FileRoutesById
 }
@@ -124,6 +136,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   GenreIdRoute: typeof GenreIdRoute
   MovieIdRoute: typeof MovieIdRoute
+  PersonIdRoute: typeof PersonIdRoute
   TvIdRoute: typeof TvIdRoute
 }
 
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/tv/$id'
       fullPath: '/tv/$id'
       preLoaderRoute: typeof TvIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/person/$id': {
+      id: '/person/$id'
+      path: '/person/$id'
+      fullPath: '/person/$id'
+      preLoaderRoute: typeof PersonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$id': {
@@ -207,6 +227,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   GenreIdRoute: GenreIdRoute,
   MovieIdRoute: MovieIdRoute,
+  PersonIdRoute: PersonIdRoute,
   TvIdRoute: TvIdRoute,
 }
 export const routeTree = rootRouteImport
