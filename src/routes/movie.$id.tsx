@@ -253,9 +253,19 @@ function Content() {
                 <span className="text-sm text-muted-foreground mx-2">({data.watchCountry})</span>
               )}
             </h2>
-            <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} link={data.watch.link} />
-            <ProviderGroup label={t("rent")} items={data.watch.rent} link={data.watch.link} />
-            <ProviderGroup label={t("buy")} items={data.watch.buy} link={data.watch.link} />
+            {(() => {
+              const fallback = `https://www.themoviedb.org/movie/${data.id}/watch${
+                data.watchCountry ? `?locale=${data.watchCountry}` : ""
+              }`;
+              const link = data.watch.link || fallback;
+              return (
+                <>
+                  <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} link={link} />
+                  <ProviderGroup label={t("rent")} items={data.watch.rent} link={link} />
+                  <ProviderGroup label={t("buy")} items={data.watch.buy} link={link} />
+                </>
+              );
+            })()}
             {data.watch.link && (
               <a
                 href={data.watch.link}
