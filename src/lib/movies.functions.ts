@@ -252,6 +252,7 @@ export const getMovieDetails = createServerFn({ method: "GET" })
           })),
       },
       cast: (credits.cast || []).slice(0, 16).map((c: any) => ({
+        id: c.id,
         name: c.name,
         character: c.character,
         profile: c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : null,
