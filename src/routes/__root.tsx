@@ -96,6 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const origin = loaderData?.origin ?? "";
     const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
+    const adsenseClient = (import.meta as unknown as { env: Record<string, string | undefined> })
+      .env.VITE_ADSENSE_CLIENT_ID;
     return {
     meta: [
       { charSet: "utf-8" },
@@ -127,6 +129,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "فيلمك — Filmak" },
       { name: "twitter:description", content: "AI movie & series recommendations in Arabic and English." },
       { name: "twitter:image", content: ogImage },
+      ...(adsenseClient ? [{ name: "google-adsense-account", content: adsenseClient }] : []),
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -137,6 +140,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
+    scripts: adsenseClient
+      ? [
+          {
+            async: true,
+            src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`,
+            crossOrigin: "anonymous",
+          },
+        ]
+      : [],
     };
   },
   shellComponent: RootShell,
