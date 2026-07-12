@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass } from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
@@ -233,6 +233,14 @@ function Home() {
               {t("lang_switch")}
             </button>
             <ThemeToggle />
+            <Link
+              to="/discover"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+              aria-label={t("discover")}
+            >
+              <Compass className="w-4 h-4" />
+              {t("discover")}
+            </Link>
             {user ? (
               <>
                 <Link
