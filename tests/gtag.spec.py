@@ -24,8 +24,9 @@ BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:8080")
 MEASUREMENT_ID = "G-RZVBBHB5X0"
 GTAG_URL_FRAGMENT = f"googletagmanager.com/gtag/js?id={MEASUREMENT_ID}"
 
-# Public routes to sample. Add more as they are created.
-ROUTES = ["/", "/about", "/contact", "/auth", "/browse"]
+# Public routes to sample (real routes + one 404 to confirm gtag also
+# ships on the not-found page, since it lives under __root too).
+ROUTES = ["/", "/auth", "/discover", "/movie/1", "/this-route-does-not-exist"]
 
 SCREENSHOTS = Path("/tmp/browser/gtag")
 SCREENSHOTS.mkdir(parents=True, exist_ok=True)
