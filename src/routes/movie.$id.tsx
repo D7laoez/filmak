@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ArrowRight, Star, Clock, Calendar, Play, Film } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -10,6 +10,7 @@ import { Spinner } from "@/components/Spinner";
 import { useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
+import { TrailerModal } from "@/components/TrailerModal";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -128,6 +129,7 @@ function Content() {
     queryKey: ["movie", numId, locale],
     queryFn: () => getMovieDetails({ data: { id: numId, lang: locale } }),
   });
+  const [trailerOpen, setTrailerOpen] = useState(false);
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -206,15 +208,14 @@ function Content() {
 
             {data.trailerKey && (
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
-                  href={`https://www.youtube.com/watch?v=${data.trailerKey}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => setTrailerOpen(true)}
                   className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-medium hover:opacity-90 transition"
                 >
                   <Play className="w-4 h-4 fill-current" />
                   {t("watch_trailer")}
-                </a>
+                </button>
                 <FavoriteButton
                   movie={{
                     id: data.id,
@@ -341,6 +342,14 @@ function Content() {
           </section>
         )}
       </div>
+      {data.trailerKey && (
+        <TrailerModal
+          trailerKey={data.trailerKey}
+          title={data.title}
+          open={trailerOpen}
+          onClose={() => setTrailerOpen(false)}
+        />
+      )}
     </div>
   );
 }
