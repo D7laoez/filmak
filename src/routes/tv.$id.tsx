@@ -8,6 +8,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { useLocale, useT } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { getRequestOrigin } from "@/lib/origin.functions";
+import { NavToggles } from "@/components/NavToggles";
 
 export const Route = createFileRoute("/tv/$id")({
   component: TvPage,
