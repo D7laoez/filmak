@@ -133,6 +133,32 @@ const DICT: Record<Locale, Dict> = {
     movies_count: "أفلام",
     tv_count: "مسلسلات",
     your_rating: "تقييمك",
+    original_title: "الاسم الأصلي",
+    status: "الحالة",
+    votes: "صوت",
+    popularity_label: "الشعبية",
+    box_office: "شباك التذاكر",
+    budget: "الميزانية",
+    revenue: "الإيرادات",
+    profit: "الربح",
+    production: "الإنتاج",
+    countries: "الدول",
+    languages: "اللغات",
+    companies: "شركات الإنتاج",
+    videos: "فيديوهات",
+    gallery: "الصور",
+    crew: "طاقم العمل",
+    director: "المخرج",
+    writers: "الكتّاب",
+    composer: "الموسيقى",
+    cinematographer: "التصوير",
+    editor: "المونتاج",
+    more: "عرض المزيد",
+    less: "عرض أقل",
+    close: "إغلاق",
+    imdb: "IMDb",
+    tmdb: "TMDB",
+    details: "تفاصيل",
   },
   en: {
     brand: "Filmak",
@@ -257,6 +283,32 @@ const DICT: Record<Locale, Dict> = {
     movies_count: "Movies",
     tv_count: "Series",
     your_rating: "Your rating",
+    original_title: "Original title",
+    status: "Status",
+    votes: "votes",
+    popularity_label: "Popularity",
+    box_office: "Box office",
+    budget: "Budget",
+    revenue: "Revenue",
+    profit: "Profit",
+    production: "Production",
+    countries: "Countries",
+    languages: "Languages",
+    companies: "Production companies",
+    videos: "Videos",
+    gallery: "Gallery",
+    crew: "Crew",
+    director: "Director",
+    writers: "Writers",
+    composer: "Music",
+    cinematographer: "Cinematography",
+    editor: "Editing",
+    more: "Show more",
+    less: "Show less",
+    close: "Close",
+    imdb: "IMDb",
+    tmdb: "TMDB",
+    details: "Details",
   },
 };
 
@@ -371,6 +423,32 @@ export type Dict = {
   movies_count: string;
   tv_count: string;
   your_rating: string;
+  original_title: string;
+  status: string;
+  votes: string;
+  popularity_label: string;
+  box_office: string;
+  budget: string;
+  revenue: string;
+  profit: string;
+  production: string;
+  countries: string;
+  languages: string;
+  companies: string;
+  videos: string;
+  gallery: string;
+  crew: string;
+  director: string;
+  writers: string;
+  composer: string;
+  cinematographer: string;
+  editor: string;
+  more: string;
+  less: string;
+  close: string;
+  imdb: string;
+  tmdb: string;
+  details: string;
 };
 export type TKey = keyof Dict;
 
