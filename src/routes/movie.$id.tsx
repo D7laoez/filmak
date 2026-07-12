@@ -27,6 +27,7 @@ import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
 import { TrailerModal } from "@/components/TrailerModal";
 import { MediaLightbox } from "@/components/MediaLightbox";
+import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -510,6 +511,11 @@ function Content() {
             </div>
           </section>
         )}
+
+        {/* Ad slot */}
+        <div className="mt-10">
+          <AdSlot slot="1234567890" className="min-h-[100px]" />
+        </div>
 
         {/* Crew */}
         {(data.crew.director.length +
