@@ -154,12 +154,22 @@ function Content() {
           <section className="mt-12">
             <h2 className="text-xl font-bold mb-4">{t("cast")}</h2>
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
-              {data.cast.map((c: { name: string; character: string; profile: string | null }) => (
-                <div key={c.name} className="text-center">
-                  {c.profile ? <img src={c.profile} alt={c.name} className="w-full aspect-square object-cover rounded-full mb-2" /> : <div className="w-full aspect-square bg-muted rounded-full mb-2" />}
-                  <p className="text-sm font-medium truncate">{c.name}</p>
+              {data.cast.map((c: { id?: number; name: string; character: string; profile: string | null }) => (
+                <Link
+                  key={`${c.id ?? c.name}-${c.character}`}
+                  to="/person/$id"
+                  params={{ id: String(c.id ?? "") }}
+                  disabled={!c.id}
+                  className="text-center group"
+                >
+                  {c.profile ? (
+                    <img src={c.profile} alt={c.name} className="w-full aspect-square object-cover rounded-full mb-2 group-hover:ring-2 group-hover:ring-primary/60 transition" />
+                  ) : (
+                    <div className="w-full aspect-square bg-muted rounded-full mb-2" />
+                  )}
+                  <p className="text-sm font-medium truncate group-hover:text-primary transition">{c.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{c.character}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
