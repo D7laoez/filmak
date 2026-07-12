@@ -240,10 +240,30 @@ Strict rules:
       return true;
     });
 
-    return {
+    const result = {
       intro: parsed.intro || "",
       recommendations: dedup,
     };
+
+    // Store in cache for future identical prompts (only if we got real results)
+    if (dedup.length >= 3) {
+      try {
+        await supabaseAdmin.from("ai_cache").upsert(
+          {
+            cache_key: cacheKey,
+            lang,
+            prompt: normalizedPrompt,
+            response: result,
+            last_hit_at: new Date().toISOString(),
+          },
+          { onConflict: "cache_key" },
+        );
+      } catch (e) {
+        console.warn("ai_cache write failed", e);
+      }
+    }
+
+    return result;
   });
 
 async function tmdbSearchBest(
