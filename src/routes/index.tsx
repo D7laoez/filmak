@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags } from "lucide-react";
+import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import {
@@ -106,6 +107,27 @@ function Home() {
 
   const [searchQ, setSearchQ] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Live search: debounce the input so typing "هوس" shows results instantly.
+  useEffect(() => {
+    const q = searchQ.trim();
+    const h = setTimeout(() => setActiveSearch(q), 250);
+    return () => clearTimeout(h);
+  }, [searchQ]);
+
+  // Prevent body scroll while the mobile search overlay is open.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (mobileSearchOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileSearchOpen]);
+
   const searchRes = useQuery({
     queryKey: ["search", activeSearch, locale],
     queryFn: () => searchMovies({ data: { q: activeSearch, lang: locale } }),
@@ -175,12 +197,10 @@ function Home() {
           <Link to="/" className="flex items-center gap-2">
             <Logo size={32} />
           </Link>
+          {/* Desktop / tablet inline search */}
           <form
-            onSubmit={(e: FormEvent) => {
-              e.preventDefault();
-              setActiveSearch(searchQ.trim());
-            }}
-            className="relative flex-1 max-w-md mx-4"
+            onSubmit={(e: FormEvent) => e.preventDefault()}
+            className="relative flex-1 max-w-md mx-4 hidden sm:block"
           >
             <Search
               className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
@@ -189,10 +209,19 @@ function Home() {
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
               placeholder={t("search_placeholder")}
+              dir="auto"
               className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
             />
           </form>
           <div className="flex items-center gap-2">
+            {/* Mobile-only search trigger */}
+            <button
+              onClick={() => setMobileSearchOpen(true)}
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+              aria-label={t("search_placeholder")}
+            >
+              <Search className="w-4 h-4" />
+            </button>
             <button
               onClick={toggle}
               className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
@@ -232,6 +261,21 @@ function Home() {
           </div>
         </div>
       </header>
+
+      {mobileSearchOpen && (
+        <MobileSearchOverlay
+          value={searchQ}
+          onChange={setSearchQ}
+          onClose={() => setMobileSearchOpen(false)}
+          tab={tab}
+          setTab={setTab}
+          movieResults={searchRes.data ?? []}
+          tvResults={searchTvRes.data ?? []}
+          loading={tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading}
+          dir={dir}
+        />
+      )}
+
 
       {/* Hero + AI */}
       <section className="relative overflow-hidden">
@@ -575,4 +619,131 @@ function Row({
 
 function tvToCard(t: TvCard): MovieCard {
   return t as unknown as MovieCard;
+}
+
+function MobileSearchOverlay({
+  value,
+  onChange,
+  onClose,
+  tab,
+  setTab,
+  movieResults,
+  tvResults,
+  loading,
+  dir,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onClose: () => void;
+  tab: "movie" | "tv";
+  setTab: (t: "movie" | "tv") => void;
+  movieResults: MovieCard[];
+  tvResults: TvCard[];
+  loading: boolean;
+  dir: "rtl" | "ltr";
+}) {
+  const t = useLocale().t;
+  const results: MovieCard[] = tab === "tv" ? tvResults.map(tvToCard) : movieResults;
+  const trimmed = value.trim();
+
+  return (
+    <div dir={dir} className="fixed inset-0 z-[60] bg-background flex flex-col">
+      <div className="sticky top-0 border-b border-border/40 bg-background/95 backdrop-blur px-3 py-3 flex items-center gap-2">
+        <button
+          onClick={onClose}
+          className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition shrink-0"
+          aria-label="Close"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        <div className="relative flex-1">
+          <Search
+            className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+          />
+          <input
+            autoFocus
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={t("search_placeholder")}
+            dir="auto"
+            className={`w-full bg-secondary/60 border border-border rounded-full py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-border/50 px-4">
+        <button
+          onClick={() => setTab("movie")}
+          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+            tab === "movie" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
+          }`}
+        >
+          <Film className="w-4 h-4" />
+          {t("tab_movies")}
+        </button>
+        <button
+          onClick={() => setTab("tv")}
+          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition ${
+            tab === "tv" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
+          }`}
+        >
+          <Tv className="w-4 h-4" />
+          {t("tab_series")}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 py-3">
+        {trimmed.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center mt-8">
+            {t("search_placeholder")}
+          </p>
+        ) : loading ? (
+          <div className="py-10 flex items-center justify-center">
+            <Spinner size={48} label={t("loading")} />
+          </div>
+        ) : results.length === 0 ? (
+          <div className="py-10 text-center">
+            <p className="text-sm font-medium">{t("no_results")}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t("no_results_sub")}</p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-border/60">
+            {results.map((m) => (
+              <li key={`${tab}-${m.id}`}>
+                <Link
+                  to={tab === "tv" ? "/tv/$id" : "/movie/$id"}
+                  params={{ id: String(m.id) }}
+                  onClick={onClose}
+                  className="flex items-center gap-3 py-3"
+                >
+                  {m.poster ? (
+                    <img
+                      src={m.poster}
+                      alt={m.title}
+                      loading="lazy"
+                      className="w-12 h-16 rounded-md object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-16 rounded-md bg-muted flex items-center justify-center shrink-0">
+                      <Film className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium truncate">{m.title}</h3>
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{m.year}</span>
+                      <span className="inline-flex items-center gap-1 text-primary">
+                        <Star className="w-3 h-3 fill-primary" />
+                        {m.rating}
+                      </span>
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
 }
