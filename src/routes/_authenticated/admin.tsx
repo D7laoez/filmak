@@ -21,6 +21,7 @@ import {
   getUserDetail,
   toggleAdminRole,
   deleteUser,
+  checkIsAdmin,
   type AdminUserRow,
 } from "@/lib/admin.functions";
 import { useLocale } from "@/lib/i18n";
@@ -29,6 +30,17 @@ import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  loader: async () => {
+    const { notFound } = await import("@tanstack/react-router");
+    const { isAdmin } = await checkIsAdmin();
+    if (!isAdmin) throw notFound();
+    return null;
+  },
+  errorComponent: () => null,
+  notFoundComponent: () => {
+    const { NotFoundComponent } = require("@/routes/__root");
+    return <NotFoundComponent />;
+  },
   component: AdminPage,
 });
 
