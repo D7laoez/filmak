@@ -512,6 +512,11 @@ function Content() {
           </section>
         )}
 
+        {/* Ad slot */}
+        <div className="mt-10">
+          <AdSlot slot="1234567890" className="min-h-[100px]" />
+        </div>
+
         {/* Crew */}
         {(data.crew.director.length +
           data.crew.writers.length +
