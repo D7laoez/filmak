@@ -6,8 +6,9 @@ declare global {
   }
 }
 
-const ADSENSE_CLIENT = (import.meta as unknown as { env: Record<string, string | undefined> }).env
-  .VITE_ADSENSE_CLIENT_ID;
+const ADSENSE_CLIENT =
+  (import.meta as unknown as { env: Record<string, string | undefined> }).env
+    .VITE_ADSENSE_CLIENT_ID || "ca-pub-2237012686036777";
 
 type AdSlotProps = {
   slot: string;
