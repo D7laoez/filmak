@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, rootRouteId } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -31,16 +31,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   loader: async () => {
-    const { notFound } = await import("@tanstack/react-router");
     const { isAdmin } = await checkIsAdmin();
-    if (!isAdmin) throw notFound();
+    if (!isAdmin) throw notFound({ routeId: rootRouteId });
     return null;
   },
   errorComponent: () => null,
-  notFoundComponent: () => {
-    const { NotFoundComponent } = require("@/routes/__root");
-    return <NotFoundComponent />;
-  },
   component: AdminPage,
 });
 
