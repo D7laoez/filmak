@@ -280,6 +280,9 @@ function Home() {
 
       {/* Hero + AI */}
       <section className="relative overflow-hidden">
+        {tab === "movie" && trending.data && trending.data.length > 0 && (
+          <HeroCarousel movies={trending.data} />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-accent/5 to-transparent pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
           <img
