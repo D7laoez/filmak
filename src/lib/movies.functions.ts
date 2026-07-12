@@ -146,17 +146,40 @@ export const getMovieDetails = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const [details, videos, providers, credits, similar] = await Promise.all([
+    const [details, videos, providers, credits, similar, images] = await Promise.all([
       tmdbGet<any>(`/movie/${data.id}`, {}, data.lang),
       tmdbGet<any>(`/movie/${data.id}/videos`, { language: "en-US" }, data.lang),
       tmdbGet<any>(`/movie/${data.id}/watch/providers`, {}, data.lang),
       tmdbGet<any>(`/movie/${data.id}/credits`, {}, data.lang),
       tmdbGet<any>(`/movie/${data.id}/similar`, {}, data.lang),
+      tmdbGet<any>(
+        `/movie/${data.id}/images`,
+        { include_image_language: "en,null" },
+        data.lang,
+      ).catch(() => ({ backdrops: [], posters: [] })),
     ]);
 
     const trailer = (videos.results || []).find(
       (v: any) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"),
     );
+    const allVideos = (videos.results || [])
+      .filter((v: any) => v.site === "YouTube" && v.key)
+      .sort((a: any, b: any) => {
+        const order: Record<string, number> = {
+          Trailer: 0,
+          Teaser: 1,
+          Clip: 2,
+          "Behind the Scenes": 3,
+          Featurette: 4,
+        };
+        return (order[a.type] ?? 9) - (order[b.type] ?? 9);
+      })
+      .slice(0, 12)
+      .map((v: any) => ({
+        key: v.key as string,
+        name: v.name as string,
+        type: v.type as string,
+      }));
 
     const providersByCountry = providers.results || {};
     const preferred = ["SA", "AE", "EG", "US"];
@@ -177,9 +200,17 @@ export const getMovieDetails = createServerFn({ method: "GET" })
       }
     }
 
+    const crewList = (credits.crew || []) as Array<{ job: string; name: string; profile_path: string | null }>;
+    const findCrew = (jobs: string[]) =>
+      crewList
+        .filter((c) => jobs.includes(c.job))
+        .slice(0, 3)
+        .map((c) => c.name);
+
     return {
       id: details.id,
       title: details.title || details.original_title,
+      originalTitle: details.original_title ?? null,
       tagline: details.tagline,
       overview: details.overview,
       poster: details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : null,
@@ -187,15 +218,51 @@ export const getMovieDetails = createServerFn({ method: "GET" })
         ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
         : null,
       year: (details.release_date || "").slice(0, 4),
+      releaseDate: details.release_date ?? null,
       runtime: details.runtime,
       rating: Math.round((details.vote_average || 0) * 10) / 10,
+      voteCount: details.vote_count ?? 0,
+      popularity: Math.round((details.popularity ?? 0) * 10) / 10,
+      status: details.status ?? null,
+      budget: details.budget ?? 0,
+      revenue: details.revenue ?? 0,
+      imdbId: details.imdb_id ?? null,
+      originalLanguage: details.original_language ?? null,
+      spokenLanguages: (details.spoken_languages || []).map((l: any) => l.english_name || l.name),
+      productionCountries: (details.production_countries || []).map((c: any) => c.name),
+      productionCompanies: (details.production_companies || []).map((c: any) => ({
+        name: c.name as string,
+        logo: c.logo_path ? `https://image.tmdb.org/t/p/w200${c.logo_path}` : null,
+      })),
       genres: (details.genres || []).map((g: any) => g.name),
       trailerKey: trailer?.key ?? null,
-      cast: (credits.cast || []).slice(0, 8).map((c: any) => ({
+      videos: allVideos,
+      images: {
+        backdrops: (images.backdrops || [])
+          .slice(0, 12)
+          .map((b: any) => ({
+            url: `https://image.tmdb.org/t/p/original${b.file_path}`,
+            thumb: `https://image.tmdb.org/t/p/w780${b.file_path}`,
+          })),
+        posters: (images.posters || [])
+          .slice(0, 12)
+          .map((p: any) => ({
+            url: `https://image.tmdb.org/t/p/original${p.file_path}`,
+            thumb: `https://image.tmdb.org/t/p/w342${p.file_path}`,
+          })),
+      },
+      cast: (credits.cast || []).slice(0, 16).map((c: any) => ({
         name: c.name,
         character: c.character,
         profile: c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : null,
       })),
+      crew: {
+        director: findCrew(["Director"]),
+        writers: findCrew(["Screenplay", "Writer", "Story"]),
+        composer: findCrew(["Original Music Composer", "Music"]),
+        cinematographer: findCrew(["Director of Photography"]),
+        editor: findCrew(["Editor"]),
+      },
       watchCountry,
       watch: watch
         ? {
