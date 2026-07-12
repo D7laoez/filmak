@@ -397,7 +397,7 @@ function Content() {
               {t("videos")}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {data.videos.map((v) => (
+              {data.videos.map((v: { key: string; name: string; type: string }) => (
                 <button
                   key={v.key}
                   type="button"
@@ -461,7 +461,7 @@ function Content() {
                   : "grid-cols-3 md:grid-cols-5 lg:grid-cols-6"
               }`}
             >
-              {galleryImages.map((img, i) => (
+              {galleryImages.map((img: { url: string; thumb: string }, i: number) => (
                 <button
                   key={img.url}
                   onClick={() => setLightboxIndex(i)}
@@ -489,7 +489,7 @@ function Content() {
               {t("cast")}
             </h2>
             <div className="flex md:grid md:grid-cols-4 lg:grid-cols-8 gap-4 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
-              {data.cast.map((c) => (
+              {data.cast.map((c: { name: string; character: string; profile: string | null }) => (
                 <div key={`${c.name}-${c.character}`} className="text-center shrink-0 w-24 md:w-auto snap-start">
                   {c.profile ? (
                     <img
@@ -601,7 +601,7 @@ function Content() {
               {t("companies")}
             </h3>
             <div className="flex flex-wrap gap-3">
-              {data.productionCompanies.map((c) => (
+              {data.productionCompanies.map((c: { name: string; logo: string | null }) => (
                 <div
                   key={c.name}
                   className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2"
