@@ -143,6 +143,13 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+
+  /* Reserve space for the mobile bottom nav so page content is never covered. */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    }
+  }
 }
 
 /* Hide the 'Edit with Lovable' badge on published deployments */

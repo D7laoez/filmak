@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LocaleProvider, useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
+import { BottomNav } from "@/components/BottomNav";
 
 function NotFoundComponent() {
   const t = useT();
@@ -177,6 +178,7 @@ function RootComponent() {
         <LocaleProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <BottomNav />
           <Toaster position="top-center" theme="dark" richColors />
         </LocaleProvider>
       </ThemeProvider>
