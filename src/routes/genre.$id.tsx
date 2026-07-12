@@ -17,6 +17,7 @@ const searchSchema = z.object({
   minRating: z.number().catch(0),
   year: z.number().nullable().catch(null),
   ol: z.string().nullable().catch(null),
+  ids: z.string().catch(""),
 });
 
 export const Route = createFileRoute("/genre/$id")({
@@ -38,21 +39,31 @@ function GenrePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [pages, setPages] = useState<number>(search.page);
 
+  const extraIds = search.ids
+    .split(",")
+    .map((s) => Number(s))
+    .filter((n) => Number.isFinite(n) && n > 0 && n !== genreId);
+  const selectedIds = [genreId, ...extraIds];
+
   const genres = useQuery({
     queryKey: [isTv ? "tv-genres" : "genres", locale],
     queryFn: () => (isTv ? getTvGenres({ data: { lang: locale } }) : getGenres({ data: { lang: locale } })),
   });
   const genreName = genres.data?.find((g) => g.id === genreId)?.name ?? "";
+  const selectedNames = selectedIds
+    .map((gid) => genres.data?.find((g) => g.id === gid)?.name)
+    .filter(Boolean)
+    .join(" + ");
 
   // Fetch all pages up to `pages`
   const pagesResult = useQuery({
-    queryKey: [isTv ? "tv-by-genre" : "by-genre", genreId, search.sort, pages, search.minRating, search.year, search.ol, locale],
+    queryKey: [isTv ? "tv-by-genre" : "by-genre", selectedIds.join(","), search.sort, pages, search.minRating, search.year, search.ol, locale],
     queryFn: async () => {
       const collected: (MovieCard | TvCard)[] = [];
       let totalPages = 1;
       for (let p = 1; p <= pages; p++) {
         const args = {
-          genreId,
+          genreIds: selectedIds,
           lang: locale,
           sort: search.sort as never,
           page: p,
@@ -73,6 +84,15 @@ function GenrePage() {
 
   const updateSearch = (patch: Partial<typeof search>) =>
     navigate({ to: "/genre/$id", params: { id }, search: { ...search, ...patch, page: 1 } });
+
+  const toggleExtra = (gid: number) => {
+    if (gid === genreId) return;
+    const set = new Set(extraIds);
+    if (set.has(gid)) set.delete(gid);
+    else set.add(gid);
+    updateSearch({ ids: [...set].join(",") });
+    setPages(1);
+  };
 
   const sortOptions = isTv
     ? ([
@@ -97,7 +117,7 @@ function GenrePage() {
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {isTv ? <TvIcon className="w-5 h-5 text-primary shrink-0" /> : <Tags className="w-5 h-5 text-primary shrink-0" />}
             <h1 className="text-xl font-bold truncate">
-              {isTv ? t("tv_series") : t("tab_movies")} · {genreName}
+              {isTv ? t("tv_series") : t("tab_movies")} · {selectedNames || genreName}
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -121,6 +141,46 @@ function GenrePage() {
             <NavToggles />
           </div>
         </div>
+
+        {/* Genre multi-select chips */}
+        {(genres.data?.length ?? 0) > 0 && (
+          <div className="max-w-7xl mx-auto px-4 pb-3 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+              <Tags className="w-3.5 h-3.5" />
+              {t("browse_by_genre")}
+            </span>
+            {genres.data!.map((g) => {
+              const selected = selectedIds.includes(g.id);
+              const isPrimary = g.id === genreId;
+              return (
+                <button
+                  key={g.id}
+                  onClick={() => toggleExtra(g.id)}
+                  disabled={isPrimary}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition ${
+                    selected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-secondary/60 border-border hover:bg-secondary"
+                  } ${isPrimary ? "opacity-90 cursor-default" : ""}`}
+                  title={isPrimary ? undefined : selected ? "remove" : "add"}
+                >
+                  {g.name}
+                </button>
+              );
+            })}
+            {extraIds.length > 0 && (
+              <button
+                onClick={() => {
+                  updateSearch({ ids: "" });
+                  setPages(1);
+                }}
+                className="text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:bg-secondary"
+              >
+                {t("all_genres")}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Sort */}
         <div className="max-w-7xl mx-auto px-4 pb-4 flex flex-wrap items-center gap-2">
