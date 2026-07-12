@@ -156,7 +156,7 @@ function Home() {
 
   const [prompt, setPrompt] = useState("");
   const recMutation = useMutation({
-    mutationFn: (p: string) => recommendMovies({ data: { prompt: p } }),
+    mutationFn: (p: string) => recommendMovies({ data: { prompt: p, lang: locale } }),
   });
 
   const suggestions = t("suggestions");

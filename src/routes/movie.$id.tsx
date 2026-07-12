@@ -9,6 +9,7 @@ import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
+import { NavToggles } from "@/components/NavToggles";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -141,7 +142,7 @@ function Content() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
         <div className="absolute top-0 left-0 right-0 p-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
             <Link
               to="/"
               className="inline-flex items-center gap-2 bg-black/50 backdrop-blur rounded-full px-3 py-1.5 text-sm hover:bg-black/70 transition"
@@ -149,6 +150,7 @@ function Content() {
               <ArrowRight className="w-4 h-4" />
               {t("back")}
             </Link>
+            <NavToggles />
           </div>
         </div>
       </div>
