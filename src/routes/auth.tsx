@@ -3,6 +3,7 @@ import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
+import { resolveLoginIdentifier, isUsernameAvailable } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,7 +30,8 @@ function AuthPage() {
   const navigate = useNavigate();
   const { dir, t } = useLocale();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email OR username on sign-in
+  const [email, setEmail] = useState(""); // signup only
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,18 +51,45 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
+        // Enforce unique username server-side before creating the auth user
+        const uname = username.trim();
+        if (!/^[a-zA-Z0-9_.-]{2,40}$/.test(uname)) {
+          throw new Error(
+            dir === "rtl"
+              ? "اسم المستخدم: أحرف/أرقام/نقطة/شرطة سفلية فقط (2–40)"
+              : "Username: letters, digits, . _ - only (2–40 chars)",
+          );
+        }
+        const { available } = await isUsernameAvailable({ data: { username: uname } });
+        if (!available) {
+          throw new Error(
+            dir === "rtl" ? "اسم المستخدم مستخدم بالفعل" : "Username already taken",
+          );
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { username: username.trim() },
+            data: { username: uname },
           },
         });
         if (error) throw error;
         navigate({ to: "/" });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        // Accept either email or username; resolve to email server-side.
+        const { email: resolvedEmail } = await resolveLoginIdentifier({
+          data: { identifier: identifier.trim() },
+        });
+        if (!resolvedEmail) {
+          throw new Error(
+            dir === "rtl" ? "بيانات الدخول غير صحيحة" : "Invalid login credentials",
+          );
+        }
+        const { error } = await supabase.auth.signInWithPassword({
+          email: resolvedEmail,
+          password,
+        });
         if (error) throw error;
         navigate({ to: "/" });
       }
@@ -106,17 +135,32 @@ function AuthPage() {
                 />
               </div>
             )}
-            <div className="relative">
-              <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("email")}
-                className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
-              />
-            </div>
+            {mode === "signup" ? (
+              <div className="relative">
+                <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t("email")}
+                  className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
+                />
+              </div>
+            ) : (
+              <div className="relative">
+                <User className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <input
+                  type="text"
+                  required
+                  autoComplete="username"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder={dir === "rtl" ? "الإيميل أو اسم المستخدم" : "Email or username"}
+                  className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
+                />
+              </div>
+            )}
             <div className="relative">
               <Lock className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
               <input
