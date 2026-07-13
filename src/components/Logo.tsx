@@ -19,7 +19,7 @@ export function Logo({
       <img
         src="/icon-192.png"
         srcSet="/icon-192.png 1x, /icon-512.png 2x"
-        alt={t("brand")}
+        alt={`${t("brand")} logo`}
         width={size}
         height={size}
         style={{ width: size, height: size }}
