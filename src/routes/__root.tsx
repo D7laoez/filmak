@@ -261,7 +261,7 @@ function RootComponent() {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         if (typeof window !== "undefined" && window.location.pathname !== "/reset-password") {
-          window.location.replace("/reset-password");
+          window.location.replace("/reset-password" + window.location.search + window.location.hash);
         }
         return;
       }

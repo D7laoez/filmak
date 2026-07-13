@@ -4,6 +4,7 @@ import { Loader2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useLocale } from "@/lib/i18n";
+import { emailExists } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -52,9 +53,10 @@ function AuthPage() {
     setGoogleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
       if (result.error) throw result.error;
+      if (result.redirected) return;
       navigate({ to: "/" });
     } catch (e) {
       setError(
@@ -78,6 +80,14 @@ function AuthPage() {
         if (!target.includes("@")) {
           throw new Error(
             dir === "rtl" ? "أدخل بريدك الإلكتروني" : "Enter your email",
+          );
+        }
+        const exists = await emailExists({ data: { email: target } });
+        if (!exists) {
+          throw new Error(
+            dir === "rtl"
+              ? "إيميلك غير مسجل"
+              : "Your email is not registered",
           );
         }
         const { error } = await supabase.auth.resetPasswordForEmail(target, {
