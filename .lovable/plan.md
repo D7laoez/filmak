@@ -1,73 +1,41 @@
+## Plan
 
-# خطة تطوير filmak.site — نسخة أقوى وأسرع وأكمل
+### 1. Disable email confirmation for new signups
+- Call `supabase--configure_auth` with `auto_confirm_email: true` so new accounts are active immediately without clicking a confirmation link.
 
-بعد فحص الكود، حددت 4 محاور رئيسية للتحديث. راح أنفذها على مراحل واضحة.
+### 2. Signup flow → redirect to sign-in
+- In `src/routes/auth.tsx`, after a successful `signUp` call, do NOT auto sign the user in. Instead:
+  - Show a brief success notice ("تم إنشاء الحساب، سجّل دخولك").
+  - Switch the form to `signin` mode and prefill the email/username field.
+  - Clear password field so the user explicitly types password to sign in.
 
----
+### 3. New "Account settings" page (user control panel)
+- Create `src/routes/_authenticated/account.tsx` (protected route).
+- Clean, matching design (card layout, same rounded-2xl / bg-card style as auth/reset-password pages, RTL/LTR aware via `useLocale`).
+- Sections:
+  1. **Profile info** — edit `username` and `display_name` from `profiles` table. Username uniqueness check (case-insensitive) before update.
+  2. **Email** — change email via `supabase.auth.updateUser({ email })`. Show current email.
+  3. **Password** — change password via `supabase.auth.updateUser({ password })`. No old password required (new + confirm only, min 6 chars, match check).
+  4. **Sign out** button.
+- Each section is an independent form with its own submit button, loading state, success/error inline messages.
+- Add a link/entry point to `/account` from the top bar user menu (or wherever the auth avatar/menu lives) — locate current entry point in `TopBar.tsx` and add the item.
 
-## 1) السرعة (الأولوية القصوى — تحل البطء الحالي)
+### 4. Password reset email — single-use, new link each request
+- Supabase recovery links are already single-use by design (once consumed via `exchangeCodeForSession` or `setSession`, the token is invalidated server-side).
+- The current `reset-password.tsx` already handles both PKCE (`?code=`) and hash tokens.
+- Ensure that after a successful password update, we call `supabase.auth.signOut()` and the URL params/hash are cleared (they already are), so re-opening the same link fails cleanly and the "Send new link" resend form appears.
+- Verify `resetPasswordForEmail` uses `redirectTo: ${origin}/reset-password` (already the case) — each call generates a new token; the previous link becomes invalid once a new one is issued or once used. No code change needed beyond confirming behavior; if a user opens an old/used link, the page shows the resend form (existing behavior).
+- Add an explicit call to invalidate the URL and sign out on success in reset-password to make it obvious the link is one-shot.
 
-**السبب الجذري للبطء**:
-- لا يوجد `staleTime` معرّف → كل تنقل يعيد جلب بيانات TMDB من الصفر
-- الصفحة الرئيسية تُطلق **15+ استعلام** بينما loader يجلب 5 فقط
-- الصور تُحمّل بحجم كامل بدون `sizes` مناسبة
-- لا يوجد كاش من طرف الخادم لنداءات TMDB المتكررة
+### 5. End-to-end verification
+- Run `tsgo --noEmit` after edits.
+- Playwright: sign up a new account (verify no confirmation email needed, redirected to sign-in), sign in, open `/account`, change display name / password / email, verify each works, then test `/reset-password` flow (request link twice → confirm only the newest works; using a link twice fails and shows resend form).
 
-**التغييرات**:
-- `staleTime: 30 دقيقة` و `gcTime: 24 ساعة` افتراضياً في `router.tsx` — القوائم الشعبية ما تتغير كل دقيقة
-- كاش داخل الذاكرة على الخادم لنداءات TMDB (نفس النتيجة تُقدّم فوراً لكل الزوار)
-- `loading="lazy"` + `sizes` صحيحة لكل الصور، `fetchpriority="high"` لصورة الـHero فقط
-- تحميل تبويب المسلسلات فقط عند فتحه (موجود جزئياً — راح أكمله)
-- تقسيم صفحة الفلم (757 سطر) لمكونات مؤجلة (cast, similar, trailer)
+### Files touched
+- edit `src/routes/auth.tsx` (post-signup redirect to sign-in mode)
+- create `src/routes/_authenticated/account.tsx`
+- edit `src/components/TopBar.tsx` (add link to `/account`)
+- edit `src/routes/reset-password.tsx` (sign out + clean URL after success to enforce one-shot UX)
+- `supabase--configure_auth` call (auto_confirm_email true, keep signups enabled, HIBP as-is, no anonymous)
 
-**المتوقع**: تحميل الرئيسية أسرع 3-5× للزوار العائدين، والتنقل بين الصفحات يصير فوري تقريباً.
-
----
-
-## 2) الاستقرار والأمان
-
-- تفعيل **فحص كلمات السر المسرّبة (HIBP)** — يمنع المستخدم من التسجيل بكلمة سر معروفة
-- تشغيل فحص أمني شامل (`security_scan`) ومعالجة أي ثغرة حرجة
-- `errorBoundary` لكل قسم بدل ما تتعطل الصفحة كاملة إذا فشل استعلام واحد
-- تسجيل الأخطاء المهمة في جدول للمراجعة (كثير من هذا موجود عبر `error-capture` — راح أراجع)
-
----
-
-## 3) تجربة المستخدم والتصميم
-
-- **صفحة "مكتبتي" مخصصة** `/library` تعرض المفضلة + القوائم المخصصة (الحالي مبعثر)
-- **skeletons محسّنة** — بدل الدوامة، هيكل الشبكة يظهر فوراً
-- **بحث ذكي**: اختصار `⌘K` / `Ctrl+K`، اقتراحات فورية، تاريخ البحث
-- تحسين شبكة الأفلام على الجوال (grid + min-w-0 لتفادي القص)
-- انتقالات ناعمة بين الصفحات (`view-transitions API`)
-
----
-
-## 4) ميزات جديدة عملية
-
-- **"مقترحات لك"**: توصيات ذكية مبنية على مفضلاتك (يستخدم Lovable AI الموجود)
-- **"شاهد لاحقاً"**: قائمة منفصلة عن "أعجبني"
-- **مشاركة بصمة الفلم**: صورة OG ديناميكية تظهر البوستر + العنوان + التقييم عند المشاركة
-- **إشعار عند نزول فلم جديد** للممثل/المخرج الذي أضفته للمفضلة (خيار)
-
----
-
-## التنفيذ
-
-راح أشتغل بترتيب: **السرعة أولاً** (يحل شكواك الحالية)، ثم الأمان، ثم UX، ثم الميزات الجديدة. بعد كل مرحلة تقدر تجرب وتقول لي إذا نكمل.
-
-## التفاصيل التقنية
-
-```text
-router.tsx      → defaultOptions.queries: { staleTime: 1000*60*30, gcTime: 1000*60*60*24 }
-tmdb.server.ts  → إضافة Map cache مع TTL لكل endpoint
-routes/index    → تقسيم إلى Hero + Sections مؤجلة (React.lazy + Suspense)
-routes/movie.$id → استخراج Cast/Similar/Reviews لمكونات .lazy
-routes/library  → جديد، يجمع favorites + user_lists في واجهة واحدة
-routes/search   → جديد، مع CMDK dialog على مستوى الموقع
-configure_auth  → password_hibp_enabled: true
-```
-
----
-
-**سؤال قبل ما أبدأ**: تبيني أنفذ الأربعة كلها بالتسلسل، أو تركز على السرعة والاستقرار فقط الحين ونأجل الميزات الجديدة لطلب لاحق؟
+No DB migration needed; `profiles` table and update triggers already exist.
