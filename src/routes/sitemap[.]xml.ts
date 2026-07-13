@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const BASE = "https://filmak.lovable.app";
+const BASE = "https://filmak.site";
 
 async function tmdbList(path: string): Promise<Array<{ id: number }>> {
   const key = process.env.TMDB_API_KEY;

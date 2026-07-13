@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://filmak.lovable.app/sitemap.xml
+Sitemap: https://filmak.site/sitemap.xml

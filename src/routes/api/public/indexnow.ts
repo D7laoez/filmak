@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const KEY = "07678c3baf01261ffab8106c2e13dfe1";
-const HOST = "filmak.lovable.app";
+const HOST = "filmak.site";
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
 
 // --- Throttle + retry knobs ---

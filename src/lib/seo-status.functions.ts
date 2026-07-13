@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const SITE_URL = "https://filmak.lovable.app/";
-const SITEMAP_URL = "https://filmak.lovable.app/sitemap.xml";
+const SITE_URL = "https://filmak.site/";
+const SITEMAP_URL = "https://filmak.site/sitemap.xml";
 const GATEWAY_BASE = "https://connector-gateway.lovable.dev/google_search_console";
 
 function gcHeaders() {

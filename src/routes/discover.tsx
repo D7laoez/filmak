@@ -22,7 +22,7 @@ export const Route = createFileRoute("/discover")({
           "Filter thousands of movies by genre, year, rating, and popularity.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://filmak.lovable.app/discover" }],
+    links: [{ rel: "canonical", href: "https://filmak.site/discover" }],
   }),
   component: DiscoverPage,
 });
