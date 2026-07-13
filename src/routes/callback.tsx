@@ -4,17 +4,17 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute("/callback")({
   head: () => ({
     meta: [
       { title: "تسجيل الدخول — Filmak" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: AuthCallbackPage,
+  component: CallbackPage,
 });
 
-function AuthCallbackPage() {
+function CallbackPage() {
   const navigate = useNavigate();
   const { dir } = useLocale();
 
