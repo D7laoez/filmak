@@ -141,10 +141,20 @@ function AuthPage() {
 
         <div className="bg-card border border-border rounded-2xl p-6 shadow-lg">
           <h1 className="text-2xl font-bold mb-1">
-            {mode === "signin" ? t("signin") : t("signup")}
+            {mode === "signin"
+              ? t("signin")
+              : mode === "signup"
+                ? t("signup")
+                : dir === "rtl"
+                  ? "استعادة كلمة المرور"
+                  : "Reset password"}
           </h1>
           <p className="text-sm text-muted-foreground mb-6">
-            {t("auth_sub")}
+            {mode === "forgot"
+              ? dir === "rtl"
+                ? "أدخل بريدك لإرسال رابط إعادة التعيين"
+                : "Enter your email to receive a reset link"
+              : t("auth_sub")}
           </p>
 
           <form onSubmit={handleEmail} className="space-y-3">
@@ -163,7 +173,19 @@ function AuthPage() {
                 />
               </div>
             )}
-            {mode === "signup" ? (
+            {mode === "forgot" ? (
+              <div className="relative">
+                <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <input
+                  type="email"
+                  required
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder={t("email")}
+                  className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
+                />
+              </div>
+            ) : mode === "signup" ? (
               <div className="relative">
                 <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
                 <input
@@ -189,6 +211,7 @@ function AuthPage() {
                 />
               </div>
             )}
+            {mode !== "forgot" && (
             <div className="relative">
               <Lock className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
               <input
@@ -201,18 +224,38 @@ function AuthPage() {
                 className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
               />
             </div>
+            )}
             <button
               type="submit"
               disabled={loading}
               className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin" ? t("signin_btn") : t("signup_btn")}
+              {mode === "signin"
+                ? t("signin_btn")
+                : mode === "signup"
+                  ? t("signup_btn")
+                  : dir === "rtl"
+                    ? "إرسال الرابط"
+                    : "Send reset link"}
             </button>
           </form>
 
           {error && <p className="mt-3 text-destructive text-sm text-center">{error}</p>}
           {notice && <p className="mt-3 text-primary text-sm text-center">{notice}</p>}
+
+          {mode === "signin" && (
+            <button
+              onClick={() => {
+                setMode("forgot");
+                setError(null);
+                setNotice(null);
+              }}
+              className="w-full text-sm text-muted-foreground mt-4 hover:text-foreground transition"
+            >
+              {dir === "rtl" ? "نسيت كلمة المرور؟" : "Forgot your password?"}
+            </button>
+          )}
 
           <button
             onClick={() => {
@@ -220,9 +263,15 @@ function AuthPage() {
               setError(null);
               setNotice(null);
             }}
-            className="w-full text-sm text-muted-foreground mt-5 hover:text-foreground transition"
+            className="w-full text-sm text-muted-foreground mt-3 hover:text-foreground transition"
           >
-            {mode === "signin" ? t("no_account") : t("have_account")}
+            {mode === "signup"
+              ? t("have_account")
+              : mode === "forgot"
+                ? dir === "rtl"
+                  ? "العودة لتسجيل الدخول"
+                  : "Back to sign in"
+                : t("no_account")}
           </button>
         </div>
       </div>
