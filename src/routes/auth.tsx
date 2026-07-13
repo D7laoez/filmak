@@ -1,11 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useLocale } from "@/lib/i18n";
-import { emailExists } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -38,38 +35,14 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const checkEmailExists = useServerFn(emailExists);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/" });
     });
   }, [navigate]);
-
-  async function handleGoogleSignIn() {
-    setError(null);
-    setNotice(null);
-    setGoogleLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/callback`,
-      });
-      if (result.error) throw result.error;
-      if (result.redirected) return;
-      navigate({ to: "/" });
-    } catch (e) {
-      setError(
-        dir === "rtl"
-          ? "تعذّر تسجيل الدخول عبر Google. حاول مرة ثانية."
-          : "Couldn't sign in with Google. Please try again.",
-      );
-    } finally {
-      setGoogleLoading(false);
-    }
-  }
 
   async function handleEmail(e: FormEvent) {
     e.preventDefault();
@@ -84,7 +57,11 @@ function AuthPage() {
             dir === "rtl" ? "أدخل بريدك الإلكتروني" : "Enter your email",
           );
         }
-        const exists = await checkEmailExists({ data: { email: target } });
+        const { data: exists, error: existsErr } = await supabase.rpc(
+          "email_exists",
+          { _email: target },
+        );
+        if (existsErr) throw existsErr;
         if (!exists) {
           throw new Error(
             dir === "rtl"
@@ -157,8 +134,8 @@ function AuthPage() {
           if (error.message.toLowerCase().includes("invalid login credentials")) {
             throw new Error(
               dir === "rtl"
-                ? "بيانات الدخول غير صحيحة. إذا حسابك معمول بـ Google استخدم زر Google، أو اضغط نسيت كلمة المرور لتعيين كلمة سر."
-                : "Invalid sign-in details. If your account uses Google, use the Google button, or reset your password.",
+                ? "بيانات الدخول غير صحيحة. تحقق من الإيميل/اسم المستخدم وكلمة المرور."
+                : "Invalid sign-in details. Check your email/username and password.",
             );
           }
           throw error;
@@ -200,31 +177,6 @@ function AuthPage() {
                 : "Enter your email to receive a reset link"
               : t("auth_sub")}
           </p>
-
-          {mode !== "forgot" && (
-            <>
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-                className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-foreground border border-border rounded-xl py-2.5 text-sm font-medium hover:bg-secondary/80 disabled:opacity-50 transition"
-              >
-                {googleLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-background text-xs font-bold">
-                    G
-                  </span>
-                )}
-                {t("continue_google")}
-              </button>
-              <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
-                <span>{t("or")}</span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-            </>
-          )}
 
           <form onSubmit={handleEmail} className="space-y-3">
             {mode === "signup" && (

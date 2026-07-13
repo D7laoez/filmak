@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.email_exists(text) TO anon, authenticated;
