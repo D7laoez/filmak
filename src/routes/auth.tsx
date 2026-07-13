@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const checkEmailExists = useServerFn(emailExists);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -82,7 +84,7 @@ function AuthPage() {
             dir === "rtl" ? "أدخل بريدك الإلكتروني" : "Enter your email",
           );
         }
-        const exists = await emailExists({ data: { email: target } });
+        const exists = await checkEmailExists({ data: { email: target } });
         if (!exists) {
           throw new Error(
             dir === "rtl"
