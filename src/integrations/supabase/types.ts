@@ -242,7 +242,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      resolve_login_email: { Args: { _identifier: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
