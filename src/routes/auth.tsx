@@ -244,26 +244,13 @@ function AuthPage() {
           {error && <p className="mt-3 text-destructive text-sm text-center">{error}</p>}
           {notice && <p className="mt-3 text-primary text-sm text-center">{notice}</p>}
 
-          {mode === "signin" && (
-            <button
-              onClick={() => {
-                setMode("forgot");
-                setError(null);
-                setNotice(null);
-              }}
-              className="w-full text-sm text-muted-foreground mt-4 hover:text-foreground transition"
-            >
-              {dir === "rtl" ? "نسيت كلمة المرور؟" : "Forgot your password?"}
-            </button>
-          )}
-
           <button
             onClick={() => {
               setMode(mode === "signin" ? "signup" : "signin");
               setError(null);
               setNotice(null);
             }}
-            className="w-full text-sm text-muted-foreground mt-3 hover:text-foreground transition"
+            className="w-full text-sm text-muted-foreground mt-4 hover:text-foreground transition"
           >
             {mode === "signup"
               ? t("have_account")
@@ -273,6 +260,19 @@ function AuthPage() {
                   : "Back to sign in"
                 : t("no_account")}
           </button>
+
+          {mode !== "forgot" && (
+            <button
+              onClick={() => {
+                setMode("forgot");
+                setError(null);
+                setNotice(null);
+              }}
+              className="w-full text-sm text-muted-foreground mt-3 hover:text-foreground transition"
+            >
+              {dir === "rtl" ? "نسيت كلمة المرور؟" : "Forgot your password?"}
+            </button>
+          )}
         </div>
       </div>
     </div>
