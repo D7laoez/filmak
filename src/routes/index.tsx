@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
+import { z } from "zod";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass } from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -39,6 +40,8 @@ import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/")({
   component: Home,
+  validateSearch: (r: Record<string, unknown>) =>
+    z.object({ q: z.string().optional() }).parse(r),
   head: () => {
     const title = "فلمك — Filmak · توصيات أفلام ومسلسلات بالذكاء الاصطناعي";
     const description =
