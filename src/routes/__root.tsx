@@ -258,10 +258,27 @@ function RootComponent() {
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        if (typeof window !== "undefined" && window.location.pathname !== "/reset-password") {
+          window.location.replace("/reset-password");
+        }
+        return;
+      }
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
+    // Fallback: if the recovery link opened at "/" with a hash token, jump to the reset page.
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash || "";
+      const search = window.location.search || "";
+      const isRecovery =
+        hash.includes("type=recovery") ||
+        (search.includes("code=") && window.location.pathname === "/");
+      if (isRecovery && window.location.pathname !== "/reset-password") {
+        window.location.replace("/reset-password" + search + hash);
+      }
+    }
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
 
