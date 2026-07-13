@@ -28,9 +28,10 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { dir, t } = useLocale();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [identifier, setIdentifier] = useState("");
   const [email, setEmail] = useState(""); // signup only
+  const [resetEmail, setResetEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +50,23 @@ function AuthPage() {
     setNotice(null);
     setLoading(true);
     try {
-      if (mode === "signup") {
+      if (mode === "forgot") {
+        const target = resetEmail.trim();
+        if (!target.includes("@")) {
+          throw new Error(
+            dir === "rtl" ? "أدخل بريدك الإلكتروني" : "Enter your email",
+          );
+        }
+        const { error } = await supabase.auth.resetPasswordForEmail(target, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setNotice(
+          dir === "rtl"
+            ? "أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك"
+            : "We sent a password reset link to your email",
+        );
+      } else if (mode === "signup") {
         // Enforce unique username server-side before creating the auth user
         const uname = username.trim();
         if (!/^[a-zA-Z0-9_.-]{2,40}$/.test(uname)) {
@@ -103,7 +120,7 @@ function AuthPage() {
         });
         if (error) throw error;
         navigate({ to: "/" });
-      }
+    }
     } catch (e) {
       setError((e as Error).message);
     } finally {
