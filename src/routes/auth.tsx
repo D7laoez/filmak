@@ -5,6 +5,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "تسجيل الدخول — Filmak" },
+      {
+        name: "description",
+        content: "سجّل دخولك أو أنشئ حساباً في فلمك لحفظ المفضلة ومتابعة توصيات الذكاء الاصطناعي.",
+      },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "تسجيل الدخول — Filmak" },
+      {
+        property: "og:description",
+        content: "سجّل دخولك أو أنشئ حساباً في فلمك.",
+      },
+      { property: "og:url", content: "https://filmak.site/auth" },
+    ],
+    links: [{ rel: "canonical", href: "https://filmak.site/auth" }],
+  }),
   component: AuthPage,
 });
 
