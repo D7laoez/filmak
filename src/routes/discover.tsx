@@ -21,6 +21,17 @@ export const Route = createFileRoute("/discover")({
         content:
           "Filter thousands of movies by genre, year, rating, and popularity.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://filmak.site/discover" },
+      { property: "og:image", content: "https://filmak.site/icon-512.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "اكتشف — Filmak Discover" },
+      {
+        name: "twitter:description",
+        content:
+          "Filter thousands of movies by genre, year, rating, and popularity.",
+      },
+      { name: "twitter:image", content: "https://filmak.site/icon-512.png" },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/discover" }],
   }),
