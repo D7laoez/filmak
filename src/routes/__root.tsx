@@ -145,6 +145,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: adsenseClient
       ? [
           {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://filmak.site/#website",
+                  url: "https://filmak.site/",
+                  name: "فلمك — Filmak",
+                  description: "AI movie & series recommendations in Arabic and English.",
+                  inLanguage: ["ar", "en"],
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://filmak.site/?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://filmak.site/#org",
+                  name: "Filmak",
+                  url: "https://filmak.site/",
+                  logo: "https://filmak.site/icon-512.png",
+                },
+              ],
+            }),
+          },
+          {
             async: true,
             src: "https://www.googletagmanager.com/gtag/js?id=G-0JV72533H2",
           },
@@ -159,6 +187,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           },
         ]
       : [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://filmak.site/#website",
+                  url: "https://filmak.site/",
+                  name: "فلمك — Filmak",
+                  description: "AI movie & series recommendations in Arabic and English.",
+                  inLanguage: ["ar", "en"],
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://filmak.site/?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://filmak.site/#org",
+                  name: "Filmak",
+                  url: "https://filmak.site/",
+                  logo: "https://filmak.site/icon-512.png",
+                },
+              ],
+            }),
+          },
           {
             async: true,
             src: "https://www.googletagmanager.com/gtag/js?id=G-0JV72533H2",

@@ -66,6 +66,32 @@ export const Route = createFileRoute("/movie/$id")({
         { name: "twitter:image", content: abs },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: movie
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Movie",
+                name: movie.title,
+                description: movie.overview || undefined,
+                image: abs,
+                datePublished: movie.releaseDate || undefined,
+                url,
+                aggregateRating:
+                  movie.rating && movie.voteCount
+                    ? {
+                        "@type": "AggregateRating",
+                        ratingValue: Number(movie.rating).toFixed(1),
+                        ratingCount: movie.voteCount,
+                        bestRating: 10,
+                        worstRating: 0,
+                      }
+                    : undefined,
+              }),
+            },
+          ]
+        : undefined,
     };
   },
   errorComponent: ({ error, reset }) => {

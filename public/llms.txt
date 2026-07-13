@@ -1,0 +1,20 @@
+# فلمك — Filmak
+
+> Filmak is an AI-powered movie and TV recommendations service in Arabic and English, using TMDB data with intelligent suggestions across Gemini, GPT, Groq, Mistral and OpenRouter models.
+
+Filmak helps viewers discover films and series by mood, genre, cast, or free-form prompt. Users can browse trending, top-rated, popular, now-playing, and upcoming titles, save favorites, and get personalized AI recommendations.
+
+## Pages
+
+- [Home](/): Landing page with search, AI recommendations, and curated movie & TV lists.
+- [Discover](/discover): Advanced filtering by genre, year, rating, and language.
+- [Movie details](/movie/278): Example movie page with cast, trailer, ratings, and similar titles.
+- [TV details](/tv/1399): Example series page with seasons, cast, and details.
+- [Person](/person/500): Actor / director filmography and biography.
+- [Genre](/genre/28): Browse all titles in a specific genre.
+- [Sign in](/auth): Create an account to save favorites and personalized lists.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Machine-readable index of all public pages.
+- [Robots](/robots.txt): Crawler rules.
