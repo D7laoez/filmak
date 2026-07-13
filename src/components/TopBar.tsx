@@ -63,11 +63,11 @@ export function TopBar() {
             e.preventDefault();
             submitSearch(q);
           }}
-          className="relative flex-1 max-w-md mx-2"
+          className="relative flex-1 min-w-0 max-w-md mx-1 sm:mx-2"
           role="search"
         >
           <Search
-            className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none`}
+            className={`hidden sm:block absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none`}
           />
           <input
             value={q}
@@ -75,7 +75,7 @@ export function TopBar() {
             placeholder={t("search_placeholder")}
             dir="auto"
             aria-label={t("search_placeholder")}
-            className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
+            className={`w-full bg-secondary/60 border border-border rounded-full py-2 px-3 sm:px-10 text-sm text-center outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "text-right sm:text-center" : "text-left sm:text-center"}`}
           />
         </form>
 

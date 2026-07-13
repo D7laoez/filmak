@@ -103,7 +103,7 @@ function Content() {
         {data.backdrop && <img src={data.backdrop} alt={data.title} className="absolute inset-0 w-full h-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
         <div className="absolute top-0 left-0 right-0 p-4">
-          <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             <Link to="/" className="inline-flex items-center gap-2 bg-black/50 backdrop-blur rounded-full px-3 py-1.5 text-sm hover:bg-black/70 transition">
               <ArrowRight className="w-4 h-4" />
               {t("back")}
@@ -113,7 +113,7 @@ function Content() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-40 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 -mt-40 relative z-10">
         <div className="flex flex-col md:flex-row gap-6">
           {data.poster ? (
             <img src={data.poster} alt={data.title} className="w-48 md:w-64 rounded-xl shadow-2xl shrink-0 mx-auto md:mx-0" />
