@@ -124,7 +124,9 @@ function ResetPasswordPage() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       setNotice(dir === "rtl" ? "تم تحديث كلمة المرور" : "Password updated");
-      setTimeout(() => navigate({ to: "/" }), 1200);
+      // One-shot: end the recovery session and send them to sign-in.
+      await supabase.auth.signOut();
+      setTimeout(() => navigate({ to: "/auth" }), 1200);
     } catch (e) {
       setError((e as Error).message);
     } finally {

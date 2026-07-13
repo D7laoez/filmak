@@ -109,7 +109,17 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        navigate({ to: "/" });
+        // Do not auto sign-in. Send user back to sign-in with prefilled identifier.
+        setMode("signin");
+        setIdentifier(uname);
+        setPassword("");
+        setEmail("");
+        setUsername("");
+        setNotice(
+          dir === "rtl"
+            ? "تم إنشاء الحساب. سجّل دخولك الآن."
+            : "Account created. Please sign in.",
+        );
       } else {
         const id = identifier.trim();
         let loginEmail = id;
