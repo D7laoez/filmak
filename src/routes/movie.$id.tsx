@@ -76,14 +76,14 @@ export const Route = createFileRoute("/movie/$id")({
                 name: movie.title,
                 description: movie.overview || undefined,
                 image: abs,
-                datePublished: movie.release_date || undefined,
+                datePublished: movie.releaseDate || undefined,
                 url,
                 aggregateRating:
-                  movie.vote_average && movie.vote_count
+                  movie.rating && movie.voteCount
                     ? {
                         "@type": "AggregateRating",
-                        ratingValue: Number(movie.vote_average).toFixed(1),
-                        ratingCount: movie.vote_count,
+                        ratingValue: Number(movie.rating).toFixed(1),
+                        ratingCount: movie.voteCount,
                         bestRating: 10,
                         worstRating: 0,
                       }
