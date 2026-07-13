@@ -237,6 +237,12 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="ar" dir="rtl">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var l=localStorage.getItem('locale');var t=localStorage.getItem('theme');if(!l){var n=(navigator.language||'ar').toLowerCase();l=n.indexOf('ar')===0?'ar':'en';}if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var h=document.documentElement;h.lang=l;h.dir=l==='ar'?'rtl':'ltr';if(t==='dark')h.classList.add('dark');else h.classList.remove('dark');h.style.colorScheme=t;}catch(e){}})();",
+          }}
+        />
       </head>
       <body>
         {children}
