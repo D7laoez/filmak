@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Search, Heart, LogOut, User, Compass, Languages } from "lucide-react";
+import { Search, Heart, LogOut, User, Compass, Languages, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
@@ -107,6 +107,14 @@ export function TopBar() {
               >
                 <Heart className="w-4 h-4 text-primary" />
                 <span className="hidden sm:inline">{t("my_favorites")}</span>
+              </Link>
+              <Link
+                to="/account"
+                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+                aria-label={dir === "rtl" ? "الحساب" : "Account"}
+                title={dir === "rtl" ? "إعدادات الحساب" : "Account settings"}
+              >
+                <Settings className="w-4 h-4" />
               </Link>
               <button
                 onClick={handleSignOut}
