@@ -167,7 +167,7 @@ function AuthPage() {
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={t("email")}
+                  placeholder={dir === "rtl" ? "الإيميل أو اسم المستخدم" : "Email or username"}
                   className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
                 />
               </div>
