@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
+import { z } from "zod";
 import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass } from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -39,6 +40,8 @@ import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/")({
   component: Home,
+  validateSearch: (r: Record<string, unknown>) =>
+    z.object({ q: z.string().optional() }).parse(r),
   head: () => {
     const title = "فلمك — Filmak · توصيات أفلام ومسلسلات بالذكاء الاصطناعي";
     const description =
@@ -112,6 +115,7 @@ function Home() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { locale, dir, t, toggle } = useLocale();
+  const { q: urlQ } = Route.useSearch();
   const trending = useQuery({
     queryKey: ["trending", locale],
     queryFn: () => getTrending({ data: { lang: locale } }),
@@ -133,9 +137,14 @@ function Home() {
     queryFn: () => getUpcoming({ data: { lang: locale } }),
   });
 
-  const [searchQ, setSearchQ] = useState("");
-  const [activeSearch, setActiveSearch] = useState("");
+  const [searchQ, setSearchQ] = useState(urlQ ?? "");
+  const [activeSearch, setActiveSearch] = useState(urlQ ?? "");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Keep the search field in sync when the URL ?q= changes (e.g. TopBar submit).
+  useEffect(() => {
+    setSearchQ(urlQ ?? "");
+  }, [urlQ]);
 
   // Live search: debounce the input so typing "هوس" shows results instantly.
   useEffect(() => {
