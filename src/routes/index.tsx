@@ -115,6 +115,7 @@ function Home() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { locale, dir, t, toggle } = useLocale();
+  const { q: urlQ } = Route.useSearch();
   const trending = useQuery({
     queryKey: ["trending", locale],
     queryFn: () => getTrending({ data: { lang: locale } }),
@@ -136,9 +137,14 @@ function Home() {
     queryFn: () => getUpcoming({ data: { lang: locale } }),
   });
 
-  const [searchQ, setSearchQ] = useState("");
-  const [activeSearch, setActiveSearch] = useState("");
+  const [searchQ, setSearchQ] = useState(urlQ ?? "");
+  const [activeSearch, setActiveSearch] = useState(urlQ ?? "");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Keep the search field in sync when the URL ?q= changes (e.g. TopBar submit).
+  useEffect(() => {
+    setSearchQ(urlQ ?? "");
+  }, [urlQ]);
 
   // Live search: debounce the input so typing "هوس" shows results instantly.
   useEffect(() => {
