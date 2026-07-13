@@ -75,7 +75,7 @@ export function TopBar() {
             placeholder={t("search_placeholder")}
             dir="auto"
             aria-label={t("search_placeholder")}
-            className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
+            className="w-full bg-secondary/60 border border-border rounded-full py-2 px-10 text-sm text-center outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-ellipsis"
           />
         </form>
 
