@@ -3,7 +3,6 @@ import { useState, type FormEvent, useEffect } from "react";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { resolveLoginIdentifier, isUsernameAvailable } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -30,7 +29,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { dir, t } = useLocale();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [identifier, setIdentifier] = useState(""); // email OR username on sign-in
+  const [identifier, setIdentifier] = useState("");
   const [email, setEmail] = useState(""); // signup only
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +59,13 @@ function AuthPage() {
               : "Username: letters, digits, . _ - only (2–40 chars)",
           );
         }
-        const { available } = await isUsernameAvailable({ data: { username: uname } });
+        const { data: existing, error: usernameError } = await supabase
+          .from("profiles")
+          .select("id")
+          .ilike("username", uname)
+          .maybeSingle();
+        if (usernameError) throw usernameError;
+        const available = !existing;
         if (!available) {
           throw new Error(
             dir === "rtl" ? "اسم المستخدم مستخدم بالفعل" : "Username already taken",
@@ -77,17 +82,14 @@ function AuthPage() {
         if (error) throw error;
         navigate({ to: "/" });
       } else {
-        // Accept either email or username; resolve to email server-side.
-        const { email: resolvedEmail } = await resolveLoginIdentifier({
-          data: { identifier: identifier.trim() },
-        });
-        if (!resolvedEmail) {
+        const loginEmail = identifier.trim();
+        if (!loginEmail.includes("@")) {
           throw new Error(
-            dir === "rtl" ? "بيانات الدخول غير صحيحة" : "Invalid login credentials",
+            dir === "rtl" ? "استخدم الإيميل لتسجيل الدخول" : "Use your email to sign in",
           );
         }
         const { error } = await supabase.auth.signInWithPassword({
-          email: resolvedEmail,
+          email: loginEmail,
           password,
         });
         if (error) throw error;
@@ -156,7 +158,7 @@ function AuthPage() {
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={dir === "rtl" ? "الإيميل أو اسم المستخدم" : "Email or username"}
+                  placeholder={t("email")}
                   className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
                 />
               </div>
