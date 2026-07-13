@@ -1,10 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, type FormEvent } from "react";
 import { Loader2, Lock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
-import { emailExists } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -27,7 +25,6 @@ function ResetPasswordPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [resendEmail, setResendEmail] = useState("");
   const [resending, setResending] = useState(false);
-  const checkEmailExists = useServerFn(emailExists);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -82,7 +79,11 @@ function ResetPasswordPage() {
     }
     setResending(true);
     try {
-      const exists = await checkEmailExists({ data: { email: target } });
+      const { data: exists, error: existsErr } = await supabase.rpc(
+        "email_exists",
+        { _email: target },
+      );
+      if (existsErr) throw existsErr;
       if (!exists) {
         throw new Error(
           dir === "rtl"
