@@ -41,8 +41,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        setNotice(t("check_email"));
-        setMode("signin");
+        navigate({ to: "/" });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
