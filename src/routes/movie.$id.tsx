@@ -645,11 +645,18 @@ function Content() {
                   className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2"
                 >
                   {c.logo ? (
-                    <img src={c.logo} alt={c.name} className="h-6 max-w-[80px] object-contain" loading="lazy" />
+                    <span className="inline-flex items-center justify-center bg-white rounded-md px-1.5 py-1">
+                      <img
+                        src={c.logo}
+                        alt={c.name}
+                        className="h-5 max-w-[80px] object-contain"
+                        loading="lazy"
+                      />
+                    </span>
                   ) : (
                     <Building2 className="w-4 h-4 text-muted-foreground" />
                   )}
-                  <span className="text-sm">{c.name}</span>
+                  <span className="text-sm text-foreground">{c.name}</span>
                 </div>
               ))}
             </div>
