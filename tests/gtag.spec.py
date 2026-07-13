@@ -8,7 +8,7 @@ is actually fired on page load.
 Runs against TEST_BASE_URL (default http://localhost:8080). Point it at
 the published site to verify the deployed version:
 
-  TEST_BASE_URL=https://filmak.lovable.app python3 tests/gtag.spec.py
+  TEST_BASE_URL=https://filmak.site python3 tests/gtag.spec.py
 """
 
 from __future__ import annotations
