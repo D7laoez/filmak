@@ -22,6 +22,29 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/genre/$id")({
   validateSearch: (raw) => searchSchema.parse(raw),
+  head: ({ params }) => {
+    const url = `https://filmak.site/genre/${params.id}`;
+    const title = "تصفح حسب النوع — Filmak · Browse by genre";
+    const description =
+      "تصفح الأفلام والمسلسلات حسب النوع مع فلاتر السنة والتقييم واللغة. Browse movies and TV shows by genre with year, rating, and language filters.";
+    const image = "https://filmak.site/icon-512.png";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: GenrePage,
 });
 
