@@ -17,6 +17,7 @@ import { LocaleProvider, useT } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
+import { TopBar } from "@/components/TopBar";
 
 function NotFoundComponent() {
   const t = useT();
@@ -287,6 +288,7 @@ function RootComponent() {
       <ThemeProvider>
         <LocaleProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <TopBar />
           <Outlet />
           <BottomNav />
           <Toaster position="top-center" theme="dark" richColors />
