@@ -113,7 +113,7 @@ function PersonInner() {
 
   return (
     <div className="min-h-screen bg-background" dir={dir}>
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-4 flex items-center justify-between">
           <Link
             to="/"

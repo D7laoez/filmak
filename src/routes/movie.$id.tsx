@@ -245,7 +245,7 @@ function Content() {
         />
 
         <div className="absolute top-0 inset-x-0 p-4 z-10">
-          <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             <Link
               to="/"
               className="inline-flex items-center gap-2 bg-black/50 backdrop-blur rounded-full px-3 py-1.5 text-sm hover:bg-black/70 transition text-white"
@@ -258,7 +258,7 @@ function Content() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-56 md:-mt-64 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 -mt-56 md:-mt-64 relative z-10">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
           {data.poster ? (
             <img
