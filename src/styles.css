@@ -152,7 +152,6 @@
   }
 }
 
-/* Hide the 'Edit with Lovable' badge on published deployments */
 @keyframes genre-progress {
   0% { transform: translateX(-100%); }
   50% { transform: translateX(180%); }
