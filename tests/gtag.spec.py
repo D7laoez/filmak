@@ -1,8 +1,8 @@
 """Integration test: Google Analytics gtag loads on every page.
 
-Verifies that the GA4 measurement ID G-RZVBBHB5X0 is wired into every
+Verifies that the GA4 measurement ID G-0JV72533H2 is wired into every
 top-level route: the gtag loader script tag is present in the DOM AND
-the request to https://www.googletagmanager.com/gtag/js?id=G-RZVBBHB5X0
+the request to https://www.googletagmanager.com/gtag/js?id=G-0JV72533H2
 is actually fired on page load.
 
 Runs against TEST_BASE_URL (default http://localhost:8080). Point it at
@@ -21,7 +21,7 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:8080")
-MEASUREMENT_ID = "G-RZVBBHB5X0"
+MEASUREMENT_ID = "G-0JV72533H2"
 GTAG_URL_FRAGMENT = f"googletagmanager.com/gtag/js?id={MEASUREMENT_ID}"
 
 # Public routes to sample (real routes + one 404 to confirm gtag also
