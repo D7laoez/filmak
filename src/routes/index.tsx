@@ -39,6 +39,32 @@ import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/")({
   component: Home,
+  head: () => {
+    const title = "فلمك — Filmak · توصيات أفلام ومسلسلات بالذكاء الاصطناعي";
+    const description =
+      "اكتشف أفلاماً ومسلسلات تناسب مزاجك بالذكاء الاصطناعي — بالعربية والإنجليزية. Discover movies and series that match your mood with AI.";
+    const url = "https://filmak.site/";
+    const image = "https://filmak.site/icon-512.png";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { property: "og:image:secure_url", content: image },
+        { property: "og:image:width", content: "512" },
+        { property: "og:image:height", content: "512" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.ensureQueryData({
