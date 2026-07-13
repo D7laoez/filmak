@@ -82,11 +82,20 @@ function AuthPage() {
         if (error) throw error;
         navigate({ to: "/" });
       } else {
-        const loginEmail = identifier.trim();
-        if (!loginEmail.includes("@")) {
-          throw new Error(
-            dir === "rtl" ? "استخدم الإيميل لتسجيل الدخول" : "Use your email to sign in",
+        const id = identifier.trim();
+        let loginEmail = id;
+        if (!id.includes("@")) {
+          const { data: resolved, error: rpcError } = await supabase.rpc(
+            "get_email_by_username",
+            { _username: id },
           );
+          if (rpcError) throw rpcError;
+          if (!resolved) {
+            throw new Error(
+              dir === "rtl" ? "اسم المستخدم غير موجود" : "Username not found",
+            );
+          }
+          loginEmail = resolved as string;
         }
         const { error } = await supabase.auth.signInWithPassword({
           email: loginEmail,
@@ -158,7 +167,7 @@ function AuthPage() {
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={t("email")}
+                  placeholder={dir === "rtl" ? "الإيميل أو اسم المستخدم" : "Email or username"}
                   className={`w-full bg-secondary/60 border border-border rounded-xl py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-3" : "pl-10 pr-3"}`}
                 />
               </div>
