@@ -178,31 +178,6 @@ function AuthPage() {
               : t("auth_sub")}
           </p>
 
-          {mode !== "forgot" && (
-            <>
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-                className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-foreground border border-border rounded-xl py-2.5 text-sm font-medium hover:bg-secondary/80 disabled:opacity-50 transition"
-              >
-                {googleLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-background text-xs font-bold">
-                    G
-                  </span>
-                )}
-                {t("continue_google")}
-              </button>
-              <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
-                <span>{t("or")}</span>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-            </>
-          )}
-
           <form onSubmit={handleEmail} className="space-y-3">
             {mode === "signup" && (
               <div className="relative">
