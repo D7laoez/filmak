@@ -3,6 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Loader2, Lock, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/lib/i18n";
+import { emailExists } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -79,6 +80,14 @@ function ResetPasswordPage() {
     }
     setResending(true);
     try {
+      const exists = await emailExists({ data: { email: target } });
+      if (!exists) {
+        throw new Error(
+          dir === "rtl"
+            ? "إيميلك غير مسجل"
+            : "Your email is not registered",
+        );
+      }
       const { error } = await supabase.auth.resetPasswordForEmail(target, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
