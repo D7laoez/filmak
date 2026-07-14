@@ -7,7 +7,7 @@ import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-export const Route = createFileRoute("/_authenticated/stats")({
+export const Route = createFileRoute("/stats")({
   component: StatsPage,
 });
 
