@@ -31,6 +31,9 @@ export function BottomNav() {
   const wl = protectedTo("/favorites", "watchlist");
   const stats = protectedTo("/stats");
 
+  // Isolate auth pages: no bottom nav on sign-in / reset-password.
+  if (pathname === "/auth" || pathname === "/reset-password") return null;
+
   return (
     <nav
       aria-label="Bottom navigation"
