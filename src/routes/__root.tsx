@@ -22,7 +22,6 @@ import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
 
 function NotFoundComponent() {
-  const t = useT();
   const navigate = useNavigate();
   const [isCompletingAuth, setIsCompletingAuth] = useState(false);
 
@@ -79,18 +78,18 @@ function NotFoundComponent() {
           src="/icon-192.png"
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
           decoding="async"
-          alt={t("brand")}
+          alt="Filmak"
           className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 opacity-90"
         />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">{t("page_not_found_title")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("page_not_found_sub")}</p>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">الصفحة غير موجودة</h2>
+        <p className="mt-2 text-sm text-muted-foreground">الرابط اللي فتحته ما يقود لأي صفحة.</p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            {t("go_home")}
+            الرجوع للرئيسية
           </Link>
         </div>
       </div>
