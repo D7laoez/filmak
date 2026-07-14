@@ -49,6 +49,8 @@ function NotFoundComponent() {
         if (accessToken && refreshToken) {
           await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
         }
+      } catch {
+        // Even if the token is expired/invalid, leave the broken callback URL.
       } finally {
         if (!cancelled) navigate({ to: "/", replace: true });
       }
