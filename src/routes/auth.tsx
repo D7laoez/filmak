@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent, useEffect } from "react";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -17,19 +18,10 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-type Mode = "signin" | "signup" | "forgot";
-
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("signin");
-  const [identifier, setIdentifier] = useState("");
-  const [email, setEmail] = useState("");
-  const [resetEmail, setResetEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -37,88 +29,21 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleGoogle() {
     setError(null);
-    setNotice(null);
     setLoading(true);
     try {
-      if (mode === "forgot") {
-        const target = resetEmail.trim();
-        if (!target.includes("@")) throw new Error("أدخل بريدك الإلكتروني");
-        const { data: exists, error: existsErr } = await supabase.rpc(
-          "email_exists",
-          { _email: target },
-        );
-        if (existsErr) throw existsErr;
-        if (!exists) throw new Error("إيميلك غير مسجل");
-        const { error } = await supabase.auth.resetPasswordForEmail(target, {
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-        if (error) throw error;
-        setNotice("أرسلنا رابط إعادة تعيين كلمة المرور إلى بريدك");
-      } else if (mode === "signup") {
-        const uname = username.trim();
-        if (!/^[a-zA-Z0-9_.-]{2,40}$/.test(uname)) {
-          throw new Error("اسم المستخدم: أحرف/أرقام/نقطة/شرطة سفلية فقط (2–40)");
-        }
-        const { data: existing, error: usernameError } = await supabase
-          .from("profiles")
-          .select("id")
-          .ilike("username", uname)
-          .maybeSingle();
-        if (usernameError) throw usernameError;
-        if (existing) throw new Error("اسم المستخدم مستخدم بالفعل");
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { username: uname },
-          },
-        });
-        if (error) throw error;
-        setMode("signin");
-        setIdentifier(uname);
-        setPassword("");
-        setEmail("");
-        setUsername("");
-        setNotice("تم إنشاء الحساب. سجّل دخولك الآن.");
-      } else {
-        const id = identifier.trim();
-        let loginEmail = id;
-        if (!id.includes("@")) {
-          const { data: resolved, error: rpcError } = await supabase.rpc(
-            "get_email_by_username",
-            { _username: id },
-          );
-          if (rpcError) throw rpcError;
-          if (!resolved) throw new Error("اسم المستخدم غير موجود");
-          loginEmail = resolved as string;
-        }
-        const { error } = await supabase.auth.signInWithPassword({
-          email: loginEmail,
-          password,
-        });
-        if (error) {
-          if (error.message.toLowerCase().includes("invalid login credentials")) {
-            throw new Error(
-              "بيانات الدخول غير صحيحة. تحقق من الإيميل/اسم المستخدم وكلمة المرور.",
-            );
-          }
-          throw error;
-        }
-        navigate({ to: "/" });
-      }
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return; // browser is redirecting
+      navigate({ to: "/" });
     } catch (e) {
-      setError((e as Error).message);
-    } finally {
+      setError((e as Error).message || "تعذر تسجيل الدخول");
       setLoading(false);
     }
   }
-
-  const inputBase =
-    "w-full rounded-xl py-3 text-sm outline-none transition pr-11 pl-3 bg-[#161a2b] border border-[#232842] text-white placeholder:text-white/40 focus:border-[#f97316] focus:ring-2 focus:ring-[#f97316]/30";
 
   return (
     <div
@@ -143,136 +68,35 @@ function AuthPage() {
           <span className="text-2xl font-bold text-white">فلمك</span>
         </div>
 
-        <div className="rounded-2xl p-6 shadow-2xl bg-[#0f1324]/90 backdrop-blur border border-white/10">
-          <h1 className="text-2xl font-bold mb-1 text-white">
-            {mode === "signin"
-              ? "تسجيل الدخول"
-              : mode === "signup"
-                ? "حساب جديد"
-                : "استعادة كلمة المرور"}
-          </h1>
-          <p className="text-sm text-white/60 mb-6">
-            {mode === "forgot"
-              ? "أدخل بريدك لإرسال رابط إعادة التعيين"
-              : "احفظ أفلامك المفضلة وشاهدها لاحقاً"}
+        <div className="rounded-2xl p-8 shadow-2xl bg-[#0f1324]/90 backdrop-blur border border-white/10 text-center">
+          <h1 className="text-2xl font-bold mb-2 text-white">تسجيل الدخول</h1>
+          <p className="text-sm text-white/60 mb-8">
+            سجّل دخولك بحساب Google لحفظ مفضلتك وقائمة المشاهدة عبر أجهزتك.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {mode === "signup" && (
-              <div className="relative">
-                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <input
-                  type="text"
-                  required
-                  minLength={2}
-                  maxLength={40}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="اسم المستخدم"
-                  className={inputBase}
-                />
-              </div>
-            )}
-            {mode === "forgot" ? (
-              <div className="relative">
-                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <input
-                  type="email"
-                  required
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="الإيميل"
-                  className={inputBase}
-                />
-              </div>
-            ) : mode === "signup" ? (
-              <div className="relative">
-                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="الإيميل"
-                  className={inputBase}
-                />
-              </div>
-            ) : (
-              <div className="relative">
-                <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <input
-                  type="text"
-                  required
-                  autoComplete="username"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="الإيميل أو اسم المستخدم"
-                  className={inputBase}
-                />
-              </div>
-            )}
-            {mode !== "forgot" && (
-              <div className="relative">
-                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="كلمة السر (6 أحرف على الأقل)"
-                  className={inputBase}
-                />
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white bg-gradient-to-l from-[#f97316] to-[#f59e0b] hover:opacity-95 disabled:opacity-60 transition"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {mode === "signin"
-                ? "دخول"
-                : mode === "signup"
-                  ? "إنشاء الحساب"
-                  : "إرسال الرابط"}
-            </button>
-          </form>
-
-          {error && (
-            <p className="mt-3 text-sm text-center text-red-400">{error}</p>
-          )}
-          {notice && (
-            <p className="mt-3 text-sm text-center text-emerald-400">{notice}</p>
-          )}
-
           <button
-            onClick={() => {
-              setMode(mode === "signin" ? "signup" : "signin");
-              setError(null);
-              setNotice(null);
-            }}
-            className="w-full text-sm text-white/60 mt-4 hover:text-white transition"
+            onClick={handleGoogle}
+            disabled={loading}
+            className="w-full inline-flex items-center justify-center gap-3 rounded-xl py-3.5 text-sm font-semibold bg-white text-gray-800 hover:bg-gray-100 disabled:opacity-60 transition shadow-lg"
           >
-            {mode === "signup"
-              ? "لديك حساب؟ تسجيل الدخول"
-              : mode === "forgot"
-                ? "العودة لتسجيل الدخول"
-                : "ما عندك حساب؟ إنشاء حساب جديد"}
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden>
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+            )}
+            <span>الدخول بحساب Google</span>
           </button>
 
-          {mode !== "forgot" && (
-            <button
-              onClick={() => {
-                setMode("forgot");
-                setError(null);
-                setNotice(null);
-              }}
-              className="w-full text-sm text-white/50 mt-2 hover:text-white transition"
-            >
-              نسيت كلمة المرور؟
-            </button>
-          )}
+          {error && <p className="mt-4 text-sm text-red-400">{error}</p>}
+
+          <p className="mt-6 text-xs text-white/40 leading-relaxed">
+            بتسجيلك تُخوّل فلمك بحفظ مفضلتك وقائمة المشاهدة على حسابك. لن نصل إلى إيميلك بأي طريقة أخرى.
+          </p>
         </div>
       </div>
     </div>
