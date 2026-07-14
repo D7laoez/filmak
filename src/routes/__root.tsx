@@ -269,15 +269,12 @@ function RootComponent() {
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
-    // Fallback: if the recovery link opened at "/" with a hash token, jump to the reset page.
+    // Fallback: only true recovery links (hash contains type=recovery) go to reset page.
+    // Do NOT hijack generic ?code= params — Google OAuth's PKCE redirect also uses ?code=.
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
-      const search = window.location.search || "";
-      const isRecovery =
-        hash.includes("type=recovery") ||
-        (search.includes("code=") && window.location.pathname === "/");
-      if (isRecovery && window.location.pathname !== "/reset-password") {
-        window.location.replace("/reset-password" + search + hash);
+      if (hash.includes("type=recovery") && window.location.pathname !== "/reset-password") {
+        window.location.replace("/reset-password" + window.location.search + hash);
       }
     }
     return () => sub.subscription.unsubscribe();
