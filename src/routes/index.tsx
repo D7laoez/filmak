@@ -29,7 +29,6 @@ import {
 import { recommendMovies } from "@/lib/recommend.functions";
 
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
