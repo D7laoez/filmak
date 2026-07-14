@@ -254,6 +254,18 @@ function AccountPage() {
                     className={inputClass}
                   />
                 </div>
+                <div className="relative">
+                  <Lock className={iconClass} />
+                  <input
+                    type="password"
+                    required
+                    value={profileCurrentPw}
+                    onChange={(e) => setProfileCurrentPw(e.target.value)}
+                    placeholder={rtl ? "كلمة المرور الحالية للتأكيد" : "Current password (to confirm)"}
+                    className={inputClass}
+                    autoComplete="current-password"
+                  />
+                </div>
                 <button
                   type="submit"
                   disabled={profileSaving}
@@ -316,6 +328,18 @@ function AccountPage() {
                 {rtl ? "اختر كلمة مرور جديدة" : "Choose a new password"}
               </p>
               <form onSubmit={savePassword} className="space-y-3">
+                <div className="relative">
+                  <Lock className={iconClass} />
+                  <input
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder={rtl ? "كلمة المرور الحالية" : "Current password"}
+                    className={inputClass}
+                    autoComplete="current-password"
+                  />
+                </div>
                 <div className="relative">
                   <Lock className={iconClass} />
                   <input
