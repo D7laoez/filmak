@@ -13,7 +13,6 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as CallbackRouteImport } from './routes/callback'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -46,11 +45,6 @@ const DiscoverRoute = DiscoverRouteImport.update({
 const CallbackRoute = CallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -121,7 +115,6 @@ const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
   '/discover': typeof DiscoverRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -139,7 +132,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
   '/discover': typeof DiscoverRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -159,7 +151,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$': typeof SplatRoute
-  '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
   '/discover': typeof DiscoverRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -180,7 +171,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$'
-    | '/auth'
     | '/callback'
     | '/discover'
     | '/reset-password'
@@ -198,7 +188,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
-    | '/auth'
     | '/callback'
     | '/discover'
     | '/reset-password'
@@ -217,7 +206,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/$'
-    | '/auth'
     | '/callback'
     | '/discover'
     | '/reset-password'
@@ -238,7 +226,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
-  AuthRoute: typeof AuthRoute
   CallbackRoute: typeof CallbackRoute
   DiscoverRoute: typeof DiscoverRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -278,13 +265,6 @@ declare module '@tanstack/react-router' {
       path: '/callback'
       fullPath: '/callback'
       preLoaderRoute: typeof CallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -413,7 +393,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   SplatRoute: SplatRoute,
-  AuthRoute: AuthRoute,
   CallbackRoute: CallbackRoute,
   DiscoverRoute: DiscoverRoute,
   ResetPasswordRoute: ResetPasswordRoute,
