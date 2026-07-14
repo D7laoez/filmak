@@ -34,6 +34,8 @@ export function TopBar() {
   }, [search?.q, isHome]);
 
   if (isHome) return null;
+  // Isolate auth pages: no top bar, only the login/signup form.
+  if (pathname === "/auth" || pathname === "/reset-password") return null;
 
   function submitSearch(value: string) {
     const v = value.trim();
