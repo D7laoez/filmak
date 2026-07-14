@@ -12,7 +12,7 @@ const searchSchema = z.object({
   tab: z.enum(["favorite", "watchlist", "watched"]).catch("favorite"),
 });
 
-export const Route = createFileRoute("/_authenticated/favorites")({
+export const Route = createFileRoute("/favorites")({
   validateSearch: (r) => searchSchema.parse(r),
   component: FavoritesPage,
 });

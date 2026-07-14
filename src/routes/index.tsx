@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, Tv, Tags, Compass } from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
@@ -27,11 +27,8 @@ import {
   type TvCard,
 } from "@/lib/tv.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
-import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -111,9 +108,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const { locale, dir, t, toggle } = useLocale();
   const { q: urlQ } = Route.useSearch();
   const trending = useQuery({
@@ -220,13 +215,6 @@ function Home() {
 
   const suggestions = t("suggestions");
 
-  async function handleSignOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    toast.success(t("logout_toast"));
-  }
-
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
@@ -276,33 +264,14 @@ function Home() {
               <Compass className="w-4 h-4" />
               {t("discover")}
             </Link>
-            {user ? (
-              <>
-                <Link
-                  to="/favorites"
-                  search={{ tab: "favorite" }}
-                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                >
-                  <Heart className="w-4 h-4 text-primary" />
-                  <span className="hidden sm:inline">{t("my_favorites")}</span>
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                  aria-label={t("logout")}
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => navigate({ to: "/auth" })}
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
-              >
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">{t("login")}</span>
-              </button>
-            )}
+            <Link
+              to="/favorites"
+              search={{ tab: "favorite" }}
+              className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+            >
+              <Heart className="w-4 h-4 text-primary" />
+              <span className="hidden sm:inline">{t("my_favorites")}</span>
+            </Link>
           </div>
         </div>
       </header>

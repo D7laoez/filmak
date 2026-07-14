@@ -1,11 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Search, Heart, LogOut, User, Compass, Languages, Settings } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { Search, Heart, Compass, Languages } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -15,10 +11,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
  * routes render their own richer headers, so we hide this there.
  */
 export function TopBar() {
-  const { user } = useAuth();
   const { t, dir, toggle } = useLocale();
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search }) as
     | { q?: string }
@@ -34,19 +28,10 @@ export function TopBar() {
   }, [search?.q, isHome]);
 
   if (isHome) return null;
-  // Isolate auth pages: no top bar, only the login/signup form.
-  if (pathname === "/auth" || pathname === "/reset-password") return null;
 
   function submitSearch(value: string) {
     const v = value.trim();
     navigate({ to: "/", search: v ? { q: v } : {} });
-  }
-
-  async function handleSignOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    toast.success(t("logout_toast"));
   }
 
   return (
@@ -99,42 +84,15 @@ export function TopBar() {
             <Compass className="w-4 h-4" />
             {t("discover")}
           </Link>
-          {user ? (
-            <>
-              <Link
-                to="/favorites"
-                search={{ tab: "favorite" }}
-                className="hidden sm:inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                aria-label={t("my_favorites")}
-              >
-                <Heart className="w-4 h-4 text-primary" />
-                <span className="hidden sm:inline">{t("my_favorites")}</span>
-              </Link>
-              <Link
-                to="/account"
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                aria-label={dir === "rtl" ? "الحساب" : "Account"}
-                title={dir === "rtl" ? "إعدادات الحساب" : "Account settings"}
-              >
-                <Settings className="w-4 h-4" />
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                aria-label={t("logout")}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => navigate({ to: "/auth" })}
-              className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
-            >
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("login")}</span>
-            </button>
-          )}
+          <Link
+            to="/favorites"
+            search={{ tab: "favorite" }}
+            className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+            aria-label={t("my_favorites")}
+          >
+            <Heart className="w-4 h-4 text-primary" />
+            <span className="hidden sm:inline">{t("my_favorites")}</span>
+          </Link>
         </div>
       </div>
     </header>
