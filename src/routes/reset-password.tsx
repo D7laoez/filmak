@@ -79,18 +79,6 @@ function ResetPasswordPage() {
     }
     setResending(true);
     try {
-      const { data: exists, error: existsErr } = await supabase.rpc(
-        "email_exists",
-        { _email: target },
-      );
-      if (existsErr) throw existsErr;
-      if (!exists) {
-        throw new Error(
-          dir === "rtl"
-            ? "إيميلك غير مسجل"
-            : "Your email is not registered",
-        );
-      }
       const { error } = await supabase.auth.resetPasswordForEmail(target, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
