@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
 const MANAGED_OAUTH_BROKER_URL = "https://filmak.lovable.app/~oauth/initiate";
+const MANAGED_OAUTH_CALLBACK_URL = "https://filmak.lovable.app/callback";
 
 function isCustomFilmakDomain() {
   if (typeof window === "undefined") return false;
@@ -54,7 +55,7 @@ function AuthPage() {
       if (isCustomFilmakDomain()) {
         const params = new URLSearchParams({
           provider: "google",
-          redirect_uri: redirectUri,
+          redirect_uri: MANAGED_OAUTH_CALLBACK_URL,
           prompt: "select_account",
           state: createOAuthState(),
         });
