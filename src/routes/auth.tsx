@@ -4,6 +4,22 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
+const MANAGED_OAUTH_BROKER_URL = "https://filmak.lovable.app/~oauth/initiate";
+
+function isCustomFilmakDomain() {
+  if (typeof window === "undefined") return false;
+  return window.location.hostname === "filmak.site" || window.location.hostname === "www.filmak.site";
+}
+
+function createOAuthState() {
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    return [...crypto.getRandomValues(new Uint8Array(16))]
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -33,8 +49,21 @@ function AuthPage() {
     setError(null);
     setLoading(true);
     try {
+      const redirectUri = `${window.location.origin}/callback`;
+
+      if (isCustomFilmakDomain()) {
+        const params = new URLSearchParams({
+          provider: "google",
+          redirect_uri: redirectUri,
+          prompt: "select_account",
+          state: createOAuthState(),
+        });
+        window.location.href = `${MANAGED_OAUTH_BROKER_URL}?${params.toString()}`;
+        return;
+      }
+
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/callback`,
+        redirect_uri: redirectUri,
         extraParams: { prompt: "select_account" },
       });
       if (result.error) throw result.error;
