@@ -28,6 +28,7 @@ function AccountPage() {
   const [displayName, setDisplayName] = useState("");
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [profileCurrentPw, setProfileCurrentPw] = useState("");
 
   const [newEmail, setNewEmail] = useState("");
   const [emailSaving, setEmailSaving] = useState(false);
@@ -37,6 +38,7 @@ function AccountPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
   const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -60,6 +62,17 @@ function AccountPage() {
     })();
   }, [navigate]);
 
+  // Verify the current password by attempting a sign-in with the stored email.
+  async function verifyCurrentPassword(pw: string): Promise<void> {
+    if (!pw) {
+      throw new Error(rtl ? "أدخل كلمة المرور الحالية" : "Enter your current password");
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (error) {
+      throw new Error(rtl ? "كلمة المرور الحالية غير صحيحة" : "Current password is incorrect");
+    }
+  }
+
   async function saveProfile(e: FormEvent) {
     e.preventDefault();
     setProfileMsg(null);
@@ -75,6 +88,7 @@ function AccountPage() {
     }
     setProfileSaving(true);
     try {
+      await verifyCurrentPassword(profileCurrentPw);
       const { data: userRes } = await supabase.auth.getUser();
       const uid = userRes.user?.id;
       if (!uid) throw new Error("no user");
@@ -97,6 +111,7 @@ function AccountPage() {
         .eq("id", uid);
       if (error) throw error;
       setProfileMsg({ ok: true, text: rtl ? "تم حفظ التغييرات" : "Changes saved" });
+      setProfileCurrentPw("");
     } catch (err) {
       setProfileMsg({ ok: false, text: (err as Error).message });
     } finally {
@@ -147,13 +162,24 @@ function AccountPage() {
       });
       return;
     }
+    if (newPassword === currentPassword) {
+      setPwMsg({
+        ok: false,
+        text: rtl
+          ? "كلمة المرور الجديدة يجب أن تختلف عن الحالية"
+          : "New password must differ from the current one",
+      });
+      return;
+    }
     setPwSaving(true);
     try {
+      await verifyCurrentPassword(currentPassword);
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       setPwMsg({ ok: true, text: rtl ? "تم تحديث كلمة المرور" : "Password updated" });
       setNewPassword("");
       setConfirmPassword("");
+      setCurrentPassword("");
     } catch (err) {
       setPwMsg({ ok: false, text: (err as Error).message });
     } finally {
@@ -228,6 +254,18 @@ function AccountPage() {
                     className={inputClass}
                   />
                 </div>
+                <div className="relative">
+                  <Lock className={iconClass} />
+                  <input
+                    type="password"
+                    required
+                    value={profileCurrentPw}
+                    onChange={(e) => setProfileCurrentPw(e.target.value)}
+                    placeholder={rtl ? "كلمة المرور الحالية للتأكيد" : "Current password (to confirm)"}
+                    className={inputClass}
+                    autoComplete="current-password"
+                  />
+                </div>
                 <button
                   type="submit"
                   disabled={profileSaving}
@@ -290,6 +328,18 @@ function AccountPage() {
                 {rtl ? "اختر كلمة مرور جديدة" : "Choose a new password"}
               </p>
               <form onSubmit={savePassword} className="space-y-3">
+                <div className="relative">
+                  <Lock className={iconClass} />
+                  <input
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder={rtl ? "كلمة المرور الحالية" : "Current password"}
+                    className={inputClass}
+                    autoComplete="current-password"
+                  />
+                </div>
                 <div className="relative">
                   <Lock className={iconClass} />
                   <input
