@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Heart, Loader2, Bookmark, CheckCircle2 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/use-auth";
 import { listMyItems, upsertItem, removeItem, type MediaType } from "@/lib/user-lists.functions";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
@@ -19,15 +17,12 @@ type Props = {
 };
 
 export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }: Props) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const { t } = useLocale();
 
   const items = useQuery({
     queryKey: ["user-lists"],
     queryFn: () => listMyItems({ data: {} }),
-    enabled: !!user,
   });
 
   const match = items.data?.find(
@@ -78,17 +73,12 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
   function onClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) {
-      navigate({ to: "/auth" });
-      return;
-    }
     toggle.mutate();
   }
 
   function pick(e: React.MouseEvent, next: "watchlist" | "watched") {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) { navigate({ to: "/auth" }); return; }
     setStatus.mutate(next);
   }
 
