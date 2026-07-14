@@ -110,7 +110,6 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const { locale, dir, t, toggle } = useLocale();
   const { q: urlQ } = Route.useSearch();
   const trending = useQuery({
