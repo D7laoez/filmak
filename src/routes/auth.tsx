@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, ArrowLeft, Sparkles, Film } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -34,23 +33,27 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function handleGoogle() {
-    setError(null);
-    setLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-        extraParams: { prompt: "select_account" },
-      });
-      if (result.error) throw result.error;
-      if (result.redirected) return;
-      navigate({ to: "/" });
-    } catch (e) {
-      setError((e as Error).message || "تعذر تسجيل الدخول");
-      setLoading(false);
-    }
-  }
+async function handleGoogle() {
+  setError(null);
+  setLoading(true);
 
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/callback`,
+        queryParams: {
+          prompt: "select_account",
+        },
+      },
+    });
+
+    if (error) throw error;
+  } catch (e) {
+    setError((e as Error).message || "تعذر تسجيل الدخول");
+    setLoading(false);
+  }
+}
   return (
     <div
       dir="rtl"
