@@ -124,7 +124,7 @@ async function handleGoogle() {
                 className="text-white text-5xl xl:text-6xl leading-[1.05] tracking-tight mb-6"
                 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800 }}
               >
-                لقّي فلم يشبه
+                ابحث عن فلمك الي يناسب
                 <br />
                 <span style={{ color: "#e85d3a" }}>مزاجك</span> بالضبط.
               </h1>
