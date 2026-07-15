@@ -184,15 +184,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-site-verification", content: "Ba8-EE-ouLI8m2vv00Ci4LWeeHuGdKKhDu4iW-sSwHg" },
       ...(adsenseClient ? [{ name: "google-adsense-account", content: adsenseClient }] : []),
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/icon-32.png", sizes: "32x32", type: "image/png" },
-      { rel: "icon", href: "/icon-16.png", sizes: "16x16", type: "image/png" },
-      { rel: "icon", href: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { rel: "icon", href: "/icon-512.png", sizes: "512x512", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-    ],
+links: [
+  { rel: "icon", href: "/favicon.ico" },
+  { rel: "icon", type: "image/png", sizes: "16x16", href: "/icon-16.png" },
+  { rel: "icon", type: "image/png", sizes: "32x32", href: "/icon-32.png" },
+  { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
+  { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/manifest.webmanifest" },
+],
     scripts: adsenseClient
       ? [
           {
