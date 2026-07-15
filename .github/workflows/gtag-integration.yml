@@ -30,17 +30,22 @@ jobs:
       - name: Build app
         run: bun run build
 
-      - name: Start preview server
+      - name: Start dev server
         run: |
-          nohup bun run preview --port 8080 --host 127.0.0.1 > /tmp/preview.log 2>&1 &
+          nohup bun run dev --host 127.0.0.1 --port 8080 > /tmp/preview.log 2>&1 &
           echo $! > /tmp/preview.pid
-          for i in {1..40}; do
+
+          for i in {1..60}; do
             if curl -sf http://127.0.0.1:8080/ > /dev/null; then
-              echo "preview up"; exit 0
+              echo "server up"
+              exit 0
             fi
             sleep 1
           done
-          echo "preview failed to start"; cat /tmp/preview.log; exit 1
+
+          echo "server failed"
+          cat /tmp/preview.log
+          exit 1
 
       - name: Setup Python
         uses: actions/setup-python@v5
