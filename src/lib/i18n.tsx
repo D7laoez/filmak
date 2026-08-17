@@ -471,6 +471,11 @@ export type Dict = {
     privacy_policy: string;
     about_content: string;
     privacy_content: string;
+    why_filmak: string;
+    our_vision: string;
+    terms_of_use: string;
+    user_rights: string;
+    data_protection: string;
   };
 export type TKey = keyof Dict;
 
