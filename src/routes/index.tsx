@@ -508,9 +508,6 @@ function Home() {
         </>
       )}
 
-      <footer className="border-t border-border/40 mt-16 py-8 text-center text-xs text-muted-foreground">
-        {t("footer")}
-      </footer>
     </div>
   );
 }
