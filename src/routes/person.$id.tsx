@@ -27,7 +27,7 @@ export const Route = createFileRoute("/person/$id")({
     const p = loaderData?.person;
     const img = p?.profile ?? `${origin}/icon-512.png`;
     const abs = img?.startsWith("http") ? img : `${origin}${img}`;
-    const title = p ? `${p.name} — فلمك` : "فلمك";
+    const title = p ? `${p.name} — فلمك · السيرة الذاتية والأعمال` : "فلمك";
     const desc = p?.biography?.slice(0, 200) ?? "";
     const url = origin ? `${origin}/person/${params.id}` : `/person/${params.id}`;
     return {

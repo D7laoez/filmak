@@ -29,7 +29,7 @@ export const Route = createFileRoute("/tv/$id")({
     const tv = loaderData?.tv;
     const img = tv?.backdropLarge ?? tv?.poster ?? `${origin}/icon-512.png`;
     const abs = img?.startsWith("http") ? img : `${origin}${img}`;
-    const title = tv ? `${tv.title} — فلمك` : "فلمك";
+    const title = tv ? `${tv.title} — فلمك · تفاصيل المسلسل` : "فلمك";
     const desc = tv?.overview?.slice(0, 200) ?? "";
     const url = origin ? `${origin}/tv/${params.id}` : `/tv/${params.id}`;
     return {
