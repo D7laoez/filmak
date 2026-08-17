@@ -1,95 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
-import { ArrowRight, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => {
-    const title = "سياسة الخصوصية — فلمك";
-    const description = "سياسة الخصوصية لمنصة فلمك. تعرف على كيفية تعاملنا مع بياناتك وحرصنا التام على خصوصية المستخدمين أثناء تصفح الموقع.";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-      ],
-    };
-  },
+  head: () => ({ meta: [{ title: "سياسة الخصوصية — فلمك | Privacy Policy" }, { name: "description", content: "سياسة الخصوصية في فلمك وكيفية التعامل مع بيانات الحساب والقوائم والتفضيلات." }], links: [{ rel: "canonical", href: "https://filmak.site/privacy" }] }),
   component: PrivacyPage,
 });
 
 function PrivacyPage() {
-  const { t, dir } = useLocale();
-
-  return (
-    <div dir={dir} className="min-h-screen bg-background text-foreground pb-24">
-      <header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to="/" className="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-full px-3 py-1.5 text-sm hover:bg-secondary transition">
-            <ArrowRight className="w-4 h-4" />
-            {t("back")}
-          </Link>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary" />
-            <h1 className="text-xl font-bold">{t("privacy_policy")}</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 py-12">
-        <div className="prose prose-invert max-w-none">
-          <h2 className="text-3xl font-bold mb-6">{t("privacy_policy")}</h2>
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            {t("privacy_content")}
-          </p>
-
-          <div className="mt-8 space-y-8">
-            <section>
-              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-                {t("data_protection")}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                نحن نلتزم بحماية بياناتك الشخصية. المعلومات التي يتم جمعها تُستخدم فقط لتحسين تجربتك في الموقع. لن يتم بيع أو مشاركة بياناتك مع أي طرف ثالث لأغراض تسويقية دون موافقتك الصريحة.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-                {t("user_rights")}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                لك الحق في الوصول إلى بياناتك المخزنة محلياً، تعديلها، أو مسحها في أي وقت. كما يمكنك اختيار عدم تقديم أي معلومات اختيارية دون أن يؤثر ذلك على وظائف الموقع الأساسية.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-                {t("terms_of_use")}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                باستخدامك لموقع فلمك، فإنك توافق على شروط الاستخدام الموضحة هنا. الموقع مخصص للاستخدام الشخصي وغير التجاري. يمنع استخدام أي أدوات آلية لسحب البيانات من الموقع بشكل يضر بأدائه.
-              </p>
-            </section>
-
-            <section className="pt-8 border-t border-border">
-              <h3 className="text-xl font-semibold mb-3">TMDB API</h3>
-              <p className="text-muted-foreground italic text-sm">
-                استخدم هذا الموقع بيانات TMDB ولكن لا يتم اعتماده أو التصديق عليه من قبل TMDB.
-              </p>
-            </section>
-
-            <section>
-              <h3 className="text-xl font-semibold mb-3">Cookies & Local Storage</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                نستخدم التخزين المحلي (Local Storage) لحفظ تفضيلاتك مثل المظهر (داكن/فاتح) واللغة، ولحفظ قائمة مفضلاتك. هذه البيانات تبقى على جهازك الخاص ولا يتم إرسالها إلى خوادمنا.
-              </p>
-            </section>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+  const { dir, locale } = useLocale();
+  const ar = locale === "ar";
+  const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
+  const sections = ar ? [["البيانات التي نستخدمها", "عند تسجيل الدخول نستخدم معلومات الحساب التي يوفرها مزود المصادقة لإدارة الجلسة وربط القوائم بحسابك. نستخدم أيضًا بيانات الأفلام من TMDB لعرض المعلومات."], ["المفضلة والقوائم", "المفضلة وقائمة المشاهدة وسجل المشاهدة والتقييمات المرتبطة بالحساب تحفظ في قاعدة البيانات لتتمكن من الوصول إليها من أجهزتك. الوصول إليها محمي بحسب حساب المستخدم."], ["التفضيلات المحلية", "اللغة والمظهر وبعض إعدادات الواجهة قد تحفظ محليًا في متصفحك."], ["التحليلات", "قد نستخدم أدوات قياس الزيارات والأداء لفهم استخدام الموقع وتحسينه. لا نبيع بيانات المستخدمين الشخصية."], ["حقوقك", "يمكنك طلب حذف حسابك وبياناتك المرتبطة به، كما يمكنك حذف البيانات المحلية من إعدادات المتصفح."]] : [["Data we use", "When you sign in, we use account information supplied by the authentication provider to manage your session and associate lists with your account. Movie data comes from TMDB."], ["Favorites and lists", "Favorites, watchlist, watched items and ratings associated with your account are stored so you can access them across devices."], ["Local preferences", "Language, theme and some interface preferences may be stored locally in your browser."], ["Analytics", "We may use analytics and performance measurement to understand usage and improve the site. We do not sell users' personal information."], ["Your rights", "You can request deletion of your account and associated data, and you can clear local browser data at any time."]];
+  return <main dir={dir} className="min-h-screen bg-background text-foreground pb-24"><header className="border-b border-border/40 bg-background/80 backdrop-blur sticky top-0 z-40"><div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4"><Link to="/" className="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-full px-3 py-1.5 text-sm hover:bg-secondary"><Arrow className="w-4 h-4"/>{ar ? "رجوع" : "Back"}</Link><div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-primary"/><h1 className="text-xl font-bold">{ar ? "سياسة الخصوصية" : "Privacy Policy"}</h1></div></div></header><article className="max-w-4xl mx-auto px-4 py-12"><h2 className="text-4xl font-black">{ar ? "خصوصيتك مهمة" : "Your privacy matters"}</h2><p className="mt-4 max-w-3xl leading-8 text-muted-foreground">{ar ? "نحاول إبقاء جمع البيانات في الحد اللازم لتشغيل الحساب وتحسين تجربة Filmak." : "We aim to keep data collection limited to what is needed to operate accounts and improve the Filmak experience."}</p><div className="mt-10 space-y-5">{sections.map(([title,text]) => <section key={title} className="rounded-2xl border border-border bg-card p-6"><h3 className="text-lg font-bold">{title}</h3><p className="mt-3 leading-8 text-muted-foreground">{text}</p></section>)}</div><section className="mt-8 rounded-2xl border border-border bg-secondary/40 p-6"><h3 className="font-bold">TMDB</h3><p className="mt-2 text-sm leading-7 text-muted-foreground">{ar ? "استخدم هذا الموقع بيانات TMDB ولكن لا يتم اعتماده أو التصديق عليه من قبل TMDB." : "This product uses the TMDB API but is not endorsed or certified by TMDB."}</p></section></article></main>;
 }
