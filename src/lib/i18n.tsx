@@ -322,6 +322,11 @@ const DICT: Record<Locale, Dict> = {
     privacy_policy: "Privacy Policy",
     about_content: "Filmak is an AI-powered platform designed to help you find the perfect movies and TV shows. Instead of scrolling for hours, just describe what you're looking for and let us recommend the best options for you.",
     privacy_content: "We care about your privacy. Your favorites and stats are stored locally on your device. We use TMDB data for movie information and do not collect personal data without your consent.",
+    why_filmak: "Why Choose Filmak?",
+    our_vision: "Our Vision & Goals",
+    terms_of_use: "Terms of Use",
+    user_rights: "User Rights",
+    data_protection: "Data Protection",
   },
 };
 
