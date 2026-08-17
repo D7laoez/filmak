@@ -236,83 +236,6 @@ function Home() {
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo size={32} />
-          </Link>
-          {/* Desktop / tablet inline search */}
-          <form
-            onSubmit={(e: FormEvent) => e.preventDefault()}
-            className="relative flex-1 max-w-md mx-4 hidden sm:block"
-          >
-            <Search
-              className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
-            />
-            <input
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-              placeholder={t("search_placeholder")}
-              dir="auto"
-              className={`w-full bg-secondary/60 border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
-            />
-          </form>
-          <div className="flex items-center gap-2">
-            {/* Mobile-only search trigger */}
-            <button
-              onClick={() => setMobileSearchOpen(true)}
-              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-              aria-label={t("search_placeholder")}
-            >
-              <Search className="w-4 h-4" />
-            </button>
-            <button
-              onClick={toggle}
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-              aria-label="Switch language"
-            >
-              <Languages className="w-4 h-4" />
-              {t("lang_switch")}
-            </button>
-            <ThemeToggle />
-            <Link
-              to="/discover"
-              className="hidden md:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-              aria-label={t("discover")}
-            >
-              <Compass className="w-4 h-4" />
-              {t("discover")}
-            </Link>
-            {user ? (
-              <>
-                <Link
-                  to="/favorites"
-                  search={{ tab: "favorite" }}
-                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                >
-                  <Heart className="w-4 h-4 text-primary" />
-                  <span className="hidden sm:inline">{t("my_favorites")}</span>
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                  aria-label={t("logout")}
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => navigate({ to: "/auth" })}
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"
-              >
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">{t("login")}</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
 
       {mobileSearchOpen && (
         <MobileSearchOverlay
@@ -585,9 +508,6 @@ function Home() {
         </>
       )}
 
-      <footer className="border-t border-border/40 mt-16 py-8 text-center text-xs text-muted-foreground">
-        {t("footer")}
-      </footer>
     </div>
   );
 }
