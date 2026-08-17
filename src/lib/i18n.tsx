@@ -456,8 +456,12 @@ export type Dict = {
   close: string;
   imdb: string;
   tmdb: string;
-  details: string;
-};
+    details: string;
+    about_us: string;
+    privacy_policy: string;
+    about_content: string;
+    privacy_content: string;
+  };
 export type TKey = keyof Dict;
 
 type Ctx = {
