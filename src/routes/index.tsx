@@ -539,7 +539,7 @@ function Home() {
               key={g.id}
               to="/genre/$id"
               params={{ id: String(g.id) }}
-              search={{ type: tab, sort: "popularity.desc", page: 1 }}
+              search={{ type: tab, sort: "popularity.desc", page: 1, minRating: 0, year: null, ol: null, ids: "" }}
               className="snap-start shrink-0 text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
               {g.name}
