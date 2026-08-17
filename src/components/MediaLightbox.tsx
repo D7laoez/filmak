@@ -71,7 +71,7 @@ export function MediaLightbox({
       )}
       <img
         src={img.url}
-        alt=""
+        alt="Gallery preview"
         onClick={(e) => e.stopPropagation()}
         className="max-w-[95vw] max-h-[90vh] object-contain rounded-lg shadow-2xl"
       />

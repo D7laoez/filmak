@@ -457,7 +457,7 @@ function Content() {
         {(data.images.backdrops.length > 0 || data.images.posters.length > 0) && (
           <section className="mt-12">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <h2 className="flex items-center gap-2 text-xl font-bold">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
                 <ImageIcon className="w-5 h-5 text-primary" />
                 {t("gallery")}
               </h2>

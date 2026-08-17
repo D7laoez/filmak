@@ -339,8 +339,8 @@ function Home() {
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
           <img
             src="/icon-192.png"
-          srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          decoding="async"
+            srcSet="/icon-192.png 1x, /icon-512.png 2x"
+            decoding="async"
             alt={t("brand")}
             className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 drop-shadow-[0_8px_32px_rgba(168,85,247,0.35)]"
           />
