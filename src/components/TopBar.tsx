@@ -9,11 +9,7 @@ import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-/**
- * Shared sticky top bar used across secondary pages so the search and
- * sign-in controls remain visible while scrolling. The home and discover
- * routes render their own richer headers, so we hide this there.
- */
+/** Shared sticky navigation bar with search, language, theme and account controls. */
 export function TopBar() {
   const { user } = useAuth();
   const { t, dir, toggle } = useLocale();
@@ -24,16 +20,14 @@ export function TopBar() {
     | { q?: string }
     | undefined;
 
-  // Home has its own richer header (with tabs + hero). Show TopBar everywhere else.
   const isHome = pathname === "/";
   const [q, setQ] = useState<string>(search?.q ?? "");
 
-  // Keep the input in sync when the URL changes from elsewhere.
   useEffect(() => {
-    if (!isHome) setQ(search?.q ?? "");
-  }, [search?.q, isHome]);
+    setQ(search?.q ?? "");
+  }, [search?.q]);
 
-  if (isHome) return null;
+  // Auth has its own layout and should not show the global navigation.
   if (pathname === "/auth") return null;
 
   function submitSearch(value: string) {
@@ -58,7 +52,6 @@ export function TopBar() {
           <Logo size={28} />
         </Link>
 
-        {/* Inline search — submits to home with ?q= */}
         <form
           onSubmit={(e: FormEvent) => {
             e.preventDefault();
