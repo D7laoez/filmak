@@ -39,15 +39,34 @@ function AboutPage() {
       <main className="max-w-3xl mx-auto px-4 py-12">
         <div className="prose prose-invert max-w-none">
           <h2 className="text-3xl font-bold mb-6">{t("brand")}</h2>
-          <p className="text-lg leading-relaxed text-muted-foreground">
-            {t("about_content")}
-          </p>
-          
-          <div className="mt-12 p-6 rounded-2xl bg-secondary/30 border border-border">
-            <h3 className="text-xl font-bold mb-4">{t("tagline_ai")}</h3>
-            <p className="text-muted-foreground">
-              {t("hero_sub")}
+          <div className="space-y-6">
+            <p className="text-lg leading-relaxed text-muted-foreground">
+              {t("about_content")}
             </p>
+            
+            <section className="mt-8">
+              <h3 className="text-xl font-bold mb-4">{t("why_filmak")}</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                في عالم مليء بملايين الأفلام والمسلسلات، نهدف في فلمك إلى تبسيط تجربة المشاهد العربي. نستخدم أحدث تقنيات الذكاء الاصطناعي لفهم ما تبحث عنه حقاً، سواء كنت تبحث عن فيلم يغير حالتك المزاجية أو مسلسل يشد أنفاسك حتى الحلقة الأخيرة.
+              </p>
+            </section>
+
+            <section className="mt-8">
+              <h3 className="text-xl font-bold mb-4">{t("our_vision")}</h3>
+              <ul className="list-disc list-inside space-y-3 text-muted-foreground">
+                <li>تقديم ترشيحات دقيقة ومخصصة لكل مستخدم.</li>
+                <li>توفير واجهة مستخدم عربية سهلة وسريعة.</li>
+                <li>تسهيل الوصول إلى معلومات الإنتاج، طاقم العمل، وأماكن المشاهدة.</li>
+                <li>تطوير محرك بحث ذكي يفهم الأوصاف الطبيعية وليس فقط العناوين.</li>
+              </ul>
+            </section>
+
+            <div className="mt-12 p-8 rounded-2xl bg-primary/5 border border-primary/20">
+              <h3 className="text-xl font-bold mb-4 text-primary">{t("tagline_ai")}</h3>
+              <p className="text-muted-foreground leading-relaxed italic">
+                {t("hero_sub")}
+              </p>
+            </div>
           </div>
         </div>
       </main>
