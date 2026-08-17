@@ -70,28 +70,34 @@ export const Route = createFileRoute("/")({
     };
   },
   loader: async ({ context }) => {
-    await Promise.all([
-      context.queryClient.ensureQueryData({
-        queryKey: ["trending", "ar"],
-        queryFn: () => getTrending({ data: { lang: "ar" } }),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["top-rated", "ar"],
-        queryFn: () => getTopRated({ data: { lang: "ar" } }),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["popular", "ar"],
-        queryFn: () => getPopular({ data: { lang: "ar" } }),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["now-playing", "ar"],
-        queryFn: () => getNowPlaying({ data: { lang: "ar" } }),
-      }),
-      context.queryClient.ensureQueryData({
-        queryKey: ["upcoming", "ar"],
-        queryFn: () => getUpcoming({ data: { lang: "ar" } }),
-      }),
-    ]);
+    try {
+      await Promise.all([
+        context.queryClient.ensureQueryData({
+          queryKey: ["trending", "ar"],
+          queryFn: () => getTrending({ data: { lang: "ar" } }),
+        }),
+        context.queryClient.ensureQueryData({
+          queryKey: ["top-rated", "ar"],
+          queryFn: () => getTopRated({ data: { lang: "ar" } }),
+        }),
+        context.queryClient.ensureQueryData({
+          queryKey: ["popular", "ar"],
+          queryFn: () => getPopular({ data: { lang: "ar" } }),
+        }),
+        context.queryClient.ensureQueryData({
+          queryKey: ["now-playing", "ar"],
+          queryFn: () => getNowPlaying({ data: { lang: "ar" } }),
+        }),
+        context.queryClient.ensureQueryData({
+          queryKey: ["upcoming", "ar"],
+          queryFn: () => getUpcoming({ data: { lang: "ar" } }),
+        }),
+      ]);
+    } catch (err) {
+      console.error("Home loader failed:", err);
+      // Re-throw so errorComponent or global error boundary catches it with context
+      throw err;
+    }
   },
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-6 text-center">
