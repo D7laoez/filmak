@@ -2,30 +2,28 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const OWNER_ADMIN_EMAIL = "ali.m2002121@gmail.com";
+type AdminContext = { supabase: any; userId: string; claims?: { email?: string } };
 
-function isOwnerAdmin(ctx: { claims?: { email?: string } }) {
-  return String(ctx.claims?.email ?? "").trim().toLowerCase() === OWNER_ADMIN_EMAIL;
+async function isOwnerAdmin(ctx: AdminContext) {
+  const claimEmail = String(ctx.claims?.email ?? "").trim().toLowerCase();
+  if (claimEmail === OWNER_ADMIN_EMAIL) return true;
+  const { data, error } = await ctx.supabase.auth.getUser();
+  if (error || !data.user?.email) return false;
+  return data.user.email.trim().toLowerCase() === OWNER_ADMIN_EMAIL;
 }
 
-async function assertAdmin(ctx: { supabase: any; userId: string; claims?: { email?: string } }) {
-  if (!isOwnerAdmin(ctx)) throw new Error("Forbidden: owner admin access required");
+async function assertAdmin(ctx: AdminContext) {
+  if (!(await isOwnerAdmin(ctx))) throw new Error("Forbidden: owner admin access required");
 }
 
-export const checkIsAdmin = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => ({ isAdmin: isOwnerAdmin(context) }));
+export const checkIsAdmin = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => ({ isAdmin: await isOwnerAdmin(context) }));
 
 /** Logs an unauthorized attempt without storing the user's email or full ID. */
-export const logUnauthorizedAdminAccess = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data: { path: string }) => ({
-    path: typeof data?.path === "string" ? data.path.slice(0, 128) : "unknown",
-  }))
-  .handler(async ({ context, data }) => {
-    const userPrefix = context.userId.slice(0, 8);
-    console.warn(`[admin-guard] unauthorized access attempt path=${data.path} user=${userPrefix} at=${new Date().toISOString()}`);
-    return { ok: true as const };
-  });
+export const logUnauthorizedAdminAccess = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((data: { path: string }) => ({ path: typeof data?.path === "string" ? data.path.slice(0, 128) : "unknown" })).handler(async ({ context, data }) => {
+  const userPrefix = context.userId.slice(0, 8);
+  console.warn(`[admin-guard] unauthorized access attempt path=${data.path} user=${userPrefix} at=${new Date().toISOString()}`);
+  return { ok: true as const };
+});
 
 export type AdminUserRow = { id: string; email: string | null; created_at: string; last_sign_in_at: string | null; is_admin: boolean; favorites_count: number; lists_count: number };
 export type AdminStats = { total_users: number; total_admins: number; total_favorites: number; total_lists: number; signups_last_7d: number };
@@ -59,7 +57,7 @@ export const listUsers = createServerFn({ method: "GET" }).middleware([requireSu
   const adminSet = new Set((roles ?? []).filter((r) => r.role === "admin").map((r) => r.user_id));
   const favCount = new Map<string, number>(); (favs ?? []).forEach((f) => favCount.set(f.user_id, (favCount.get(f.user_id) ?? 0) + 1));
   const listCount = new Map<string, number>(); (lists ?? []).forEach((l) => listCount.set(l.user_id, (listCount.get(l.user_id) ?? 0) + 1));
-  return authData.users.map((u) => ({ id: u.id, email: u.email ?? null, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at ?? null, is_admin: adminSet.has(u.id), favorites_count: favCount.get(u.id) ?? 0, lists_count: listCount.get(u.id) ?? 0 })).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) satisfies AdminUserRow[];
+  return authData.users.map((u) => ({ id: u.id, email: u.email ?? null, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at ?? null, is_admin: adminSet.has(u.id) || u.email?.trim().toLowerCase() === OWNER_ADMIN_EMAIL, favorites_count: favCount.get(u.id) ?? 0, lists_count: listCount.get(u.id) ?? 0 })).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) satisfies AdminUserRow[];
 });
 
 export const getUserDetail = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).inputValidator((data: { userId: string }) => data).handler(async ({ context, data }) => {
@@ -73,7 +71,7 @@ export const getUserDetail = createServerFn({ method: "GET" }).middleware([requi
   ]);
   if (authErr) throw new Error(authErr.message);
   const u = authUser.user!;
-  return { user: { id: u.id, email: u.email ?? null, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at ?? null, is_admin: (rolesRes.data ?? []).some((r) => r.role === "admin"), favorites_count: favsRes.data?.length ?? 0, lists_count: listsRes.data?.length ?? 0 }, favorites: (favsRes.data ?? []) as AdminUserDetail["favorites"], lists: (listsRes.data ?? []) as AdminUserDetail["lists"] } satisfies AdminUserDetail;
+  return { user: { id: u.id, email: u.email ?? null, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at ?? null, is_admin: (rolesRes.data ?? []).some((r) => r.role === "admin") || u.email?.trim().toLowerCase() === OWNER_ADMIN_EMAIL, favorites_count: favsRes.data?.length ?? 0, lists_count: listsRes.data?.length ?? 0 }, favorites: (favsRes.data ?? []) as AdminUserDetail["favorites"], lists: (listsRes.data ?? []) as AdminUserDetail["lists"] } satisfies AdminUserDetail;
 });
 
 export const toggleAdminRole = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((data: { userId: string; makeAdmin: boolean }) => data).handler(async ({ context, data }) => {
