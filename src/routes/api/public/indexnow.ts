@@ -3,14 +3,21 @@ import { createFileRoute } from "@tanstack/react-router";
 const KEY = "07678c3baf01261ffab8106c2e13dfe1";
 const HOST = "filmak.site";
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
+const INDEXNOW_SECRET = process.env.INDEXNOW_SECRET;
 
-// --- Throttle + retry knobs ---
-const BATCH_SIZE = 10;              // URLs per IndexNow call
-const DELAY_BETWEEN_BATCHES = 1500; // ms between batches
-const MAX_RETRIES = 4;              // per batch on 429/5xx
-const BASE_BACKOFF = 2000;          // ms; doubles each retry
+const BATCH_SIZE = 10;
+const DELAY_BETWEEN_BATCHES = 1500;
+const MAX_RETRIES = 4;
+const BASE_BACKOFF = 2000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function isAuthorized(request: Request) {
+  if (!INDEXNOW_SECRET) return false;
+  const url = new URL(request.url);
+  const provided = url.searchParams.get("secret") || request.headers.get("x-indexnow-secret");
+  return Boolean(provided && provided === INDEXNOW_SECRET);
+}
 
 async function submitOnce(urls: string[]) {
   const clean = Array.from(
@@ -25,28 +32,17 @@ async function submitOnce(urls: string[]) {
   const res = await fetch("https://api.indexnow.org/IndexNow", {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      host: HOST,
-      key: KEY,
-      keyLocation: KEY_LOCATION,
-      urlList: clean,
-    }),
+    body: JSON.stringify({ host: HOST, key: KEY, keyLocation: KEY_LOCATION, urlList: clean }),
   });
   const body = await res.text();
   return { submitted: clean.length, status: res.status, body };
 }
 
-// Retry with exponential backoff on 429 / 5xx. Honors Retry-After when the
-// server sends it (headers aren't exposed here; parse from body if present).
 async function submitWithRetry(urls: string[]) {
   let attempt = 0;
   let last = await submitOnce(urls);
-  while (
-    attempt < MAX_RETRIES &&
-    (last.status === 429 || (last.status >= 500 && last.status < 600))
-  ) {
-    const wait = BASE_BACKOFF * Math.pow(2, attempt);
-    await sleep(wait);
+  while (attempt < MAX_RETRIES && (last.status === 429 || (last.status >= 500 && last.status < 600))) {
+    await sleep(BASE_BACKOFF * Math.pow(2, attempt));
     attempt++;
     last = await submitOnce(urls);
   }
@@ -54,8 +50,6 @@ async function submitWithRetry(urls: string[]) {
 }
 
 async function submit(urls: string[]) {
-  // Chunk any single request into small batches so a huge POST becomes
-  // several throttled ones; identical behavior for small inputs.
   const clean = Array.from(
     new Set(
       urls
@@ -63,8 +57,7 @@ async function submit(urls: string[]) {
         .filter((u) => u.startsWith(`https://${HOST}/`)),
     ),
   );
-  if (clean.length === 0)
-    return { submitted: 0, status: 0, body: "no valid urls", batches: [] as any[] };
+  if (clean.length === 0) return { submitted: 0, status: 0, body: "no valid urls", batches: [] as any[] };
 
   const batches: Array<{ submitted: number; status: number; body: string; retries: number }> = [];
   for (let i = 0; i < clean.length; i += BATCH_SIZE) {
@@ -72,9 +65,8 @@ async function submit(urls: string[]) {
     batches.push(await submitWithRetry(clean.slice(i, i + BATCH_SIZE)));
   }
   const ok = batches.filter((b) => b.status >= 200 && b.status < 300);
-  const submitted = ok.reduce((s, b) => s + b.submitted, 0);
   return {
-    submitted,
+    submitted: ok.reduce((s, b) => s + b.submitted, 0),
     totalBatches: batches.length,
     successBatches: ok.length,
     batches,
@@ -92,35 +84,20 @@ export const Route = createFileRoute("/api/public/indexnow")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        if (!isAuthorized(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
         const url = new URL(request.url);
         const single = url.searchParams.get("url");
         const all = url.searchParams.get("all");
-
-        if (all === "1") {
-          const out = await submitAllFromSitemap();
-          return Response.json(out);
-        }
-        if (single) {
-          const out = await submit([single]);
-          return Response.json(out);
-        }
-        return Response.json({
-          usage: {
-            single: `/api/public/indexnow?url=https://${HOST}/movie/123`,
-            bulkFromSitemap: `/api/public/indexnow?all=1`,
-            post: "POST JSON { urls: string[] } to /api/public/indexnow",
-          },
-          keyLocation: KEY_LOCATION,
-        });
+        if (all === "1") return Response.json(await submitAllFromSitemap());
+        if (single) return Response.json(await submit([single]));
+        return Response.json({ usage: "Provide url or all=1", keyLocation: KEY_LOCATION });
       },
       POST: async ({ request }) => {
+        if (!isAuthorized(request)) return Response.json({ error: "Unauthorized" }, { status: 401 });
         let body: any = {};
-        try {
-          body = await request.json();
-        } catch {}
+        try { body = await request.json(); } catch {}
         const urls: string[] = Array.isArray(body?.urls) ? body.urls : [];
-        const out = await submit(urls);
-        return Response.json(out);
+        return Response.json(await submit(urls));
       },
     },
   },
