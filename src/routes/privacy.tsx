@@ -77,7 +77,7 @@ function PrivacyPage() {
             <section className="pt-8 border-t border-border">
               <h3 className="text-xl font-semibold mb-3">TMDB API</h3>
               <p className="text-muted-foreground italic text-sm">
-                {t("footer")}
+                استخدم هذا الموقع بيانات TMDB ولكن لا يتم اعتماده أو التصديق عليه من قبل TMDB.
               </p>
             </section>
 

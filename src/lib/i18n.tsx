@@ -34,8 +34,7 @@ const DICT: Record<Locale, Dict> = {
     tv_series: "مسلسل",
     movie: "فلم",
     loading: "يحمّل…",
-    footer:
-      "This product uses the TMDB API but is not endorsed or certified by TMDB.",
+    footer: "استخدم هذا الموقع بيانات TMDB ولكن لا يتم اعتماده أو التصديق عليه من قبل TMDB.",
     back: "رجوع",
     watch_trailer: "شاهد الإعلان الرسمي",
     where_to_watch: "أين تشاهد الفلم",
