@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const DEVICE = (ua: string) => /mobile|android|iphone|ipad/i.test(ua) ? (/ipad|tablet/i.test(ua) ? "Tablet" : "Mobile") : "Desktop";
 const BROWSER = (ua: string) => /Edg\//i.test(ua) ? "Edge" : /Chrome\//i.test(ua) ? "Chrome" : /Firefox\//i.test(ua) ? "Firefox" : /Safari\//i.test(ua) ? "Safari" : /OPR\//i.test(ua) ? "Opera" : "Other";
@@ -60,8 +61,10 @@ export type SiteAnalytics = {
   daily: Array<{ day: string; visits: number; sessions: number }>;
 };
 
-export const getSiteAnalytics = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin.rpc("admin_site_analytics", { days: 30 });
+export const getSiteAnalytics = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+  if (!role) throw new Error("Forbidden: admin access required");
+  const { data, error } = await context.supabase.rpc("admin_site_analytics", { days: 30 });
   if (error) throw new Error(error.message);
   return data as unknown as SiteAnalytics;
 });
