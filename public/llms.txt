@@ -1,20 +1,25 @@
 # فلمك — Filmak
 
-> Filmak is an AI-powered movie and TV recommendations service in Arabic and English, using TMDB data with intelligent suggestions across Gemini, GPT, Groq, Mistral and OpenRouter models.
+> Filmak is an Arabic-first movie and TV discovery platform with English support, intelligent search, recommendations, personalized lists, and TMDB-powered title information.
 
-Filmak helps viewers discover films and series by mood, genre, cast, or free-form prompt. Users can browse trending, top-rated, popular, now-playing, and upcoming titles, save favorites, and get personalized AI recommendations.
+Filmak helps viewers discover films and series by title, mood, genre, cast, language, year, rating, or natural-language prompts. Signed-in users can save favorites, watchlist items, watched titles and personal ratings across devices.
 
-## Pages
+## Public pages
 
-- [Home](/): Landing page with search, AI recommendations, and curated movie & TV lists.
-- [Discover](/discover): Advanced filtering by genre, year, rating, and language.
-- [Movie details](/movie/278): Example movie page with cast, trailer, ratings, and similar titles.
-- [TV details](/tv/1399): Example series page with seasons, cast, and details.
-- [Person](/person/500): Actor / director filmography and biography.
-- [Genre](/genre/28): Browse all titles in a specific genre.
-- [Sign in](/auth): Create an account to save favorites and personalized lists.
+- [Home](/): Search, AI recommendations, trending and curated titles.
+- [Discover](/discover): Browse and filter movies and TV.
+- [Tonight](/tonight): A quick current pick for what to watch tonight.
+- [Movie details](/movie/278): Movie information, cast, trailers, ratings and similar titles.
+- [TV details](/tv/1399): Series information, seasons, cast and details.
+- [Person](/person/500): Actor/director biography and filmography.
+- [Genre](/genre/28): Titles grouped by genre.
+- [About](/about): About Filmak and product vision.
+- [FAQ](/faq): Frequently asked questions.
+- [Privacy](/privacy): Privacy policy.
 
-## Optional
+## Machine-readable resources
 
-- [Sitemap](/sitemap.xml): Machine-readable index of all public pages.
+- [Sitemap](/sitemap.xml): Public URL index for search engines.
 - [Robots](/robots.txt): Crawler rules.
+
+Private account pages such as authentication, favorites, stats and taste profiles should not be indexed.
