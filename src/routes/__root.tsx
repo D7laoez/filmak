@@ -337,6 +337,17 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <TopBar />
           <Outlet />
+          <footer className="mt-auto py-12 px-4 border-t border-border/40 bg-black/20 pb-24">
+            <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
+              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                <Link to="/about" className="hover:text-primary transition">{t("about_us")}</Link>
+                <Link to="/privacy" className="hover:text-primary transition">{t("privacy_policy")}</Link>
+              </div>
+              <p className="text-center text-xs text-muted-foreground leading-relaxed max-w-2xl">
+                {t("footer")}
+              </p>
+            </div>
+          </footer>
           <BottomNav />
           <Toaster position="top-center" theme="dark" richColors />
         </LocaleProvider>
