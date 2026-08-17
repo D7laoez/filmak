@@ -56,7 +56,10 @@ async function tmdb<T>(
   lang: "ar" | "en" = "ar",
 ): Promise<T> {
   const key = process.env.TMDB_API_KEY;
-  if (!key) throw new Error("TMDB_API_KEY not configured");
+  if (!key) {
+    console.error("CRITICAL: TMDB_API_KEY is missing from process.env");
+    throw new Error("TMDB_API_KEY not configured");
+  }
   const cacheKey = `${lang}|${path}|${new URLSearchParams(params).toString()}`;
   const cached = cacheGet<T>(cacheKey);
   if (cached !== undefined) return cached;
