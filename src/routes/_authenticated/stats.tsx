@@ -8,6 +8,12 @@ import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/stats")({
+  head: () => ({
+    meta: [
+      { title: "إحصائياتي — فلمك" },
+      { name: "description", content: "شاهد ملخصاً لنشاطك السينمائي وإحصائيات الأفلام والمسلسلات التي تابعتها على منصة فلمك." },
+    ],
+  }),
   component: StatsPage,
 });
 

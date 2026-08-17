@@ -7,7 +7,7 @@ import { useLocale } from "@/lib/i18n";
 export const Route = createFileRoute("/callback")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول — Filmak" },
+      { title: "جارٍ التحقق — فلمك" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
