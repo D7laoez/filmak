@@ -43,16 +43,48 @@ function PrivacyPage() {
             {t("privacy_content")}
           </p>
 
-          <div className="mt-8 space-y-6">
+          <div className="mt-8 space-y-8">
             <section>
-              <h3 className="text-xl font-semibold mb-2">TMDB API</h3>
-              <p className="text-muted-foreground">{t("footer")}</p>
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
+                {t("data_protection")}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                نحن نلتزم بحماية بياناتك الشخصية. المعلومات التي يتم جمعها تُستخدم فقط لتحسين تجربتك في الموقع. لن يتم بيع أو مشاركة بياناتك مع أي طرف ثالث لأغراض تسويقية دون موافقتك الصريحة.
+              </p>
             </section>
 
             <section>
-              <h3 className="text-xl font-semibold mb-2">Cookies & Local Storage</h3>
-              <p className="text-muted-foreground">
-                We use local storage to save your preferences, theme, and language. We do not use tracking cookies for advertising purposes.
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
+                {t("user_rights")}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                لك الحق في الوصول إلى بياناتك المخزنة محلياً، تعديلها، أو مسحها في أي وقت. كما يمكنك اختيار عدم تقديم أي معلومات اختيارية دون أن يؤثر ذلك على وظائف الموقع الأساسية.
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
+                {t("terms_of_use")}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                باستخدامك لموقع فلمك، فإنك توافق على شروط الاستخدام الموضحة هنا. الموقع مخصص للاستخدام الشخصي وغير التجاري. يمنع استخدام أي أدوات آلية لسحب البيانات من الموقع بشكل يضر بأدائه.
+              </p>
+            </section>
+
+            <section className="pt-8 border-t border-border">
+              <h3 className="text-xl font-semibold mb-3">TMDB API</h3>
+              <p className="text-muted-foreground italic text-sm">
+                {t("footer")}
+              </p>
+            </section>
+
+            <section>
+              <h3 className="text-xl font-semibold mb-3">Cookies & Local Storage</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                نستخدم التخزين المحلي (Local Storage) لحفظ تفضيلاتك مثل المظهر (داكن/فاتح) واللغة، ولحفظ قائمة مفضلاتك. هذه البيانات تبقى على جهازك الخاص ولا يتم إرسالها إلى خوادمنا.
               </p>
             </section>
           </div>
