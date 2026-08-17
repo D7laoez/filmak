@@ -24,9 +24,9 @@ export const Route = createFileRoute("/genre/$id")({
   validateSearch: (raw) => searchSchema.parse(raw),
   head: ({ params }) => {
     const url = `https://filmak.site/genre/${params.id}`;
-    const title = "تصفح حسب النوع — Filmak · Browse by genre";
+    const title = "تصفح حسب النوع — فلمك";
     const description =
-      "تصفح الأفلام والمسلسلات حسب النوع مع فلاتر السنة والتقييم واللغة. Browse movies and TV shows by genre with year, rating, and language filters.";
+      "تصفح مجموعات ضخمة من الأفلام والمسلسلات حسب تصنيفها المفضل لديك مع خيارات بحث متقدمة وتصفية حسب السنة والتقييم.";
     const image = "https://filmak.site/icon-512.png";
     return {
       meta: [

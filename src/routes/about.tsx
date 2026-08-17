@@ -4,8 +4,8 @@ import { ArrowRight, Info } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => {
-    const title = "من نحن — About Us | Filmak";
-    const description = "تعرف على منصة فلمك وكيف نستخدم الذكاء الاصطناعي لترشيح الأفلام. Learn about Filmak and how we use AI to recommend movies.";
+    const title = "من نحن — فلمك · تعرف على منصتنا";
+    const description = "تعرف على منصة فلمك وكيف نستخدم تقنيات الذكاء الاصطناعي لمساعدتك في العثور على أفضل الأفلام والمسلسلات التي تناسب ذوقك الشخصي.";
     return {
       meta: [
         { title },

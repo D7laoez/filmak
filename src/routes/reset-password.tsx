@@ -7,7 +7,7 @@ import { useLocale } from "@/lib/i18n";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "إعادة تعيين كلمة المرور — Filmak" },
+      { title: "إعادة تعيين كلمة المرور — فلمك" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

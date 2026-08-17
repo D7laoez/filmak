@@ -159,15 +159,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "فلمك" },
-      { title: "فلمك — Filmak · AI movie recommender" },
+      { title: "فلمك — Filmak · دليل أفلام ومسلسلات بالذكاء الاصطناعي" },
       {
         name: "description",
-        content: "اكتشف أفلاماً ومسلسلات تناسب مزاجك بالذكاء الاصطناعي. Discover movies and series that match your mood with AI, in Arabic and English.",
+        content: "اكتشف أفضل الأفلام والمسلسلات التي تناسب ذوقك باستخدام الذكاء الاصطناعي. ابحث عما تريد مشاهدته وسيقوم فلمك بالعثور على الخيار المثالي لك.",
       },
       { property: "og:title", content: "فلمك — Filmak" },
       {
         property: "og:description",
-        content: "Describe what you want to watch, and AI finds the best movies and series for you. متاح بالعربية والإنجليزية.",
+        content: "اكتشف أفضل الأفلام والمسلسلات التي تناسب ذوقك باستخدام الذكاء الاصطناعي. ابحث عما تريد مشاهدته وسيقوم فلمك بالعثور على الخيار المثالي لك.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "فلمك — Filmak" },

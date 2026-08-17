@@ -9,11 +9,11 @@ import { Spinner } from "@/components/Spinner";
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "اكتشف — Filmak · Discover movies with filters" },
+      { title: "اكتشف — فلمك · استكشاف الأفلام والمسلسلات" },
       {
         name: "description",
         content:
-          "استكشف الأفلام حسب النوع والسنة والتقييم والترتيب. Browse movies by genre, year, rating, and sort — powered by TMDB.",
+          "استكشف آلاف الأفلام والمسلسلات حسب النوع، السنة، والتقييم. اعثر على ما تشاهده اليوم مع فلاتر البحث المتقدمة في فلمك.",
       },
       { property: "og:title", content: "اكتشف — Filmak Discover" },
       {

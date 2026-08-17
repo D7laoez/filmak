@@ -14,6 +14,12 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/favorites")({
   validateSearch: (r) => searchSchema.parse(r),
+  head: () => ({
+    meta: [
+      { title: "مفضلتي وقوائمي — فلمك" },
+      { name: "description", content: "استعرض قائمتك المفضلة، قائمة المشاهدة لاحقاً، والأفلام التي شاهدتها في فلمك." },
+    ],
+  }),
   component: FavoritesPage,
 });
 

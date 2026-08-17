@@ -47,7 +47,7 @@ export const Route = createFileRoute("/movie/$id")({
     const movie = loaderData?.movie;
     const backdrop = movie?.backdrop ?? movie?.poster ?? `${origin}/icon-512.png`;
     const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
-    const title = movie ? `${movie.title} — فلمك` : "فلمك";
+    const title = movie ? `${movie.title} — فلمك · تفاصيل الفيلم` : "فلمك";
     const desc = movie?.overview?.slice(0, 200) ?? "";
     const url = origin ? `${origin}/movie/${params.id}` : `/movie/${params.id}`;
     return {

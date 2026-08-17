@@ -4,8 +4,8 @@ import { ArrowRight, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
   head: () => {
-    const title = "سياسة الخصوصية — Privacy Policy | Filmak";
-    const description = "سياسة الخصوصية لمنصة فلمك. Privacy Policy for Filmak platform.";
+    const title = "سياسة الخصوصية — فلمك";
+    const description = "سياسة الخصوصية لمنصة فلمك. تعرف على كيفية تعاملنا مع بياناتك وحرصنا التام على خصوصية المستخدمين أثناء تصفح الموقع.";
     return {
       meta: [
         { title },

@@ -6,8 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول — Filmak" },
-      { name: "description", content: "سجّل دخولك أو أنشئ حساباً في فلمك." },
+      { title: "تسجيل الدخول — فلمك" },
+      { name: "description", content: "سجّل دخولك إلى منصة فلمك لحفظ مفضلتك والحصول على ترشيحات أفلام ومسلسلات مخصصة لك بالذكاء الاصطناعي." },
       { name: "robots", content: "noindex, nofollow" },
     ],
     links: [

@@ -44,9 +44,9 @@ export const Route = createFileRoute("/")({
   validateSearch: (r: Record<string, unknown>) =>
     z.object({ q: z.string().optional() }).parse(r),
   head: () => {
-    const title = "فلمك — Filmak · توصيات أفلام ومسلسلات بالذكاء الاصطناعي";
+    const title = "فلمك — Filmak · دليل أفلام ومسلسلات بالذكاء الاصطناعي";
     const description =
-      "اكتشف أفلاماً ومسلسلات تناسب مزاجك بالذكاء الاصطناعي — بالعربية والإنجليزية. Discover movies and series that match your mood with AI.";
+      "اكتشف أفضل الأفلام والمسلسلات التي تناسب ذوقك باستخدام الذكاء الاصطناعي. ابحث عما تريد مشاهدته وسيقوم فلمك بالعثور على الخيار المثالي لك.";
     const url = "https://filmak.site/";
     const image = "https://filmak.site/icon-512.png";
     return {

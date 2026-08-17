@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/$")({
   head: () => ({
     meta: [
-      { title: "Page not found — Filmak" },
+      { title: "404 الصفحة غير موجودة — فلمك" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
