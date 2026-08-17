@@ -230,7 +230,7 @@ function Content() {
         {data.backdrop && (
           <img
             src={data.backdrop}
-            alt=""
+            alt={data.title}
             className="absolute inset-0 w-full h-full object-cover"
             fetchPriority="high"
           />
