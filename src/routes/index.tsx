@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass } from "lucide-react";
+import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass, CheckCircle2 } from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
@@ -358,6 +358,20 @@ function Home() {
           <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
             {t("hero_sub")}
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm text-muted-foreground font-medium opacity-80">
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+              أفضل ترشيحات
+            </span>
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+              تغطية عالمية
+            </span>
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-primary" />
+              دقة عالية
+            </span>
+          </div>
 
           <form
             onSubmit={(e: FormEvent) => {
