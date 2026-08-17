@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /callback
+Disallow: /favorites
+Disallow: /watchlist
+Disallow: /watched
+Disallow: /stats
+Disallow: /taste
 
 Sitemap: https://filmak.site/sitemap.xml
