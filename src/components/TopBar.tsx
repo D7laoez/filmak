@@ -20,10 +20,21 @@ export function TopBar() {
   const search = useRouterState({ select: (s) => s.location.search }) as { q?: string } | undefined;
   const [q, setQ] = useState<string>(search?.q ?? "");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [debouncedQ, setDebouncedQ] = useState<string>(search?.q ?? "");
+
   useEffect(() => { setQ(search?.q ?? ""); }, [search?.q]);
+
+  // Avoid firing two server-function requests on every keystroke. Suggestions wait
+  // briefly until the user pauses typing, while the visible input remains instant.
+  useEffect(() => {
+    const value = q.trim();
+    const timer = window.setTimeout(() => setDebouncedQ(value), 300);
+    return () => window.clearTimeout(timer);
+  }, [q]);
+
   if (pathname === "/auth") return null;
 
-  const normalizedQ = q.trim();
+  const normalizedQ = debouncedQ;
   const showSuggestions = searchFocused && normalizedQ.length >= 2;
 
   const movieSuggestions = useQuery({
@@ -102,13 +113,7 @@ export function TopBar() {
               {hasResults ? (
                 <div className="py-2">
                   {movies.map((movie) => (
-                    <button
-                      key={`movie-${movie.id}`}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => openMovie(movie.id)}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-start hover:bg-secondary transition"
-                    >
+                    <button key={`movie-${movie.id}`} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => openMovie(movie.id)} className="w-full flex items-center gap-3 px-3 py-2 text-start hover:bg-secondary transition">
                       {movie.poster ? <img src={movie.poster} alt="" className="w-9 h-12 rounded-md object-cover shrink-0" loading="lazy" /> : <div className="w-9 h-12 rounded-md bg-secondary flex items-center justify-center shrink-0"><Film className="w-4 h-4 text-muted-foreground" /></div>}
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-medium truncate">{movie.title}</span>
@@ -117,13 +122,7 @@ export function TopBar() {
                     </button>
                   ))}
                   {tvShows.map((show) => (
-                    <button
-                      key={`tv-${show.id}`}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => openTv(show.id)}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-start hover:bg-secondary transition"
-                    >
+                    <button key={`tv-${show.id}`} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => openTv(show.id)} className="w-full flex items-center gap-3 px-3 py-2 text-start hover:bg-secondary transition">
                       {show.poster ? <img src={show.poster} alt="" className="w-9 h-12 rounded-md object-cover shrink-0" loading="lazy" /> : <div className="w-9 h-12 rounded-md bg-secondary flex items-center justify-center shrink-0"><Tv className="w-4 h-4 text-muted-foreground" /></div>}
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-medium truncate">{show.title}</span>
@@ -131,13 +130,8 @@ export function TopBar() {
                       </span>
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => submitSearch(q)}
-                    className="w-full mt-1 border-t border-border px-3 pt-2 pb-1 text-center text-xs font-medium text-primary hover:bg-secondary/60 transition"
-                  >
-                    {dir === "rtl" ? `عرض كل النتائج لـ «${normalizedQ}»` : `View all results for “${normalizedQ}”`}
+                  <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => submitSearch(q)} className="w-full mt-1 border-t border-border px-3 pt-2 pb-1 text-center text-xs font-medium text-primary hover:bg-secondary/60 transition">
+                    {dir === "rtl" ? `عرض كل النتائج لـ «${q.trim()}»` : `View all results for “${q.trim()}”`}
                   </button>
                 </div>
               ) : loading ? (
