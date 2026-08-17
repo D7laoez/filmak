@@ -159,6 +159,10 @@ const DICT: Record<Locale, Dict> = {
     imdb: "IMDb",
     tmdb: "TMDB",
     details: "تفاصيل",
+    about_us: "من نحن",
+    privacy_policy: "سياسة الخصوصية",
+    about_content: "فلمك هو منصة مدعومة بالذكاء الاصطناعي لمساعدتك في العثور على الأفلام والمسلسلات التي تناسب ذوقك. بدلاً من قضاء وقت طويل في البحث، يمكنك ببساطة وصف ما تبحث عنه وسنقوم بترشيح الأفضل لك.",
+    privacy_content: "نحن نهتم بخصوصيتك. يتم تخزين مفضلاتك وإحصائياتك محلياً على جهازك. نستخدم بيانات TMDB لعرض معلومات الأفلام ولا نقوم بجمع بيانات شخصية دون موافقتك.",
   },
   en: {
     brand: "Filmak",
@@ -309,6 +313,10 @@ const DICT: Record<Locale, Dict> = {
     imdb: "IMDb",
     tmdb: "TMDB",
     details: "Details",
+    about_us: "About Us",
+    privacy_policy: "Privacy Policy",
+    about_content: "Filmak is an AI-powered platform designed to help you find the perfect movies and TV shows. Instead of scrolling for hours, just describe what you're looking for and let us recommend the best options for you.",
+    privacy_content: "We care about your privacy. Your favorites and stats are stored locally on your device. We use TMDB data for movie information and do not collect personal data without your consent.",
   },
 };
 
@@ -448,8 +456,12 @@ export type Dict = {
   close: string;
   imdb: string;
   tmdb: string;
-  details: string;
-};
+    details: string;
+    about_us: string;
+    privacy_policy: string;
+    about_content: string;
+    privacy_content: string;
+  };
 export type TKey = keyof Dict;
 
 type Ctx = {
