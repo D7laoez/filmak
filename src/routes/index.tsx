@@ -337,13 +337,6 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-accent/5 to-transparent pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
-          <img
-            src="/icon-192.png"
-            srcSet="/icon-192.png 1x, /icon-512.png 2x"
-            decoding="async"
-            alt={t("brand")}
-            className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 drop-shadow-[0_8px_32px_rgba(168,85,247,0.35)]"
-          />
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             {t("tagline_ai")}
