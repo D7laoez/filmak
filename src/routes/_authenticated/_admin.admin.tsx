@@ -2,434 +2,55 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import {
-  ArrowRight,
-  RefreshCw,
-  Search,
-  Shield,
-  ShieldOff,
-  Trash2,
-  Users as UsersIcon,
-  Heart,
-  ListChecks,
-  UserPlus,
-  X,
-} from "lucide-react";
-import {
-  getAdminStats,
-  listUsers,
-  getUserDetail,
-  toggleAdminRole,
-  deleteUser,
-  type AdminUserRow,
-} from "@/lib/admin.functions";
+import { ArrowRight, RefreshCw, Search, Shield, Trash2, Users, Heart, ListChecks, UserPlus, Globe2, Monitor, MapPin, Activity, X, LogIn, Eye, Smartphone } from "lucide-react";
+import { getAdminStats, listUsers, getUserDetail, toggleAdminRole, deleteUser, type AdminUserRow } from "@/lib/admin.functions";
+import { getSiteAnalytics, type SiteAnalytics } from "@/lib/site-analytics.functions";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/_admin/admin")({
-  head: () => ({
-    meta: [
-      { title: "لوحة الإدارة — فلمك" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "لوحة الإدارة — فلمك" }, { name: "robots", content: "noindex, nofollow" }] }),
   component: AdminPage,
 });
 
 function AdminPage() {
   const { dir } = useLocale();
   const qc = useQueryClient();
-  const statsFn = useServerFn(getAdminStats);
-  const usersFn = useServerFn(listUsers);
-  const detailFn = useServerFn(getUserDetail);
-  const toggleFn = useServerFn(toggleAdminRole);
-  const deleteFn = useServerFn(deleteUser);
-
-  const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
+  const statsFn = useServerFn(getAdminStats), usersFn = useServerFn(listUsers), detailFn = useServerFn(getUserDetail), analyticsFn = useServerFn(getSiteAnalytics);
+  const toggleFn = useServerFn(toggleAdminRole), deleteFn = useServerFn(deleteUser);
+  const [search, setSearch] = useState(""), [selectedId, setSelectedId] = useState<string | null>(null);
   const stats = useQuery({ queryKey: ["admin-stats"], queryFn: () => statsFn(), retry: false });
   const users = useQuery({ queryKey: ["admin-users"], queryFn: () => usersFn(), retry: false });
-  const detail = useQuery({
-    queryKey: ["admin-user", selectedId],
-    queryFn: () => detailFn({ data: { userId: selectedId! } }),
-    enabled: !!selectedId,
-    retry: false,
-  });
+  const analytics = useQuery({ queryKey: ["admin-analytics"], queryFn: () => analyticsFn(), retry: false, staleTime: 30_000 });
+  const detail = useQuery({ queryKey: ["admin-user", selectedId], queryFn: () => detailFn({ data: { userId: selectedId! } }), enabled: !!selectedId, retry: false });
+  const toggleMut = useMutation({ mutationFn: (v: { userId: string; makeAdmin: boolean }) => toggleFn({ data: v }), onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin-users"] }); qc.invalidateQueries({ queryKey: ["admin-stats"] }); } });
+  const deleteMut = useMutation({ mutationFn: (userId: string) => deleteFn({ data: { userId } }), onSuccess: () => { setSelectedId(null); qc.invalidateQueries({ queryKey: ["admin-users"] }); qc.invalidateQueries({ queryKey: ["admin-stats"] }); } });
+  const filtered = useMemo(() => { const all = users.data ?? []; const q = search.trim().toLowerCase(); return q ? all.filter(u => (u.email ?? "").toLowerCase().includes(q) || u.id.toLowerCase().includes(q)) : all; }, [users.data, search]);
+  const forbidden = (stats.error instanceof Error && /Forbidden|admin/i.test(stats.error.message)) || (analytics.error instanceof Error && /Forbidden|admin/i.test(analytics.error.message));
+  const refresh = () => { stats.refetch(); users.refetch(); analytics.refetch(); };
 
-  const toggleMut = useMutation({
-    mutationFn: (v: { userId: string; makeAdmin: boolean }) => toggleFn({ data: v }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
-      qc.invalidateQueries({ queryKey: ["admin-stats"] });
-      if (selectedId) qc.invalidateQueries({ queryKey: ["admin-user", selectedId] });
-    },
-  });
-
-  const deleteMut = useMutation({
-    mutationFn: (userId: string) => deleteFn({ data: { userId } }),
-    onSuccess: () => {
-      setSelectedId(null);
-      qc.invalidateQueries({ queryKey: ["admin-users"] });
-      qc.invalidateQueries({ queryKey: ["admin-stats"] });
-    },
-  });
-
-  const filtered = useMemo(() => {
-    if (!users.data) return [];
-    const q = search.trim().toLowerCase();
-    if (!q) return users.data;
-    return users.data.filter(
-      (u) => (u.email ?? "").toLowerCase().includes(q) || u.id.toLowerCase().includes(q),
-    );
-  }, [users.data, search]);
-
-  const forbidden =
-    (stats.error instanceof Error && /Forbidden|admin/i.test(stats.error.message)) ||
-    (users.error instanceof Error && /Forbidden|admin/i.test(users.error.message));
-
-  return (
-    <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-full px-3 py-1.5 text-sm hover:bg-secondary transition"
-            >
-              <ArrowRight className="w-4 h-4" />
-              رجوع
-            </Link>
-            <Logo size={32} />
-            <span className="text-sm font-semibold text-muted-foreground">لوحة الإدارة</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              to="/seo-status"
-              className="text-xs bg-secondary/60 border border-border rounded-full px-3 py-1.5 hover:bg-secondary transition"
-            >
-              SEO
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {forbidden && (
-          <div className="border border-destructive/40 bg-destructive/5 rounded-2xl p-6 text-sm">
-            <p className="font-semibold mb-1">الوصول مقيّد</p>
-            <p className="text-muted-foreground">حسابك لا يملك صلاحية admin.</p>
-          </div>
-        )}
-
-        {!forbidden && (
-          <>
-            <section className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <StatCard icon={<UsersIcon className="w-5 h-5" />} label="مستخدمين" value={stats.data?.total_users} />
-              <StatCard icon={<Shield className="w-5 h-5" />} label="مشرفين" value={stats.data?.total_admins} />
-              <StatCard icon={<Heart className="w-5 h-5" />} label="مفضلات" value={stats.data?.total_favorites} />
-              <StatCard icon={<ListChecks className="w-5 h-5" />} label="عناصر قوائم" value={stats.data?.total_lists} />
-              <StatCard icon={<UserPlus className="w-5 h-5" />} label="جدد (7 أيام)" value={stats.data?.signups_last_7d} />
-            </section>
-
-            <section className="border border-border rounded-2xl p-5 space-y-4">
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <h2 className="text-lg font-semibold">المستخدمون ({filtered.length})</h2>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center bg-secondary/40 border border-border rounded-full px-3">
-                    <Search className="w-4 h-4 text-muted-foreground" />
-                    <input
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="ابحث بالإيميل أو ID..."
-                      className="bg-transparent outline-none py-2 px-2 text-sm w-56"
-                    />
-                  </div>
-                  <button
-                    onClick={() => {
-                      users.refetch();
-                      stats.refetch();
-                    }}
-                    disabled={users.isFetching}
-                    className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-sm hover:opacity-90 disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${users.isFetching ? "animate-spin" : ""}`} />
-                    تحديث
-                  </button>
-                </div>
-              </div>
-
-              {users.isLoading && (
-                <div className="py-12 flex items-center justify-center">
-                  <Spinner size={48} label="جاري التحميل" />
-                </div>
-              )}
-
-              {users.data && (
-                <div className="overflow-x-auto -mx-5 px-5">
-                  <table className="w-full text-sm">
-                    <thead className="text-xs uppercase text-muted-foreground border-b border-border">
-                      <tr>
-                        <th className="text-start py-2 px-2">الإيميل</th>
-                        <th className="text-start py-2 px-2">تسجيل</th>
-                        <th className="text-start py-2 px-2">آخر دخول</th>
-                        <th className="text-center py-2 px-2">مفضلة</th>
-                        <th className="text-center py-2 px-2">قوائم</th>
-                        <th className="text-center py-2 px-2">دور</th>
-                        <th className="text-end py-2 px-2">إجراءات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((u) => (
-                        <UserRow
-                          key={u.id}
-                          user={u}
-                          onOpen={() => setSelectedId(u.id)}
-                          onToggleAdmin={() =>
-                            toggleMut.mutate({ userId: u.id, makeAdmin: !u.is_admin })
-                          }
-                          onDelete={() => {
-                            if (confirm(`حذف الحساب ${u.email ?? u.id}؟ هذا لا يمكن التراجع عنه.`)) {
-                              deleteMut.mutate(u.id);
-                            }
-                          }}
-                          disabled={toggleMut.isPending || deleteMut.isPending}
-                        />
-                      ))}
-                      {filtered.length === 0 && (
-                        <tr>
-                          <td colSpan={7} className="py-8 text-center text-muted-foreground">
-                            لا يوجد نتائج
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {(toggleMut.error || deleteMut.error) && (
-                <div className="text-sm text-destructive">
-                  {(toggleMut.error as Error)?.message || (deleteMut.error as Error)?.message}
-                </div>
-              )}
-            </section>
-          </>
-        )}
-      </main>
-
-      {selectedId && (
-        <UserDrawer
-          onClose={() => setSelectedId(null)}
-          data={detail.data}
-          loading={detail.isLoading}
-          error={detail.error as Error | null}
-        />
-      )}
-    </div>
-  );
+  return <div dir={dir} className="min-h-screen bg-background text-foreground">
+    <header className="sticky top-0 z-40 border-b border-border/40 bg-background/90 backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4"><div className="flex items-center gap-3"><Link to="/" className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"><ArrowRight className="h-4 w-4"/>رجوع</Link><Logo size={32}/><div><div className="font-semibold">لوحة إدارة فلمك</div><div className="text-xs text-muted-foreground">Owner analytics & control center</div></div></div><div className="flex items-center gap-2"><button onClick={refresh} className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"><RefreshCw className={`h-4 w-4 ${stats.isFetching || analytics.isFetching ? "animate-spin" : ""}`}/>تحديث</button><Link to="/seo-status" className="hidden rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs sm:inline-flex">SEO</Link><ThemeToggle/></div></div></header>
+    <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">
+      {forbidden ? <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6"><b>الوصول مقيّد</b><p className="mt-1 text-sm text-muted-foreground">هذه اللوحة للمالك فقط.</p></div> : <>
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
+          <Kpi icon={<Users/>} label="الحسابات" value={stats.data?.total_users}/><Kpi icon={<Eye/>} label="الزيارات" value={analytics.data?.total_visits}/><Kpi icon={<Activity/>} label="الجلسات" value={analytics.data?.unique_sessions}/><Kpi icon={<Globe2/>} label="IP فريد" value={analytics.data?.unique_ips}/><Kpi icon={<LogIn/>} label="زيارات مسجلة" value={analytics.data?.logged_in_visits}/><Kpi icon={<Heart/>} label="المفضلة" value={stats.data?.total_favorites}/><Kpi icon={<ListChecks/>} label="عناصر القوائم" value={stats.data?.total_lists}/><Kpi icon={<UserPlus/>} label="تسجيلات 7 أيام" value={stats.data?.signups_last_7d}/>
+        </section>
+        <section className="grid gap-4 lg:grid-cols-3"><Panel title="الزيارات اليومية — آخر 30 يوم"><DailyChart data={analytics.data?.daily ?? []}/></Panel><Panel title="الدول"><RankList rows={analytics.data?.countries?.map(x=>({label:x.country,value:x.visits})) ?? []}/></Panel><Panel title="الأجهزة"><RankList rows={analytics.data?.devices?.map(x=>({label:x.device,value:x.visits})) ?? []}/></Panel></section>
+        <section className="grid gap-4 lg:grid-cols-2"><Panel title="أكثر الصفحات زيارة"><RankList rows={analytics.data?.top_paths?.map(x=>({label:x.path,value:x.visits})) ?? []} mono/></Panel><Panel title="أكثر عناوين IP نشاطًا"><IpList rows={analytics.data?.top_ips ?? []}/></Panel></section>
+        <section className="rounded-2xl border border-border bg-card p-4 sm:p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">الحسابات المسجلة ({filtered.length})</h2><p className="text-xs text-muted-foreground">الإيميل، آخر دخول، المفضلة، القوائم والدور</p></div><div className="flex items-center gap-2"><div className="flex items-center rounded-full border border-border bg-secondary/40 px-3"><Search className="h-4 w-4 text-muted-foreground"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="بحث بالإيميل أو ID" className="w-48 bg-transparent px-2 py-2 text-sm outline-none"/></div></div></div>{users.isLoading ? <div className="py-12 text-center"><Spinner size={42} label="جاري التحميل"/></div> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="border-b border-border text-xs text-muted-foreground"><tr><th className="p-2 text-start">الإيميل</th><th className="p-2 text-start">التسجيل</th><th className="p-2 text-start">آخر دخول</th><th className="p-2">مفضلة</th><th className="p-2">قوائم</th><th className="p-2">الدور</th><th className="p-2 text-end">إجراء</th></tr></thead><tbody>{filtered.map(u=><tr key={u.id} className="border-b border-border/40 hover:bg-secondary/20"><td className="p-2"><button onClick={()=>setSelectedId(u.id)} className="max-w-[280px] truncate text-start text-primary hover:underline">{u.email ?? u.id}</button></td><td className="p-2 text-xs text-muted-foreground">{fmt(u.created_at)}</td><td className="p-2 text-xs text-muted-foreground">{u.last_sign_in_at ? fmt(u.last_sign_in_at) : "—"}</td><td className="p-2 text-center">{u.favorites_count}</td><td className="p-2 text-center">{u.lists_count}</td><td className="p-2 text-center">{u.is_admin ? <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"><Shield className="h-3 w-3"/>admin</span> : <span className="text-xs text-muted-foreground">user</span>}</td><td className="p-2"><div className="flex justify-end gap-1"><button disabled={toggleMut.isPending} onClick={()=>toggleMut.mutate({userId:u.id,makeAdmin:!u.is_admin})} className="rounded-full p-2 hover:bg-secondary disabled:opacity-40" title="تغيير الدور"><Shield className="h-4 w-4"/></button><button disabled={deleteMut.isPending} onClick={()=>confirm(`حذف ${u.email ?? u.id}؟`) && deleteMut.mutate(u.id)} className="rounded-full p-2 text-destructive hover:bg-destructive/10 disabled:opacity-40" title="حذف"><Trash2 className="h-4 w-4"/></button></div></td></tr>)}{filtered.length===0&&<tr><td colSpan={7} className="p-8 text-center text-muted-foreground">لا توجد نتائج</td></tr>}</tbody></table></div>}</section>
+      </>}
+    </main>
+    {selectedId && <UserDrawer data={detail.data} loading={detail.isLoading} error={detail.error as Error|null} onClose={()=>setSelectedId(null)}/>} 
+  </div>;
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number | undefined;
-}) {
-  return (
-    <div className="border border-border rounded-2xl p-4 bg-card">
-      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-2">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="text-2xl font-bold">{value ?? "—"}</div>
-    </div>
-  );
-}
-
-function UserRow({
-  user,
-  onOpen,
-  onToggleAdmin,
-  onDelete,
-  disabled,
-}: {
-  user: AdminUserRow;
-  onOpen: () => void;
-  onToggleAdmin: () => void;
-  onDelete: () => void;
-  disabled: boolean;
-}) {
-  return (
-    <tr className="border-b border-border/50 hover:bg-secondary/20 transition">
-      <td className="py-2 px-2">
-        <button onClick={onOpen} className="text-primary hover:underline text-start">
-          {user.email ?? user.id.slice(0, 8)}
-        </button>
-      </td>
-      <td className="py-2 px-2 text-muted-foreground text-xs">
-        {new Date(user.created_at).toLocaleDateString()}
-      </td>
-      <td className="py-2 px-2 text-muted-foreground text-xs">
-        {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : "—"}
-      </td>
-      <td className="py-2 px-2 text-center">{user.favorites_count}</td>
-      <td className="py-2 px-2 text-center">{user.lists_count}</td>
-      <td className="py-2 px-2 text-center">
-        {user.is_admin ? (
-          <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5">
-            <Shield className="w-3 h-3" /> admin
-          </span>
-        ) : (
-          <span className="text-xs text-muted-foreground">user</span>
-        )}
-      </td>
-      <td className="py-2 px-2">
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={onToggleAdmin}
-            disabled={disabled}
-            title={user.is_admin ? "إزالة admin" : "منح admin"}
-            className="p-1.5 rounded-full hover:bg-secondary transition disabled:opacity-40"
-          >
-            {user.is_admin ? (
-              <ShieldOff className="w-4 h-4 text-amber-500" />
-            ) : (
-              <Shield className="w-4 h-4" />
-            )}
-          </button>
-          <button
-            onClick={onDelete}
-            disabled={disabled}
-            title="حذف الحساب"
-            className="p-1.5 rounded-full hover:bg-destructive/10 text-destructive transition disabled:opacity-40"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-function UserDrawer({
-  onClose,
-  data,
-  loading,
-  error,
-}: {
-  onClose: () => void;
-  data: ReturnType<typeof getUserDetail> extends Promise<infer T> ? T | undefined : never;
-  loading: boolean;
-  error: Error | null;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/50" />
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-2xl bg-background border-s border-border h-full overflow-y-auto"
-      >
-        <div className="sticky top-0 bg-background/95 backdrop-blur border-b border-border px-5 py-3 flex items-center justify-between">
-          <h3 className="font-semibold">تفاصيل المستخدم</h3>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-secondary">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="p-5 space-y-5">
-          {loading && (
-            <div className="py-12 flex items-center justify-center">
-              <Spinner size={48} />
-            </div>
-          )}
-          {error && <div className="text-sm text-destructive">{error.message}</div>}
-          {data && (
-            <>
-              <div className="border border-border rounded-xl p-4 space-y-1 text-sm">
-                <div className="font-medium">{data.user.email ?? data.user.id}</div>
-                <div className="text-xs text-muted-foreground font-mono">{data.user.id}</div>
-                <div className="text-xs text-muted-foreground pt-2">
-                  سجل: {new Date(data.user.created_at).toLocaleString()}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  آخر دخول:{" "}
-                  {data.user.last_sign_in_at
-                    ? new Date(data.user.last_sign_in_at).toLocaleString()
-                    : "—"}
-                </div>
-                <div className="text-xs pt-1">
-                  الدور:{" "}
-                  <span className={data.user.is_admin ? "text-primary" : "text-muted-foreground"}>
-                    {data.user.is_admin ? "admin" : "user"}
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                  <Heart className="w-4 h-4" /> المفضلة ({data.favorites.length})
-                </h4>
-                <div className="space-y-2">
-                  {data.favorites.map((f) => (
-                    <div key={f.id} className="flex items-center gap-3 border border-border/60 rounded-xl p-2">
-                      {f.poster && (
-                        <img src={f.poster} alt={f.title} className="w-10 h-14 object-cover rounded" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{f.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {f.year ?? "—"} · ⭐ {f.rating ?? "—"}
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(f.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  ))}
-                  {data.favorites.length === 0 && (
-                    <div className="text-xs text-muted-foreground">لا يوجد</div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                  <ListChecks className="w-4 h-4" /> القوائم ({data.lists.length})
-                </h4>
-                <div className="space-y-2">
-                  {data.lists.map((l) => (
-                    <div key={l.id} className="flex items-center gap-3 border border-border/60 rounded-xl p-2">
-                      {l.poster && (
-                        <img src={l.poster} alt={l.title} className="w-10 h-14 object-cover rounded" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{l.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {l.media_type} · {l.status} · ⭐ {l.rating ?? "—"}
-                        </div>
-                        {l.note && <div className="text-xs text-muted-foreground truncate">{l.note}</div>}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(l.updated_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  ))}
-                  {data.lists.length === 0 && (
-                    <div className="text-xs text-muted-foreground">لا يوجد</div>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+function Kpi({icon,label,value}:{icon:React.ReactNode;label:string;value:number|undefined}){return <div className="rounded-2xl border border-border bg-card p-4"><div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">{icon}<span>{label}</span></div><div className="text-2xl font-bold">{value ?? "—"}</div></div>}
+function Panel({title,children}:{title:string;children:React.ReactNode}){return <section className="rounded-2xl border border-border bg-card p-4"><h3 className="mb-4 font-semibold">{title}</h3>{children}</section>}
+function RankList({rows,mono=false}:{rows:Array<{label:string;value:number}>;mono?:boolean}){const max=Math.max(1,...rows.map(x=>x.value));return <div className="space-y-3">{rows.length?rows.slice(0,10).map((r,i)=><div key={`${r.label}-${i}`}><div className="mb-1 flex justify-between gap-3 text-sm"><span className={`truncate ${mono?"font-mono text-xs":""}`}>{r.label}</span><b>{r.value}</b></div><div className="h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-primary" style={{width:`${Math.max(3,r.value/max*100)}%`}}/></div></div>):<p className="text-sm text-muted-foreground">لا توجد بيانات بعد.</p>}</div>}
+function IpList({rows}:{rows:SiteAnalytics["top_ips"]}){return <div className="space-y-2">{rows.length?rows.slice(0,15).map((r,i)=><div key={r.ip} className="flex items-center justify-between rounded-xl border border-border/50 bg-secondary/20 px-3 py-2"><div className="min-w-0"><div className="font-mono text-sm">{r.ip}</div><div className="text-[11px] text-muted-foreground">آخر ظهور: {fmt(r.last_seen)}</div></div><b>{r.visits}</b></div>):<p className="text-sm text-muted-foreground">لم تُسجل زيارات بعد.</p>}</div>}
+function DailyChart({data}:{data:SiteAnalytics["daily"]}){const max=Math.max(1,...data.map(x=>x.visits));return <div className="flex h-44 items-end gap-1 overflow-x-auto">{data.map(d=><div key={d.day} className="group flex h-full min-w-2 flex-1 flex-col justify-end"><div className="relative rounded-t bg-primary/70" style={{height:`${Math.max(2,d.visits/max*100)}%`}} title={`${d.day}: ${d.visits} visits / ${d.sessions} sessions`}/><div className="mt-1 hidden -rotate-45 origin-top text-[9px] text-muted-foreground group-hover:block">{d.day.slice(5)}</div></div>)}</div>}
+function fmt(v:string){return new Date(v).toLocaleString("ar-IQ",{dateStyle:"medium",timeStyle:"short"})}
+function UserDrawer({data,loading,error,onClose}:{data:Awaited<ReturnType<typeof getUserDetail>>|undefined;loading:boolean;error:Error|null;onClose:()=>void}){return <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose}><aside onClick={e=>e.stopPropagation()} className="ms-auto h-full w-full max-w-2xl overflow-y-auto bg-background p-5 shadow-2xl"><div className="mb-5 flex items-center justify-between border-b border-border pb-4"><h3 className="font-semibold">تفاصيل الحساب</h3><button onClick={onClose} className="rounded-full p-2 hover:bg-secondary"><X className="h-5 w-5"/></button></div>{loading&&<Spinner size={42} label="جاري التحميل"/>}{error&&<p className="text-sm text-destructive">{error.message}</p>}{data&&<div className="space-y-5"><div className="rounded-2xl border border-border p-4"><div className="font-medium">{data.user.email}</div><div className="mt-1 break-all font-mono text-xs text-muted-foreground">{data.user.id}</div><div className="mt-3 grid grid-cols-2 gap-3 text-xs"><div>التسجيل<br/><b>{fmt(data.user.created_at)}</b></div><div>آخر دخول<br/><b>{data.user.last_sign_in_at?fmt(data.user.last_sign_in_at):"—"}</b></div><div>المفضلة<br/><b>{data.favorites.length}</b></div><div>القوائم<br/><b>{data.lists.length}</b></div></div></div><Panel title={`المفضلة (${data.favorites.length})`}><div className="space-y-2">{data.favorites.slice(0,50).map(f=><div key={f.id} className="flex gap-3 rounded-xl border border-border/50 p-2"><img src={f.poster??""} className="h-16 w-11 rounded object-cover" alt=""/><div className="min-w-0"><b className="block truncate">{f.title}</b><span className="text-xs text-muted-foreground">{f.year??""} · {f.rating??"—"}</span></div></div>)}</div></Panel><Panel title={`القوائم (${data.lists.length})`}><div className="space-y-2">{data.lists.slice(0,100).map(l=><div key={l.id} className="rounded-xl border border-border/50 p-3"><b>{l.title}</b><div className="mt-1 text-xs text-muted-foreground">{l.media_type} · {l.status} · {l.year??""} · آخر تعديل {fmt(l.updated_at)}</div></div>)}</div></Panel></div>}</aside></div>}
