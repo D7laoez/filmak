@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function TopBar() {
   const { user } = useAuth();
-  const { t, dir } = useLocale();
+  const { t, dir, toggle } = useLocale();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -33,7 +33,7 @@ export function TopBar() {
           <button onClick={() => navigate({ to: "/movie-night" })} className="hidden xl:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition" aria-label="Movie Night"><Sparkles className="w-4 h-4" />{dir === "rtl" ? "ليلة الفيلم" : "Movie Night"}</button>
           <button onClick={() => navigate({ to: "/pick" })} className="hidden md:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition" aria-label="Pick a movie"><Dices className="w-4 h-4" />{dir === "rtl" ? "اختارلي" : "Pick"}</button>
           <Link to="/discover" className="hidden lg:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"><Compass className="w-4 h-4" />{t("discover")}</Link>
-          <button onClick={() => navigate({ to: "/auth" })} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition" aria-label="Switch language"><Languages className="w-4 h-4" /><span className="hidden sm:inline">{t("lang_switch")}</span></button>
+          <button onClick={toggle} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition" aria-label="Switch language"><Languages className="w-4 h-4" /><span className="hidden sm:inline">{t("lang_switch")}</span></button>
           <ThemeToggle />
           {user ? <><Link to="/favorites" search={{ tab: "favorite" }} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition" aria-label={t("my_favorites")}><Heart className="w-4 h-4 text-primary" /><span className="hidden sm:inline">{t("my_favorites")}</span></Link><button onClick={handleSignOut} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition" aria-label={t("logout")}><LogOut className="w-4 h-4" /></button></> : <button onClick={() => navigate({ to: "/auth" })} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition"><User className="w-4 h-4" /><span className="hidden sm:inline">{t("login")}</span></button>}
         </div>
