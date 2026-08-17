@@ -37,7 +37,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
           {it.backdrop && (
             <img
               src={it.backdrop}
-              alt=""
+              alt={it.title}
               className="w-full h-full object-cover scale-105"
               loading={i === 0 ? "eager" : "lazy"}
               fetchPriority={i === 0 ? "high" : "auto"}
