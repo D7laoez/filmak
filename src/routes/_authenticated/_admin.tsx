@@ -2,6 +2,12 @@ import { createFileRoute, Outlet, notFound, rootRouteId } from "@tanstack/react-
 import { checkIsAdmin, logUnauthorizedAdminAccess } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/_admin")({
+  head: () => ({
+    meta: [
+      { title: "الإدارة — فلمك" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   loader: async ({ location }) => {
     const { isAdmin } = await checkIsAdmin();
     if (!isAdmin) {
