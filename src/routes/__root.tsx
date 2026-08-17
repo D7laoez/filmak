@@ -334,7 +334,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LocaleProvider>
-          <RootContent />
+          <RootContentWithLocale />
           <Toaster position="top-center" theme="dark" richColors />
         </LocaleProvider>
       </ThemeProvider>
@@ -342,7 +342,7 @@ function RootComponent() {
   );
 }
 
-function RootContent() {
+function RootContentWithLocale() {
   const { t } = useLocale();
   return (
     <>
