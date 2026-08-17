@@ -29,6 +29,12 @@ import { Spinner } from "@/components/Spinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/_admin/admin")({
+  head: () => ({
+    meta: [
+      { title: "لوحة الإدارة — فلمك" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: AdminPage,
 });
 
