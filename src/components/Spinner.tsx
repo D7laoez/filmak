@@ -19,7 +19,7 @@ export function Spinner({ size = 48, label, className = "" }: Props) {
         <img
           src="/icon-192.png"
           srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          alt=""
+          alt="Loading"
           aria-hidden="true"
           decoding="async"
           className="absolute inset-0 m-auto animate-pulse object-contain"

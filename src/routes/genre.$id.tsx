@@ -311,7 +311,7 @@ function GenrePage() {
 
         {!pagesResult.isLoading && (pagesResult.data?.results.length ?? 0) === 0 && (
           <div className="py-16 flex flex-col items-center justify-center text-center">
-            <img src="/icon-192.png" srcSet="/icon-192.png 1x, /icon-512.png 2x" alt="" aria-hidden className="w-16 h-16 md:w-20 md:h-20 opacity-70 mb-3" />
+            <img src="/icon-192.png" srcSet="/icon-192.png 1x, /icon-512.png 2x" alt={t("brand")} aria-hidden className="w-16 h-16 md:w-20 md:h-20 opacity-70 mb-3" />
             <p className="text-base font-medium">{t("no_results")}</p>
             <p className="text-sm text-muted-foreground mt-1">{t("no_results_sub")}</p>
           </div>

@@ -100,7 +100,7 @@ function Content() {
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <div className="relative h-[50vh] min-h-[400px] w-full">
-        {data.backdrop && <img src={data.backdrop} alt={data.title} className="absolute inset-0 w-full h-full object-cover" />}
+        {data.backdrop && <img src={data.backdrop} alt={data.title} className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
         <div className="absolute top-0 left-0 right-0 p-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
