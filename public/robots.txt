@@ -1,4 +1,30 @@
+# Filmak robots policy
+# Public movie/TV pages are crawlable; private account areas are not.
+
 User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /callback
+Disallow: /favorites
+Disallow: /watchlist
+Disallow: /watched
+Disallow: /stats
+Disallow: /taste
+
+# Keep Google search and AdSense crawlers explicitly allowed.
+User-agent: Googlebot
+Allow: /
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /callback
+Disallow: /favorites
+Disallow: /watchlist
+Disallow: /watched
+Disallow: /stats
+Disallow: /taste
+
+User-agent: Mediapartners-Google
 Allow: /
 Disallow: /auth
 Disallow: /reset-password
