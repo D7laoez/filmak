@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { LocaleProvider, useT } from "@/lib/i18n";
+import { LocaleProvider, useT, useLocale } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
