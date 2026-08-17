@@ -34,3 +34,6 @@ export function reportError(error: unknown, context: Record<string, unknown> = {
     },
   );
 }
+
+// Temporary compatibility export; removed when the root error boundary is migrated.
+export const reportLovableError = reportError;
