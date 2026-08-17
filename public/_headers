@@ -1,0 +1,26 @@
+# Static assets: browser + Cloudflare edge caching
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/favicon.ico
+  Cache-Control: public, max-age=86400
+/robots.txt
+  Cache-Control: public, max-age=86400
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+/llms.txt
+  Cache-Control: public, max-age=86400
+
+# Public SEO/content pages: short edge cache to absorb bots and repeat visits.
+# Account/auth routes are deliberately excluded because they are personalized.
+/
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+/discover
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+/about
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
+/privacy
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
+/faq
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
+/tonight
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
