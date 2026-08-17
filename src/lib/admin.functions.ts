@@ -4,12 +4,31 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const OWNER_ADMIN_EMAIL = "ali.m2002121@gmail.com";
 type AdminContext = { supabase: any; userId: string; claims?: { email?: string } };
 
-async function isOwnerAdmin(ctx: AdminContext) {
+async function getAuthenticatedEmail(ctx: AdminContext) {
   const claimEmail = String(ctx.claims?.email ?? "").trim().toLowerCase();
-  if (claimEmail === OWNER_ADMIN_EMAIL) return true;
+  if (claimEmail) return claimEmail;
   const { data, error } = await ctx.supabase.auth.getUser();
-  if (error || !data.user?.email) return false;
-  return data.user.email.trim().toLowerCase() === OWNER_ADMIN_EMAIL;
+  if (error || !data.user?.email) return "";
+  return data.user.email.trim().toLowerCase();
+}
+
+async function isOwnerAdmin(ctx: AdminContext) {
+  const email = await getAuthenticatedEmail(ctx);
+  if (email !== OWNER_ADMIN_EMAIL) return false;
+
+  // Bootstrap the owner's admin role once. This keeps the dashboard and
+  // role-based displays consistent even when the owner signed in via Google
+  // and no user_roles row exists yet. This runs server-side only.
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: ctx.userId, role: "admin" }, { onConflict: "user_id,role" });
+    if (error) console.warn("[admin-guard] owner role bootstrap failed:", error.message);
+  } catch (error) {
+    console.warn("[admin-guard] owner role bootstrap unavailable:", error);
+  }
+  return true;
 }
 
 async function assertAdmin(ctx: AdminContext) {
