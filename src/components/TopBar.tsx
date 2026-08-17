@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Search, Heart, Compass, Languages, LogOut, User, Dices, Sparkles } from "lucide-react";
+import { Search, Heart, Compass, Languages, LogOut, User, Dices, Sparkles, LibraryBig } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,7 @@ export function TopBar() {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search_placeholder")} dir="auto" aria-label={t("search_placeholder")} className="w-full bg-secondary/60 border border-border rounded-full py-2 px-3 sm:px-10 text-sm outline-none focus:ring-2 focus:ring-primary/50 text-center" />
         </form>
         <div className="flex items-center gap-2 shrink-0">
+          <Link to="/collections" className="hidden xl:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"><LibraryBig className="w-4 h-4" />{dir === "rtl" ? "المجموعات" : "Collections"}</Link>
           <button onClick={() => navigate({ to: "/movie-night" })} className="hidden xl:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition" aria-label="Movie Night"><Sparkles className="w-4 h-4" />{dir === "rtl" ? "ليلة الفيلم" : "Movie Night"}</button>
           <button onClick={() => navigate({ to: "/pick" })} className="hidden md:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 transition" aria-label="Pick a movie"><Dices className="w-4 h-4" />{dir === "rtl" ? "اختارلي" : "Pick"}</button>
           <Link to="/discover" className="hidden lg:inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"><Compass className="w-4 h-4" />{t("discover")}</Link>
