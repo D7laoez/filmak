@@ -380,7 +380,7 @@ function UserDrawer({
                   {data.favorites.map((f) => (
                     <div key={f.id} className="flex items-center gap-3 border border-border/60 rounded-xl p-2">
                       {f.poster && (
-                        <img src={f.poster} alt="" className="w-10 h-14 object-cover rounded" />
+                        <img src={f.poster} alt={f.title} className="w-10 h-14 object-cover rounded" />
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{f.title}</div>
@@ -407,7 +407,7 @@ function UserDrawer({
                   {data.lists.map((l) => (
                     <div key={l.id} className="flex items-center gap-3 border border-border/60 rounded-xl p-2">
                       {l.poster && (
-                        <img src={l.poster} alt="" className="w-10 h-14 object-cover rounded" />
+                        <img src={l.poster} alt={l.title} className="w-10 h-14 object-cover rounded" />
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate">{l.title}</div>
