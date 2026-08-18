@@ -1,5 +1,5 @@
 # Filmak robots policy
-# Public movie/TV pages are crawlable; private account areas are not.
+# Public movie/TV pages are crawlable; private account and admin areas are not.
 
 User-agent: *
 Allow: /
@@ -11,8 +11,9 @@ Disallow: /watchlist
 Disallow: /watched
 Disallow: /stats
 Disallow: /taste
+Disallow: /admin
 
-# Keep Google search and AdSense crawlers explicitly allowed.
+# Keep Google Search crawlable while excluding private areas.
 User-agent: Googlebot
 Allow: /
 Disallow: /auth
@@ -23,7 +24,9 @@ Disallow: /watchlist
 Disallow: /watched
 Disallow: /stats
 Disallow: /taste
+Disallow: /admin
 
+# AdSense crawler may crawl all public monetizable pages.
 User-agent: Mediapartners-Google
 Allow: /
 Disallow: /auth
@@ -34,5 +37,6 @@ Disallow: /watchlist
 Disallow: /watched
 Disallow: /stats
 Disallow: /taste
+Disallow: /admin
 
 Sitemap: https://filmak.site/sitemap.xml
