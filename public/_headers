@@ -7,11 +7,13 @@
   Cache-Control: public, max-age=86400
 /sitemap.xml
   Cache-Control: public, max-age=3600
+/ads.txt
+  Cache-Control: public, max-age=3600
 /llms.txt
   Cache-Control: public, max-age=86400
 
-# Public SEO/content pages: short edge cache to absorb bots and repeat visits.
-# Account/auth routes are deliberately excluded because they are personalized.
+# Public SEO/content pages: edge cache to absorb crawler bursts and repeat visits.
+# These routes contain public movie-discovery content and are not personalized.
 /
   Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
 /discover
@@ -23,4 +25,12 @@
 /faq
   Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
 /tonight
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+# Public detail and taxonomy pages: short edge cache reduces repeated origin/server-function work.
+/movie/*
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+/tv/*
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+/genre/*
   Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
