@@ -10,7 +10,6 @@ import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { searchMovies, type MovieCard } from "@/lib/movies.functions";
 import { searchTv, type TvCard } from "@/lib/tv.functions";
-import { recordSiteVisit } from "@/lib/site-analytics.functions";
 
 export function TopBar() {
   const { user } = useAuth();
@@ -31,13 +30,6 @@ export function TopBar() {
     return () => window.clearTimeout(timer);
   }, [q]);
   useEffect(() => { setMobileMenu(false); }, [pathname]);
-  useEffect(() => {
-    if (pathname === "/auth") return;
-    const key = "filmak.analytics.session";
-    const sessionId = window.localStorage.getItem(key) ?? crypto.randomUUID();
-    window.localStorage.setItem(key, sessionId);
-    void recordSiteVisit({ data: { path: pathname, sessionId, referrer: document.referrer || undefined } }).catch(() => {});
-  }, [pathname]);
 
   if (pathname === "/auth") return null;
 
