@@ -13,7 +13,7 @@ Disallow: /stats
 Disallow: /taste
 Disallow: /admin
 
-# Keep Google Search crawlable while excluding private areas.
+# Google Search crawler: public content is crawlable; private areas are excluded.
 User-agent: Googlebot
 Allow: /
 Disallow: /auth
@@ -26,8 +26,21 @@ Disallow: /stats
 Disallow: /taste
 Disallow: /admin
 
-# AdSense crawler may crawl all public monetizable pages.
+# AdSense crawler: public monetizable content must remain crawlable.
 User-agent: Mediapartners-Google
+Allow: /
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /callback
+Disallow: /favorites
+Disallow: /watchlist
+Disallow: /watched
+Disallow: /stats
+Disallow: /taste
+Disallow: /admin
+
+# Google Ads verification crawler: public content is crawlable.
+User-agent: Google-Display-Ads-Bot
 Allow: /
 Disallow: /auth
 Disallow: /reset-password
