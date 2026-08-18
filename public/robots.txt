@@ -3,6 +3,7 @@
 
 User-agent: *
 Allow: /
+Disallow: /_serverFn/
 Disallow: /auth
 Disallow: /reset-password
 Disallow: /callback
@@ -13,9 +14,10 @@ Disallow: /stats
 Disallow: /taste
 Disallow: /admin
 
-# Google Search crawler: public content is crawlable; private areas are excluded.
+# Google Search crawler: public content is crawlable; private/function endpoints are excluded.
 User-agent: Googlebot
 Allow: /
+Disallow: /_serverFn/
 Disallow: /auth
 Disallow: /reset-password
 Disallow: /callback
@@ -29,6 +31,7 @@ Disallow: /admin
 # AdSense crawler: public monetizable content must remain crawlable.
 User-agent: Mediapartners-Google
 Allow: /
+Disallow: /_serverFn/
 Disallow: /auth
 Disallow: /reset-password
 Disallow: /callback
@@ -42,6 +45,7 @@ Disallow: /admin
 # Google Ads verification crawler: public content is crawlable.
 User-agent: Google-Display-Ads-Bot
 Allow: /
+Disallow: /_serverFn/
 Disallow: /auth
 Disallow: /reset-password
 Disallow: /callback
@@ -51,5 +55,17 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+
+# High-volume non-search crawlers: do not crawl Filmak.
+User-agent: GPTBot
+Disallow: /
+User-agent: meta-externalagent
+Disallow: /
+User-agent: SemrushBot
+Disallow: /
+User-agent: DataForSeoBot
+Disallow: /
+User-agent: MJ12bot
+Disallow: /
 
 Sitemap: https://filmak.site/sitemap.xml
