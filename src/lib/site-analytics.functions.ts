@@ -8,6 +8,10 @@ const DEVICE = (ua: string) => /mobile|android|iphone|ipad/i.test(ua) ? (/ipad|t
 const BROWSER = (ua: string) => /Edg\//i.test(ua) ? "Edge" : /Chrome\//i.test(ua) ? "Chrome" : /Firefox\//i.test(ua) ? "Firefox" : /Safari\//i.test(ua) ? "Safari" : /OPR\//i.test(ua) ? "Opera" : "Other";
 const OS = (ua: string) => /Windows/i.test(ua) ? "Windows" : /Android/i.test(ua) ? "Android" : /iPhone|iPad|iPod/i.test(ua) ? "iOS" : /Mac OS/i.test(ua) ? "macOS" : /Linux/i.test(ua) ? "Linux" : "Other";
 
+// Do not pollute first-party analytics with automated crawlers. Cloudflare remains
+// responsible for mitigation/rate limiting; this only keeps the Supabase dataset useful.
+const isLikelyBot = (ua: string) => /bot|crawler|spider|slurp|headless|facebookexternalhit|meta-externalagent|gptbot|semrush|mj12bot|applebot/i.test(ua);
+
 async function getUserId(request: Request) {
   const auth = request.headers.get("authorization");
   if (!auth?.startsWith("Bearer ")) return null;
@@ -27,13 +31,14 @@ export const recordSiteVisit = createServerFn({ method: "POST" }).inputValidator
   const request = getRequest();
   if (!request) return { ok: false };
   const ua = request.headers.get("user-agent") ?? "";
+  if (isLikelyBot(ua)) return { ok: true, skipped: true };
   const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? null;
   const country = request.headers.get("cf-ipcountry") ?? null;
   const city = request.headers.get("cf-ipcity") ?? null;
-  const path = typeof data?.path === "string" ? data.path.slice(0, 500) : "/";
+  const path = typeof data?.path === "string" && data.path.startsWith("/") ? data.path.slice(0, 500) : "/";
   const sessionId = typeof data?.sessionId === "string" && data.sessionId.length >= 8 ? data.sessionId.slice(0, 128) : crypto.randomUUID();
   const userId = await getUserId(request);
-  await supabaseAdmin.from("site_visits").insert({
+  const { error } = await supabaseAdmin.from("site_visits").insert({
     session_id: sessionId,
     user_id: userId,
     path,
@@ -46,7 +51,8 @@ export const recordSiteVisit = createServerFn({ method: "POST" }).inputValidator
     browser: BROWSER(ua),
     os: OS(ua),
   });
-  return { ok: true };
+  if (error) console.warn("[site-analytics] visit insert failed:", error.message);
+  return { ok: !error };
 });
 
 export type SiteAnalytics = {
@@ -62,9 +68,12 @@ export type SiteAnalytics = {
 };
 
 export const getSiteAnalytics = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
-  const { data: role } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
-  if (!role) throw new Error("Forbidden: admin access required");
-  const { data, error } = await context.supabase.rpc("admin_site_analytics", { days: 30 });
+  // The owner is the only administrator. Keep this server-side and use the
+  // service role for the analytics RPC so RLS cannot turn the dashboard blank.
+  const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(context.userId);
+  const email = authUser.user?.email?.trim().toLowerCase() ?? "";
+  if (authError || email !== "ali.m2002121@gmail.com") throw new Error("Forbidden: owner admin access required");
+  const { data, error } = await supabaseAdmin.rpc("admin_site_analytics", { days: 30 });
   if (error) throw new Error(error.message);
   return data as unknown as SiteAnalytics;
 });
