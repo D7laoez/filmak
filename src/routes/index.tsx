@@ -301,18 +301,18 @@ function Home() {
               <div className="md:col-span-8 space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/15 px-3.5 py-1 text-xs text-primary font-bold">
                   <Award className="w-4 h-4" />
-                  {ar ? "فيلم الأسبوع المختار تحريرياً" : "FILMAK Editorial Pick of the Week"}
+                  {ar ? pickOfTheWeek.data.badge_ar : pickOfTheWeek.data.badge_en}
                 </div>
                 <h2 className="text-2xl md:text-4xl font-black">
-                  {ar ? pickOfTheWeek.data.movie_title_ar : pickOfTheWeek.data.movie_title_en}
+                  {pickOfTheWeek.data.title}
                 </h2>
                 <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/30 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
-                  "{ar ? pickOfTheWeek.data.editorial_reason_ar : pickOfTheWeek.data.editorial_reason_en}"
+                  "{ar ? pickOfTheWeek.data.why_picked_ar : pickOfTheWeek.data.why_picked_en}"
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <Link
                     to="/movie/$id"
-                    params={{ id: String(pickOfTheWeek.data.movie_id) }}
+                    params={{ id: String(pickOfTheWeek.data.movieId) }}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/20"
                   >
                     <Film className="w-4 h-4" />
@@ -328,7 +328,7 @@ function Home() {
                 {pickOfTheWeek.data.backdrop ? (
                   <img
                     src={pickOfTheWeek.data.backdrop}
-                    alt={pickOfTheWeek.data.movie_title_ar}
+                    alt={pickOfTheWeek.data.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
@@ -489,40 +489,62 @@ function Home() {
           )}
 
           {recMutation.data && (
-            <div className="pt-4 space-y-4">
-              <h3 className="font-bold text-lg">{t("recommendations_for")}: "{prompt}"</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {recMutation.data.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/movie/$id"
-                    params={{ id: String(r.id) }}
-                    className="group block"
-                  >
-                    <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
-                      {r.poster ? (
-                        <img
-                          src={r.poster}
-                          alt={r.title}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full grid place-items-center">
-                          <Film className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Star className="w-3 h-3 fill-primary text-primary" />
-                        {r.rating}
-                      </div>
+            (() => {
+              const recList = Array.isArray(recMutation.data)
+                ? recMutation.data
+                : (recMutation.data?.recommendations ?? []);
+              const recIntro = !Array.isArray(recMutation.data) ? recMutation.data?.intro : null;
+
+              return (
+                <div className="pt-4 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-lg">{t("recommendations_for")}: "{prompt}"</h3>
+                    {recIntro && (
+                      <p className="text-sm text-muted-foreground leading-relaxed bg-secondary/40 p-3.5 rounded-xl border border-border/60">
+                        {recIntro}
+                      </p>
+                    )}
+                  </div>
+                  {recList.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-4 text-center">
+                      {ar ? "لم نتمكن من إيجاد أفلام تطابق هذا الوصف بدقة، جرّب صياغة أخرى." : "No matching movies found, please try another prompt."}
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      {recList.map((r: any) => (
+                        <Link
+                          key={r.id}
+                          to="/movie/$id"
+                          params={{ id: String(r.id) }}
+                          className="group block"
+                        >
+                          <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
+                            {r.poster ? (
+                              <img
+                                src={r.poster}
+                                alt={r.title}
+                                loading="lazy"
+                                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full grid place-items-center">
+                                <Film className="w-8 h-8 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-primary text-primary" />
+                              {r.rating}
+                            </div>
+                          </div>
+                          <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{r.title}</p>
+                          <p className="text-xs text-muted-foreground">{r.year}</p>
+                        </Link>
+                      ))}
                     </div>
-                    <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{r.title}</p>
-                    <p className="text-xs text-muted-foreground">{r.year}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
+                  )}
+                </div>
+              );
+            })()
           )}
         </div>
       </section>
