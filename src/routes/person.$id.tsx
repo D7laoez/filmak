@@ -14,11 +14,13 @@ export const Route = createFileRoute("/person/$id")({
   loader: async ({ context, params }) => {
     const id = params.id;
     const [person, origin] = await Promise.all([
-      context.queryClient.ensureQueryData({
-        queryKey: ["person", id, "ar"],
-        queryFn: () => getPersonDetails({ data: { id, lang: "ar" } }),
-      }),
-      getRequestOrigin(),
+      context.queryClient
+        .ensureQueryData({
+          queryKey: ["person", id, "ar"],
+          queryFn: () => getPersonDetails({ data: { id, lang: "ar" } }),
+        })
+        .catch(() => null),
+      getRequestOrigin().catch(() => "https://filmak.site"),
     ]);
     return { person, origin };
   },

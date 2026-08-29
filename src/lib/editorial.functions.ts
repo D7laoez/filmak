@@ -1191,3 +1191,151 @@ export const getEditorialPickOfTheWeek = createServerFn({ method: "GET" }).handl
     };
   },
 );
+
+export const COLLECTIONS_DATA: Record<
+  string,
+  {
+    ar: string;
+    en: string;
+    genre: string;
+    year?: number;
+    language?: string;
+    descAr: string;
+    descEn: string;
+    editorialIntroAr: string;
+    editorialIntroEn: string;
+  }
+> = {
+  "best-movies-2026": {
+    ar: "أفضل أفلام 2026",
+    en: "Best Movies of 2026",
+    genre: "",
+    year: 2026,
+    descAr: "أبرز الإصدارات السينمائية الجديدة لعام 2026 المنتقاة بعناية لمساعدتك على متابعة أهم أعمال العام.",
+    descEn: "A carefully curated selection of the most notable new cinematic releases from 2026.",
+    editorialIntroAr: "شهد عام 2026 تنوعاً مبهراً في الإنتاجات السينمائية بين الخيال العلمي الملحمي، والدراما المستقلة المكثفة، والتجارب الإخراجية المبتكرة. اخترنا لك هنا الأعمال التي تستحق المشاهدة والتقييم.",
+    editorialIntroEn: "2026 delivered an impressive array of cinematic achievements across science fiction, intimate independent drama, and visionary directing. Here are the defining releases of the year.",
+  },
+  "horror-movies": {
+    ar: "أفضل أفلام الرعب والغموض",
+    en: "Best Horror Movies",
+    genre: "27",
+    descAr: "أفلام رعب قوية لمحبي التوتر والأجواء المظلمة والرعب النفسي العميق.",
+    descEn: "Horror masterworks for fans of psychological dread, atmosphere, and unrelenting suspense.",
+    editorialIntroAr: "يتجاوز الرعب السينمائي الفزعات السطحية ليأخذنا في رحلة داخل أعمق المخاوف الإنسانية. هذه المجموعة تضم أعمالاً رائدة في بناء الأجواء الخانقة والتوتر النفسي الصاعد.",
+    editorialIntroEn: "True horror transcends cheap jump scares into psychological dread and atmospheric terror. This collection highlights the finest films exploring the darker corners of human fear.",
+  },
+  "romantic-movies": {
+    ar: "أفضل الأفلام الرومانسية",
+    en: "Best Romantic Movies",
+    genre: "10749",
+    descAr: "اختيارات رومانسية عذبة تجمع بين دفء المشاعر والقصص الإنسانية الصادقة.",
+    descEn: "Romantic cinema ranging from timeless classics to poignant modern relationships.",
+    editorialIntroAr: "السينما الرومانسية حين تُصنع بصدق تلامس أوتار القلوب وتخلد لحظات الشوق واللقاء والتضحية. استمتع بأعمال تبتعد عن الابتذال وتقدم دراما عاطفية راقية.",
+    editorialIntroEn: "Intimate, heartfelt, and resonant stories of human connection, longing, and romance crafted with genuine emotional honesty.",
+  },
+  "action-movies": {
+    ar: "أفضل أفلام الأكشن والإثارة",
+    en: "Best Action Movies",
+    genre: "28",
+    descAr: "أكشن ومطاردات ومعارك مصممة بحرفية عالية لمن يريد جرعة حماس وأدرينالين.",
+    descEn: "High-octane choreography, breathtaking stunts, and non-stop momentum.",
+    editorialIntroAr: "الأكشن ليس مجرد انفجارات؛ بل هو فن كوريغرافيا القتال وضبط إيقاع المطاردات وتصميم المجازفات الحية التي تحبس الأنفاس من اللقطة الأولى حتى الختام.",
+    editorialIntroEn: "Action cinema at its peak: masterclass choreography, practical stunt mastery, and kinetic storytelling that keeps adrenaline pumping.",
+  },
+  "comedy-movies": {
+    ar: "أفضل الأفلام الكوميدية",
+    en: "Best Comedy Movies",
+    genre: "35",
+    descAr: "أفلام كوميدية ممتعة وذكية لسهرة خفيفة بدون تعقيد.",
+    descEn: "Hilarious, uplifting, and smart comedies for an entertaining movie night.",
+    editorialIntroAr: "الضحك فن رفيع، وهذه القائمة تجمع بين الكوميديا الذكية، والمواقف الطريفة، والحوارات الساخرة لتمنحك أمسية مريحة ترسم الابتسامة.",
+    editorialIntroEn: "Laughter and brilliant situational wit: curated comedies that combine smart writing with genuine lighthearted entertainment.",
+  },
+  "sci-fi-movies": {
+    ar: "أفضل أفلام الخيال العلمي",
+    en: "Best Sci-Fi Movies",
+    genre: "878",
+    descAr: "عوالم مستقبلية، أسرار الفضاء، وأفكار فلسفية تتجاوز المألوف.",
+    descEn: "Futuristic visions, cosmic mysteries, and mind-bending philosophical concepts.",
+    editorialIntroAr: "مختبر الأفكار الكبرى؛ حيث يلتقي التفكير العلمي مع الأسئلة الوجودية حول الزمن، ومصير البشرية، وحدود الكون.",
+    editorialIntroEn: "The ultimate frontier of speculative thought: where scientific concepts converge with existential inquiries about human destiny.",
+  },
+  "korean-movies": {
+    ar: "أفضل الأفلام الكورية",
+    en: "Best Korean Movies",
+    genre: "",
+    descAr: "اختيارات من السينما الكورية الجنوبية تجمع بين الإثارة والدراما والغموض.",
+    descEn: "South Korean cinematic gems across gripping thrillers, domestic drama, and mystery.",
+    language: "ko",
+    editorialIntroAr: "السينما الكورية الجنوبية تشتهر بالحبكات غير المتوقعة والشخصيات المعقدة والجرأة الفنية النادرة. إليك أفضل ما أنتجته هذه السينما الرائدة.",
+    editorialIntroEn: "South Korean cinema is renowned for fearless genre blending, intense psychological stakes, and unparalleled narrative surprises.",
+  },
+  "turkish-movies": {
+    ar: "أفضل الأفلام التركية",
+    en: "Best Turkish Movies",
+    genre: "",
+    descAr: "أعمال درامية وسينمائية تركية مميزة بالشخصيات القوية والقصص المؤثرة.",
+    descEn: "Turkish cinema picks renowned for emotional resonance and evocative cinematography.",
+    language: "tr",
+    editorialIntroAr: "تتميز السينما التركية بعمقها الإنساني والدراما العاطفية الدافئة والتصوير البصري المستلهم من طبيعة وثقافة المنطقة.",
+    editorialIntroEn: "Turkish cinema offers poetic visual beauty, intimate character studies, and profound emotional narratives.",
+  },
+  "arabic-movies": {
+    ar: "أفضل الأفلام العربية",
+    en: "Best Arabic Movies",
+    genre: "",
+    descAr: "أفلام عربية مختارة من مختلف المدارس السينمائية في المنطقة.",
+    descEn: "Selected Arabic-language cinema representing diverse regional voices.",
+    language: "ar",
+    editorialIntroAr: "مختارات من أبرز إنتاجات السينما العربية التي تناولت الهوية والمجتمع وقصص الإنسان العربي برؤى إخراجية معاصرة ومتميزة.",
+    editorialIntroEn: "A curated survey of modern Arabic cinema exploring identity, heritage, and compelling local stories.",
+  },
+  "movies-like-inception": {
+    ar: "أفلام مثل Inception",
+    en: "Movies Like Inception",
+    genre: "878",
+    descAr: "أفلام ذكية لمحبي الألغاز والواقع المتداخل والأفكار الذهنية الكبيرة.",
+    descEn: "Smart thrillers for fans of layered realities, memory puzzles, and big concepts.",
+    editorialIntroAr: "إذا كنت تعشق القصص التي تتلاعب بمفهوم الواقع وتجعلك تفكر في كل مشهد كأنه قطعة في لغز هندسي، فهذه هي القائمة المثالية لك.",
+    editorialIntroEn: "If you thrive on non-linear narratives and reality-bending puzzles that reward active viewing, explore these mind-bending masterworks.",
+  },
+};
+
+export const getCollectionMovies = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ slug: z.string() }).parse(d))
+  .handler(async ({ data }) => {
+    const c = COLLECTIONS_DATA[data.slug];
+    if (!c) return { collection: null, items: [] };
+    const p: Record<string, string> = {
+      sort_by: "popularity.desc",
+      include_adult: "false",
+      page: "1",
+      "vote_count.gte": "50",
+    };
+    if (c.genre) p.with_genres = c.genre;
+    if (c.year) p.primary_release_year = String(c.year);
+    if (c.language) p.with_original_language = c.language;
+
+    try {
+      const { tmdbGet } = await import("./tmdb.server");
+      const res = await tmdbGet<{ results: any[] }>("/discover/movie", p, "en");
+      return {
+        collection: c,
+        items: (res.results ?? [])
+          .filter((x: any) => x.poster_path)
+          .slice(0, 18)
+          .map((x: any) => ({
+            id: x.id,
+            title: x.title || x.original_title,
+            poster: `https://image.tmdb.org/t/p/w500${x.poster_path}`,
+            year: (x.release_date || "").slice(0, 4),
+            rating: Math.round((x.vote_average || 0) * 10) / 10,
+            overview: x.overview || "",
+          })),
+      };
+    } catch {
+      return { collection: c, items: [] };
+    }
+  });
+

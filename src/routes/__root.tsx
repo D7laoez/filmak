@@ -133,8 +133,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async () => {
-    const origin = await getRequestOrigin();
-    return { origin };
+    try {
+      const origin = await getRequestOrigin().catch(() => "https://filmak.site");
+      return { origin: origin || "https://filmak.site" };
+    } catch {
+      return { origin: "https://filmak.site" };
+    }
   },
   head: ({ loaderData }) => {
     const origin = loaderData?.origin ?? "";

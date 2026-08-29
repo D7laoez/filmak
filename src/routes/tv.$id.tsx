@@ -16,11 +16,13 @@ export const Route = createFileRoute("/tv/$id")({
   loader: async ({ context, params }) => {
     const id = Number(params.id);
     const [tv, origin] = await Promise.all([
-      context.queryClient.ensureQueryData({
-        queryKey: ["tv", id, "ar"],
-        queryFn: () => getTvDetails({ data: { id, lang: "ar" } }),
-      }),
-      getRequestOrigin(),
+      context.queryClient
+        .ensureQueryData({
+          queryKey: ["tv", id, "ar"],
+          queryFn: () => getTvDetails({ data: { id, lang: "ar" } }),
+        })
+        .catch(() => null),
+      getRequestOrigin().catch(() => "https://filmak.site"),
     ]);
     return { tv, origin };
   },
