@@ -47,11 +47,20 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      // Propagate Cloudflare worker env bindings to process.env
+      if (env && typeof env === "object") {
+        for (const [k, v] of Object.entries(env as Record<string, unknown>)) {
+          if (typeof v === "string") {
+            (process.env as Record<string, string>)[k] = v;
+          }
+        }
+      }
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
-      console.error(error);
+      console.error("Fatal worker error:", error);
       return new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },

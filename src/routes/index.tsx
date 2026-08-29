@@ -118,8 +118,7 @@ export const Route = createFileRoute("/")({
         }),
       ]);
     } catch (err) {
-      console.error("Home loader failed:", err);
-      throw err;
+      console.warn("Home loader warning:", err);
     }
   },
   errorComponent: ({ error }) => (

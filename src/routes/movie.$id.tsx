@@ -47,15 +47,19 @@ export const Route = createFileRoute("/movie/$id")({
   loader: async ({ context, params }) => {
     const id = Number(params.id);
     const [movie, origin, editorial] = await Promise.all([
-      context.queryClient.ensureQueryData({
-        queryKey: ["movie", id, "ar"],
-        queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
-      }),
-      getRequestOrigin(),
-      context.queryClient.ensureQueryData({
-        queryKey: ["movie-editorial", id],
-        queryFn: () => getEditorialReview({ data: { movieId: id } }),
-      }),
+      context.queryClient
+        .ensureQueryData({
+          queryKey: ["movie", id, "ar"],
+          queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
+        })
+        .catch(() => null),
+      getRequestOrigin().catch(() => "https://filmak.site"),
+      context.queryClient
+        .ensureQueryData({
+          queryKey: ["movie-editorial", id],
+          queryFn: () => getEditorialReview({ data: { movieId: id } }),
+        })
+        .catch(() => null),
     ]);
     return { movie, origin, editorial };
   },

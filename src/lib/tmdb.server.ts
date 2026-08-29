@@ -1,13 +1,11 @@
 const BASE = "https://api.themoviedb.org/3";
 
-export const IMG = (path: string | null, size: "w200" | "w300" | "w500" | "w780" | "original" = "w500") =>
-  path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
+export const IMG = (
+  path: string | null,
+  size: "w200" | "w300" | "w500" | "w780" | "original" = "w500",
+) => (path ? `https://image.tmdb.org/t/p/${size}${path}` : null);
 
-// In-memory TTL cache for TMDB responses. TMDB rate-limits and public
-// lists (trending/popular/genres) rarely change within an hour, so serving
-// them from memory makes SSR loaders resolve in <5ms instead of ~300ms per
-// upstream call. Cache lives per worker instance and evicts oldest entries
-// once the map exceeds MAX_ENTRIES to bound memory.
+// In-memory TTL cache for TMDB responses.
 type CacheEntry = { value: unknown; expiresAt: number };
 const cache = new Map<string, CacheEntry>();
 const MAX_ENTRIES = 500;
@@ -19,7 +17,6 @@ function cacheGet<T>(key: string): T | undefined {
     cache.delete(key);
     return undefined;
   }
-  // Refresh recency (LRU-ish)
   cache.delete(key);
   cache.set(key, entry);
   return entry.value as T;
@@ -33,14 +30,15 @@ function cacheSet(key: string, value: unknown, ttlMs: number) {
   cache.set(key, { value, expiresAt: Date.now() + ttlMs });
 }
 
-// TTL policy: static lookups (genres) live for a day, popular/trending lists
-// for 30 minutes, details/search for 15 minutes.
 function ttlFor(path: string): number {
   if (path.includes("/genre/") && path.includes("/list")) return 1000 * 60 * 60 * 24;
   if (path.startsWith("/search/")) return 1000 * 60 * 15;
   if (path.startsWith("/movie/") || path.startsWith("/tv/") || path.startsWith("/person/")) {
-    // Details endpoints: 1h. Excludes list endpoints handled below.
-    if (/\/(movie|tv)\/(popular|top_rated|now_playing|upcoming|on_the_air|airing_today)/.test(path)) {
+    if (
+      /\/(movie|tv)\/(popular|top_rated|now_playing|upcoming|on_the_air|airing_today)/.test(
+        path,
+      )
+    ) {
       return 1000 * 60 * 30;
     }
     return 1000 * 60 * 60;
@@ -57,21 +55,33 @@ async function tmdb<T>(
 ): Promise<T> {
   const key = process.env.TMDB_API_KEY;
   if (!key) {
-    console.error("CRITICAL: TMDB_API_KEY is missing from process.env");
-    throw new Error("TMDB_API_KEY not configured");
+    console.warn("WARN: TMDB_API_KEY is missing from environment. Returning empty dataset.");
+    if (path.includes("/list")) return { genres: [] } as unknown as T;
+    return { results: [], total_pages: 1 } as unknown as T;
   }
   const cacheKey = `${lang}|${path}|${new URLSearchParams(params).toString()}`;
   const cached = cacheGet<T>(cacheKey);
   if (cached !== undefined) return cached;
-  const url = new URL(BASE + path);
-  url.searchParams.set("api_key", key);
-  url.searchParams.set("language", lang === "en" ? "en-US" : "ar");
-  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`TMDB ${res.status}: ${await res.text()}`);
-  const data = (await res.json()) as T;
-  cacheSet(cacheKey, data, ttlFor(path));
-  return data;
+
+  try {
+    const url = new URL(BASE + path);
+    url.searchParams.set("api_key", key);
+    url.searchParams.set("language", lang === "en" ? "en-US" : "ar");
+    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      console.warn(`TMDB ${res.status}: ${await res.text()}`);
+      if (path.includes("/list")) return { genres: [] } as unknown as T;
+      return { results: [], total_pages: 1 } as unknown as T;
+    }
+    const data = (await res.json()) as T;
+    cacheSet(cacheKey, data, ttlFor(path));
+    return data;
+  } catch (err) {
+    console.warn(`TMDB fetch error for ${path}:`, err);
+    if (path.includes("/list")) return { genres: [] } as unknown as T;
+    return { results: [], total_pages: 1 } as unknown as T;
+  }
 }
 
 export type TmdbMovie = {
