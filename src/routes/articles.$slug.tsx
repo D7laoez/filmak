@@ -25,24 +25,28 @@ import { AdSlot } from "@/components/AdSlot";
 import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/articles/$slug")({
-  loader: async ({ context, params }) => {
-    const article = await getEditorialArticleBySlug({ data: { slug: params.slug } });
-    if (!article) return { article: null, relatedMovies: [], otherArticles: [] };
+  loader: async ({ params }) => {
+    try {
+      const article = await getEditorialArticleBySlug({ data: { slug: params.slug } }).catch(() => null);
+      if (!article) return { article: null, relatedMovies: [], otherArticles: [] };
 
-    // Fetch related movie details
-    const moviePromises = (article.related_movie_ids || []).slice(0, 5).map((id) =>
-      getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null),
-    );
-    const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
+      // Fetch related movie details
+      const moviePromises = (article.related_movie_ids || []).slice(0, 5).map((id) =>
+        getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null),
+      );
+      const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
 
-    // Fetch other recent articles
-    const otherArticles = await getEditorialArticles({ data: { limit: 4 } });
+      // Fetch other recent articles
+      const otherArticles = (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
 
-    return {
-      article,
-      relatedMovies,
-      otherArticles: otherArticles.filter((a) => a.slug !== params.slug).slice(0, 3),
-    };
+      return {
+        article,
+        relatedMovies,
+        otherArticles: otherArticles.filter((a) => a.slug !== params.slug).slice(0, 3),
+      };
+    } catch {
+      return { article: null, relatedMovies: [], otherArticles: [] };
+    }
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;

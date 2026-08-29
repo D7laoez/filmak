@@ -30,19 +30,14 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 }
 
 function createSupabaseClient() {
-  const envObj = (typeof process !== 'undefined' && process.env) ? process.env : {};
-  const metaEnv = (import.meta as unknown as { env?: Record<string, string | undefined> })?.env || {};
-
   const SUPABASE_URL =
-    metaEnv.VITE_SUPABASE_URL ||
-    envObj.VITE_SUPABASE_URL ||
-    envObj.SUPABASE_URL ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL : undefined) ||
+    (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL : undefined) ||
     DEFAULT_SUPABASE_URL;
 
   const SUPABASE_PUBLISHABLE_KEY =
-    metaEnv.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    envObj.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    envObj.SUPABASE_PUBLISHABLE_KEY ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY : undefined) ||
+    (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY : undefined) ||
     DEFAULT_SUPABASE_PUBLISHABLE_KEY;
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
