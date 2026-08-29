@@ -44,6 +44,228 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          author_role: string
+          category: string
+          content_ar: string
+          content_en: string
+          excerpt_ar: string
+          excerpt_en: string
+          featured: boolean
+          featured_image: string | null
+          id: string
+          published_at: string
+          reading_time_minutes: number
+          related_article_slugs: string[] | null
+          related_movie_ids: number[] | null
+          slug: string
+          status: string
+          subtitle_ar: string | null
+          subtitle_en: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name?: string
+          author_role?: string
+          category?: string
+          content_ar: string
+          content_en: string
+          excerpt_ar: string
+          excerpt_en: string
+          featured?: boolean
+          featured_image?: string | null
+          id?: string
+          published_at?: string
+          reading_time_minutes?: number
+          related_article_slugs?: string[] | null
+          related_movie_ids?: number[] | null
+          slug: string
+          status?: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          author_role?: string
+          category?: string
+          content_ar?: string
+          content_en?: string
+          excerpt_ar?: string
+          excerpt_en?: string
+          featured?: boolean
+          featured_image?: string | null
+          id?: string
+          published_at?: string
+          reading_time_minutes?: number
+          related_article_slugs?: string[] | null
+          related_movie_ids?: number[] | null
+          slug?: string
+          status?: string
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      collections_editorial: {
+        Row: {
+          badge: string | null
+          cover_image: string | null
+          created_at: string
+          description_ar: string
+          description_en: string
+          editorial_intro_ar: string
+          editorial_intro_en: string
+          id: string
+          is_featured: boolean
+          movie_curation_notes: Json | null
+          movie_ids: number[]
+          slug: string
+          status: string
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description_ar: string
+          description_en: string
+          editorial_intro_ar: string
+          editorial_intro_en: string
+          id?: string
+          is_featured?: boolean
+          movie_curation_notes?: Json | null
+          movie_ids?: number[]
+          slug: string
+          status?: string
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          editorial_intro_ar?: string
+          editorial_intro_en?: string
+          id?: string
+          is_featured?: boolean
+          movie_curation_notes?: Json | null
+          movie_ids?: number[]
+          slug?: string
+          status?: string
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      editorial_reviews: {
+        Row: {
+          acting_score: number | null
+          author_id: string | null
+          author_name: string
+          author_role: string
+          best_for: string | null
+          content_notes: string | null
+          editorial_score: number
+          entertainment_score: number | null
+          experience_level: string | null
+          id: string
+          mood: string | null
+          movie_id: number
+          published_at: string
+          recommended_viewing: string | null
+          review_content: string
+          similar_reasons: Json | null
+          status: string
+          story_score: number | null
+          strengths: string[] | null
+          title: string
+          updated_at: string
+          verdict: string
+          visuals_score: number | null
+          weaknesses: string[] | null
+          who_may_not_enjoy: string | null
+          who_should_watch: string | null
+          why_watch: string | null
+        }
+        Insert: {
+          acting_score?: number | null
+          author_id?: string | null
+          author_name?: string
+          author_role?: string
+          best_for?: string | null
+          content_notes?: string | null
+          editorial_score: number
+          entertainment_score?: number | null
+          experience_level?: string | null
+          id?: string
+          mood?: string | null
+          movie_id: number
+          published_at?: string
+          recommended_viewing?: string | null
+          review_content: string
+          similar_reasons?: Json | null
+          status?: string
+          story_score?: number | null
+          strengths?: string[] | null
+          title: string
+          updated_at?: string
+          verdict: string
+          visuals_score?: number | null
+          weaknesses?: string[] | null
+          who_may_not_enjoy?: string | null
+          who_should_watch?: string | null
+          why_watch?: string | null
+        }
+        Update: {
+          acting_score?: number | null
+          author_id?: string | null
+          author_name?: string
+          author_role?: string
+          best_for?: string | null
+          content_notes?: string | null
+          editorial_score?: number
+          entertainment_score?: number | null
+          experience_level?: string | null
+          id?: string
+          mood?: string | null
+          movie_id?: number
+          published_at?: string
+          recommended_viewing?: string | null
+          review_content?: string
+          similar_reasons?: Json | null
+          status?: string
+          story_score?: number | null
+          strengths?: string[] | null
+          title?: string
+          updated_at?: string
+          verdict?: string
+          visuals_score?: number | null
+          weaknesses?: string[] | null
+          who_may_not_enjoy?: string | null
+          who_should_watch?: string | null
+          why_watch?: string | null
+        }
+        Relationships: []
+      }
       ai_rate_limits: {
         Row: {
           count: number

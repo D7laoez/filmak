@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
 import {
   ArrowRight,
+  ArrowLeft,
   Star,
   Clock,
   Calendar,
@@ -16,8 +17,20 @@ import {
   Image as ImageIcon,
   Video,
   Info,
+  Award,
+  Sparkles,
+  CheckCircle2,
+  XCircle,
+  ThumbsUp,
+  ThumbsDown,
+  Compass,
+  Lightbulb,
+  ShieldCheck,
+  Tag,
+  Share2,
 } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
+import { getEditorialReview, type EditorialReview } from "@/lib/editorial.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { useLocale } from "@/lib/i18n";
@@ -33,23 +46,99 @@ export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
   loader: async ({ context, params }) => {
     const id = Number(params.id);
-    const [movie, origin] = await Promise.all([
+    const [movie, origin, editorial] = await Promise.all([
       context.queryClient.ensureQueryData({
         queryKey: ["movie", id, "ar"],
         queryFn: () => getMovieDetails({ data: { id, lang: "ar" } }),
       }),
       getRequestOrigin(),
+      context.queryClient.ensureQueryData({
+        queryKey: ["movie-editorial", id],
+        queryFn: () => getEditorialReview({ data: { movieId: id } }),
+      }),
     ]);
-    return { movie, origin };
+    return { movie, origin, editorial };
   },
   head: ({ params, loaderData }) => {
     const origin = loaderData?.origin ?? "";
     const movie = loaderData?.movie;
+    const editorial = loaderData?.editorial;
     const backdrop = movie?.backdrop ?? movie?.poster ?? `${origin}/icon-512.png`;
     const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
-    const title = movie ? `${movie.title} — فلمك · تفاصيل الفيلم` : "فلمك";
-    const desc = movie?.overview?.slice(0, 200) ?? "";
-    const url = origin ? `${origin}/movie/${params.id}` : `/movie/${params.id}`;
+    const scoreText = editorial ? ` | تقييم فلمك: ${editorial.editorial_score}/10` : "";
+    const title = movie ? `${movie.title} (${movie.year || ""}) — فلمك · مراجعة وتفاصيل الفيلم${scoreText}` : "فلمك";
+    const desc = editorial
+      ? `${editorial.verdict} — ${movie?.overview?.slice(0, 140) ?? ""}`
+      : (movie?.overview?.slice(0, 200) ?? "");
+    const url = origin ? `${origin}/movie/${params.id}` : `https://filmak.site/movie/${params.id}`;
+
+    const breadcrumbLd = movie
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "الرئيسية",
+              item: "https://filmak.site/",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: movie.genres[0] || "أفلام",
+              item: "https://filmak.site/discover",
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: movie.title,
+              item: url,
+            },
+          ],
+        }
+      : undefined;
+
+    const movieLd = movie
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Movie",
+          name: movie.title,
+          alternateName: movie.originalTitle || undefined,
+          description: movie.overview || undefined,
+          image: abs,
+          datePublished: movie.releaseDate || undefined,
+          genre: movie.genres,
+          url,
+          aggregateRating:
+            movie.rating && movie.voteCount
+              ? {
+                  "@type": "AggregateRating",
+                  ratingValue: Number(movie.rating).toFixed(1),
+                  ratingCount: movie.voteCount,
+                  bestRating: 10,
+                  worstRating: 0,
+                }
+              : undefined,
+          review: editorial
+            ? {
+                "@type": "Review",
+                reviewRating: {
+                  "@type": "Rating",
+                  ratingValue: editorial.editorial_score,
+                  bestRating: 10,
+                  worstRating: 0,
+                },
+                author: {
+                  "@type": "Organization",
+                  name: editorial.author_name,
+                },
+                reviewBody: editorial.verdict,
+              }
+            : undefined,
+        }
+      : undefined;
+
     return {
       meta: [
         { title },
@@ -66,32 +155,10 @@ export const Route = createFileRoute("/movie/$id")({
         { name: "twitter:image", content: abs },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: movie
-        ? [
-            {
-              type: "application/ld+json",
-              children: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "Movie",
-                name: movie.title,
-                description: movie.overview || undefined,
-                image: abs,
-                datePublished: movie.releaseDate || undefined,
-                url,
-                aggregateRating:
-                  movie.rating && movie.voteCount
-                    ? {
-                        "@type": "AggregateRating",
-                        ratingValue: Number(movie.rating).toFixed(1),
-                        ratingCount: movie.voteCount,
-                        bestRating: 10,
-                        worstRating: 0,
-                      }
-                    : undefined,
-              }),
-            },
-          ]
-        : undefined,
+      scripts: [
+        ...(movieLd ? [{ type: "application/ld+json", children: JSON.stringify(movieLd) }] : []),
+        ...(breadcrumbLd ? [{ type: "application/ld+json", children: JSON.stringify(breadcrumbLd) }] : []),
+      ],
     };
   },
   errorComponent: ({ error, reset }) => {
@@ -102,8 +169,8 @@ export const Route = createFileRoute("/movie/$id")({
         <div>
           <img
             src="/icon-192.png"
-          srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          decoding="async"
+            srcSet="/icon-192.png 1x, /icon-512.png 2x"
+            decoding="async"
             alt={t("brand")}
             className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
           />
@@ -168,10 +235,21 @@ function Content() {
   const { id } = Route.useParams();
   const numId = Number(id);
   const { locale, dir, t } = useLocale();
+  const ar = locale === "ar";
+  const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
+
   const { data } = useSuspenseQuery({
     queryKey: ["movie", numId, locale],
     queryFn: () => getMovieDetails({ data: { id: numId, lang: locale } }),
   });
+
+  const editorialQuery = useQuery({
+    queryKey: ["movie-editorial", numId],
+    queryFn: () => getEditorialReview({ data: { movieId: numId } }),
+  });
+
+  const editorial = editorialQuery.data;
+
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<{ key: string; name: string } | null>(null);
   const [galleryTab, setGalleryTab] = useState<"backdrops" | "posters">("backdrops");
@@ -196,37 +274,10 @@ function Content() {
   const galleryImages =
     galleryTab === "backdrops" ? data.images.backdrops : data.images.posters;
 
-  // JSON-LD Movie schema for SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Movie",
-    name: data.title,
-    alternateName: data.originalTitle ?? undefined,
-    description: overview,
-    image: data.poster ?? undefined,
-    datePublished: data.releaseDate ?? undefined,
-    genre: data.genres,
-    aggregateRating: data.voteCount > 0
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: data.rating,
-          ratingCount: data.voteCount,
-          bestRating: 10,
-          worstRating: 0,
-        }
-      : undefined,
-    director: data.crew.director.map((n) => ({ "@type": "Person", name: n })),
-  };
-
   return (
-    <div dir={dir} className="min-h-screen bg-background text-foreground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      {/* Cinematic hero */}
-      <div className="relative h-[70vh] min-h-[520px] w-full">
+    <div dir={dir} className="min-h-screen bg-background text-foreground pb-24">
+      {/* Cinematic Hero */}
+      <div className="relative h-[72vh] min-h-[540px] w-full">
         {data.backdrop && (
           <img
             src={data.backdrop}
@@ -244,13 +295,14 @@ function Content() {
           }`}
         />
 
+        {/* Top Floating Nav */}
         <div className="absolute top-0 inset-x-0 p-4 z-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 bg-black/50 backdrop-blur rounded-full px-3 py-1.5 text-sm hover:bg-black/70 transition text-white"
+              className="inline-flex items-center gap-2 bg-black/60 backdrop-blur rounded-full px-3.5 py-1.5 text-sm hover:bg-black/80 transition text-white border border-white/10"
             >
-              <ArrowRight className="w-4 h-4" />
+              <Arrow className="w-4 h-4" />
               {t("back")}
             </Link>
             <NavToggles />
@@ -258,45 +310,77 @@ function Content() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 -mt-56 md:-mt-64 relative z-10">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+      <div className="max-w-7xl mx-auto px-4 -mt-56 md:-mt-64 relative z-10 space-y-12">
+        {/* Breadcrumb Bar */}
+        <nav
+          className="inline-flex items-center gap-2 text-xs bg-black/60 backdrop-blur border border-white/10 px-4 py-2 rounded-full text-white/80"
+          aria-label="Breadcrumbs"
+        >
+          <Link to="/" className="hover:text-primary transition">
+            {ar ? "الرئيسية" : "Home"}
+          </Link>
+          <span>/</span>
+          <Link to="/discover" className="hover:text-primary transition">
+            {ar ? "الأفلام" : "Movies"}
+          </Link>
+          {data.genres[0] && (
+            <>
+              <span>/</span>
+              <span className="text-white/60">{data.genres[0]}</span>
+            </>
+          )}
+          <span>/</span>
+          <span className="text-primary font-medium truncate max-w-[180px] sm:max-w-none">
+            {data.title}
+          </span>
+        </nav>
+
+        {/* Main Header & Poster Grid */}
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
           {data.poster ? (
             <img
               src={data.poster}
               alt={data.title}
-              className="w-44 md:w-64 rounded-2xl shadow-2xl shrink-0 mx-auto md:mx-0 ring-1 ring-white/10"
+              className="w-44 md:w-64 rounded-3xl shadow-2xl shrink-0 mx-auto md:mx-0 ring-1 ring-white/15"
             />
           ) : (
-            <div className="w-44 md:w-64 aspect-[2/3] bg-muted rounded-2xl flex items-center justify-center mx-auto md:mx-0">
+            <div className="w-44 md:w-64 aspect-[2/3] bg-muted rounded-3xl flex items-center justify-center mx-auto md:mx-0">
               <Film className="w-10 h-10" />
             </div>
           )}
 
-          <div className="flex-1 pt-2 md:pt-24 min-w-0">
+          <div className="flex-1 min-w-0 pt-2 md:pt-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {editorial ? (
+                <div className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground font-black px-3 py-1 rounded-full text-xs shadow-md shadow-primary/20">
+                  <Award className="w-4 h-4" />
+                  {ar ? "تقييم فلمك:" : "FILMAK Score:"} {editorial.editorial_score}/10
+                </div>
+              ) : null}
+
+              <div className="inline-flex items-center gap-1 bg-secondary/80 border border-border px-2.5 py-1 rounded-full text-xs text-muted-foreground">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="font-semibold text-foreground">{data.rating}</span>
+                <span className="text-[10px]">TMDB ({numberFmt.format(data.voteCount)})</span>
+              </div>
+            </div>
+
             <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-2 drop-shadow-md">
               {data.title}
             </h1>
+
             {data.originalTitle && data.originalTitle !== data.title && (
               <p className="text-sm text-muted-foreground mb-2">
                 <span className="opacity-70">{t("original_title")}: </span>
                 <span className="italic">{data.originalTitle}</span>
               </p>
             )}
+
             {data.tagline && (
               <p className="text-muted-foreground italic mb-4">"{data.tagline}"</p>
             )}
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm mb-4">
-              <span className="inline-flex items-center gap-1.5 bg-primary/15 text-primary border border-primary/30 rounded-full px-2.5 py-1 font-semibold">
-                <Star className="w-4 h-4 fill-primary" />
-                {data.rating}
-                <span className="text-[10px] opacity-70">/10</span>
-              </span>
-              {data.voteCount > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  ({numberFmt.format(data.voteCount)} {t("votes")})
-                </span>
-              )}
               {data.year && (
                 <span className="inline-flex items-center gap-1 text-muted-foreground">
                   <Calendar className="w-4 h-4" />
@@ -310,7 +394,7 @@ function Content() {
                 </span>
               ) : null}
               {data.status && (
-                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border border-border bg-secondary/60">
+                <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full border border-border bg-secondary/60">
                   {data.status}
                 </span>
               )}
@@ -320,14 +404,18 @@ function Content() {
               {data.genres.map((g: string) => (
                 <span
                   key={g}
-                  className="text-xs px-3 py-1 rounded-full bg-secondary/70 border border-border"
+                  className="text-xs px-3 py-1 rounded-full bg-secondary/70 border border-border font-medium"
                 >
                   {g}
                 </span>
               ))}
             </div>
 
-            <div className="max-w-3xl">
+            {/* Synopsis / TMDB Factual Overview */}
+            <div className="max-w-3xl space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {ar ? "الملخص القصصي (بيانات TMDB الرسمية)" : "Synopsis (Factual Database)"}
+              </p>
               <p
                 className={`text-base leading-relaxed text-foreground/90 ${
                   !overviewOpen && overviewLong ? "line-clamp-4" : ""
@@ -339,7 +427,7 @@ function Content() {
                 <button
                   type="button"
                   onClick={() => setOverviewOpen((o) => !o)}
-                  className="mt-2 text-sm text-primary hover:underline"
+                  className="mt-1 text-sm text-primary hover:underline font-medium"
                 >
                   {overviewOpen ? t("less") : t("more")}
                 </button>
@@ -381,10 +469,202 @@ function Content() {
           </div>
         </div>
 
+        {/* ========================================================================= */}
+        {/* PROMINENT ORIGINAL FILMAK EDITORIAL SECTION: FILMAK VERDICT & SCORES */}
+        {/* ========================================================================= */}
+        <section className="rounded-3xl border border-primary/30 bg-card/90 backdrop-blur p-6 md:p-8 shadow-2xl space-y-8 relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border/60 pb-6">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+                <Sparkles className="w-4 h-4" />
+                {ar ? "رؤية فلمك النقدية والتحريرية" : "FILMAK Original Editorial Analysis"}
+              </div>
+              <h2 className="text-2xl md:text-3xl font-black">{ar ? "حكم فلمك (FILMAK Verdict)" : "The FILMAK Verdict"}</h2>
+            </div>
+
+            {editorial ? (
+              <div className="flex items-center gap-4 bg-primary/10 border border-primary/30 rounded-2xl px-5 py-3 shrink-0">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-black text-primary leading-none">
+                    {editorial.editorial_score}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground uppercase font-bold mt-1">
+                    {ar ? "من 10" : "Out of 10"}
+                  </div>
+                </div>
+                <div className="h-10 w-px bg-border/60" />
+                <div className="text-xs space-y-0.5">
+                  <div className="font-bold text-foreground">{ar ? "تقييم المحرر" : "Editorial Rating"}</div>
+                  <div className="text-muted-foreground">{editorial.author_name}</div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {editorial ? (
+            <div className="space-y-8">
+              {/* Verdict Summary Text */}
+              <blockquote className="text-lg md:text-xl font-semibold leading-relaxed text-foreground/95 bg-secondary/30 rounded-2xl p-5 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
+                "{editorial.verdict}"
+              </blockquote>
+
+              {/* Editorial Breakdown Progress Bars */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <ScoreBar label={ar ? "القصة والسيناريو" : "Story & Script"} score={editorial.story_score} />
+                <ScoreBar label={ar ? "الأداء التمثيلي" : "Acting"} score={editorial.acting_score} />
+                <ScoreBar label={ar ? "الإخراج والبصريات" : "Visuals & Craft"} score={editorial.visuals_score} />
+                <ScoreBar label={ar ? "المتعة العامة" : "Entertainment"} score={editorial.entertainment_score} />
+              </div>
+
+              {/* Long-form review body */}
+              {editorial.review_content && (
+                <div className="space-y-3 pt-2">
+                  <h3 className="text-lg font-bold text-foreground">{ar ? "التحليل السينمائي والنقدي" : "Critical Analysis"}</h3>
+                  <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
+                    {editorial.review_content}
+                  </p>
+                </div>
+              )}
+
+              {/* Why Watch This Movie? */}
+              {editorial.why_watch && (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-6 space-y-2">
+                  <h3 className="flex items-center gap-2 text-base md:text-lg font-bold text-primary">
+                    <Lightbulb className="w-5 h-5" />
+                    {ar ? "لماذا تشاهد هذا الفيلم؟" : "Why Watch This Movie?"}
+                  </h3>
+                  <p className="text-sm md:text-base text-foreground/90 leading-relaxed">
+                    {editorial.why_watch}
+                  </p>
+                </div>
+              )}
+
+              {/* Strengths & Weaknesses Grid */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Strengths */}
+                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5 space-y-3">
+                  <h4 className="flex items-center gap-2 font-bold text-emerald-400 text-sm md:text-base">
+                    <ThumbsUp className="w-4 h-4" />
+                    {ar ? "أبرز نقاط القوة (Strengths)" : "Core Strengths"}
+                  </h4>
+                  <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                    {editorial.strengths.map((s, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Weaknesses */}
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-3">
+                  <h4 className="flex items-center gap-2 font-bold text-amber-400 text-sm md:text-base">
+                    <ThumbsDown className="w-4 h-4" />
+                    {ar ? "ملاحظات ونقاط الضعف (Weaknesses)" : "Weaknesses / Critiques"}
+                  </h4>
+                  <ul className="space-y-2 text-xs md:text-sm text-muted-foreground">
+                    {editorial.weaknesses.map((w, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                        <span>{w}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Audience Suitability Guide */}
+              <div className="rounded-2xl border border-border bg-secondary/20 p-5 md:p-6 space-y-4">
+                <h3 className="font-bold text-base md:text-lg flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-primary" />
+                  {ar ? "دليل المشاهد والجمهور المستهدف" : "FILMAK Audience Guide"}
+                </h3>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs md:text-sm">
+                  {editorial.who_should_watch && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-emerald-400 block">
+                        {ar ? "من يُنصح بمشاهدته:" : "Best For:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.who_should_watch}</p>
+                    </div>
+                  )}
+                  {editorial.who_may_not_enjoy && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-amber-400 block">
+                        {ar ? "من قد لا يناسبه:" : "May Not Enjoy:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.who_may_not_enjoy}</p>
+                    </div>
+                  )}
+                  {editorial.mood && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-primary block">
+                        {ar ? "المزاج العام:" : "Atmospheric Mood:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.mood}</p>
+                    </div>
+                  )}
+                  {editorial.recommended_viewing && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-primary block">
+                        {ar ? "جلسة المشاهدة المقترحة:" : "Viewing Setup:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.recommended_viewing}</p>
+                    </div>
+                  )}
+                  {editorial.experience_level && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-primary block">
+                        {ar ? "مستوى الخبرة السينمائية:" : "Cinematic Level:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.experience_level}</p>
+                    </div>
+                  )}
+                  {editorial.content_notes && (
+                    <div className="space-y-1">
+                      <span className="font-semibold text-primary block">
+                        {ar ? "ملاحظات المحتوى:" : "Content Notes:"}
+                      </span>
+                      <p className="text-muted-foreground leading-relaxed">{editorial.content_notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Clear, honest placeholder when editorial review is not yet written */
+            <div className="rounded-2xl border border-dashed border-border/80 bg-secondary/20 p-6 md:p-8 text-center space-y-3">
+              <Award className="w-10 h-10 text-muted-foreground mx-auto opacity-70" />
+              <h3 className="text-lg font-bold text-foreground">
+                {ar ? "المراجعة التحريرية قيد الإعداد" : "FILMAK Editorial Review Coming Soon"}
+              </h3>
+              <p className="text-xs md:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                {ar
+                  ? "هذا العمل مسجل حالياً في دليل فلمك بالاعتماد على البيانات الوصفية الرسمية من TMDB. يقوم فريقنا النقدي بمشاهدة وتقييم الأعمال تباعاً لإضافة حكم فلمك الأصلي. لديك رأي حول هذا الفيلم؟ شاركنا ملاحظاتك!"
+                  : "This movie is cataloged using factual metadata from TMDB. An original critical assessment by our team is pending. Have thoughts on this title? Let us know!"}
+              </p>
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-medium pt-2"
+              >
+                {ar ? "إرسال اقتراح أو رأي حول الفيلم ←" : "Submit feedback on this title →"}
+              </Link>
+            </div>
+          )}
+        </section>
+
+        {/* AdSense Slot (placed below the main high-value editorial verdict) */}
+        <div className="my-6">
+          <AdSlot slot="1234567890" className="min-h-[100px]" />
+        </div>
+
         {/* Watch providers */}
         {data.watch && (
-          <section className="mt-12">
-            <h2 className="text-xl font-bold mb-4">
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold">
               {t("where_to_watch")}
               {data.watchCountry && (
                 <span className="text-sm text-muted-foreground mx-2">({data.watchCountry})</span>
@@ -408,7 +688,7 @@ function Content() {
                 href={data.watch.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary text-sm underline"
+                className="text-primary text-xs underline"
               >
                 {t("view_all_tmdb")}
               </a>
@@ -418,8 +698,8 @@ function Content() {
 
         {/* Videos */}
         {data.videos.length > 0 && (
-          <section className="mt-12">
-            <h2 className="flex items-center gap-2 text-xl font-bold mb-4">
+          <section className="space-y-4">
+            <h2 className="flex items-center gap-2 text-xl font-bold">
               <Video className="w-5 h-5 text-primary" />
               {t("videos")}
             </h2>
@@ -429,7 +709,7 @@ function Content() {
                   key={v.key}
                   type="button"
                   onClick={() => setActiveVideo({ key: v.key, name: v.name })}
-                  className="group relative aspect-video rounded-lg overflow-hidden bg-muted text-left"
+                  className="group relative aspect-video rounded-xl overflow-hidden bg-muted text-left shadow-sm"
                 >
                   <img
                     src={`https://img.youtube.com/vi/${v.key}/hqdefault.jpg`}
@@ -439,8 +719,8 @@ function Content() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10" />
                   <div className="absolute inset-0 grid place-items-center">
-                    <div className="w-12 h-12 rounded-full bg-primary/90 grid place-items-center shadow-xl">
-                      <Play className="w-5 h-5 fill-current text-primary-foreground" />
+                    <div className="w-11 h-11 rounded-full bg-primary/90 grid place-items-center shadow-xl group-hover:scale-110 transition">
+                      <Play className="w-4 h-4 fill-current text-primary-foreground" />
                     </div>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 p-2 text-white">
@@ -455,8 +735,8 @@ function Content() {
 
         {/* Gallery */}
         {(data.images.backdrops.length > 0 || data.images.posters.length > 0) && (
-          <section className="mt-12">
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <section className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
                 <ImageIcon className="w-5 h-5 text-primary" />
                 {t("gallery")}
@@ -492,7 +772,7 @@ function Content() {
                 <button
                   key={img.url}
                   onClick={() => setLightboxIndex(i)}
-                  className={`group relative overflow-hidden rounded-lg bg-muted ${
+                  className={`group relative overflow-hidden rounded-xl bg-muted ${
                     galleryTab === "backdrops" ? "aspect-video" : "aspect-[2/3]"
                   }`}
                 >
@@ -510,8 +790,8 @@ function Content() {
 
         {/* Cast */}
         {data.cast.length > 0 && (
-          <section className="mt-12">
-            <h2 className="flex items-center gap-2 text-xl font-bold mb-4">
+          <section className="space-y-4">
+            <h2 className="flex items-center gap-2 text-xl font-bold">
               <Users className="w-5 h-5 text-primary" />
               {t("cast")}
             </h2>
@@ -544,19 +824,14 @@ function Content() {
           </section>
         )}
 
-        {/* Ad slot */}
-        <div className="mt-10">
-          <AdSlot slot="1234567890" className="min-h-[100px]" />
-        </div>
-
         {/* Crew */}
         {(data.crew.director.length +
           data.crew.writers.length +
           data.crew.composer.length +
           data.crew.cinematographer.length +
           data.crew.editor.length) > 0 && (
-          <section className="mt-12">
-            <h2 className="text-xl font-bold mb-4">{t("crew")}</h2>
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold">{t("crew")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               <CrewCard label={t("director")} names={data.crew.director} />
               <CrewCard label={t("writers")} names={data.crew.writers} />
@@ -567,8 +842,8 @@ function Content() {
           </section>
         )}
 
-        {/* Details / Production */}
-        <section className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Details & Box Office */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-card border border-border rounded-2xl p-5">
             <h3 className="flex items-center gap-2 text-lg font-bold mb-4">
               <Info className="w-5 h-5 text-primary" />
@@ -633,8 +908,8 @@ function Content() {
 
         {/* Production companies */}
         {data.productionCompanies.length > 0 && (
-          <section className="mt-8">
-            <h3 className="flex items-center gap-2 text-lg font-bold mb-4">
+          <section className="space-y-4">
+            <h3 className="flex items-center gap-2 text-lg font-bold">
               <Building2 className="w-5 h-5 text-primary" />
               {t("companies")}
             </h3>
@@ -663,44 +938,83 @@ function Content() {
           </section>
         )}
 
-        {/* Similar */}
+        {/* ========================================================================= */}
+        {/* SIMILAR MOVIES WITH ORIGINAL EDITORIAL REASONING */}
+        {/* ========================================================================= */}
         {data.similar.length > 0 && (
-          <section className="mt-12 mb-16">
-            <h2 className="text-xl font-bold mb-4">{t("similar")}</h2>
+          <section className="space-y-6">
+            <div>
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                {ar ? "أعمال مقترحة مع أسباب الترشيح" : "Curated Similar Movies & Recommendations"}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {ar
+                  ? "ترشيحات منتقاة تشارك هذا العمل في الطابع البصري، الثيمة الفلسفية، أو البناء الدرامي."
+                  : "Curated selections sharing narrative themes, director styles, or atmospheric tension."}
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.similar.map((m: { id: number; title: string; poster: string | null; year: string; rating: number }) => (
-                <Link
-                  key={m.id}
-                  to="/movie/$id"
-                  params={{ id: String(m.id) }}
-                  className="group block"
-                >
-                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-muted">
-                    {m.poster ? (
-                      <img
-                        src={m.poster}
-                        alt={m.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition"
-                      />
-                    ) : (
-                      <div className="w-full h-full" />
+              {data.similar.map((m: { id: number; title: string; poster: string | null; year: string; rating: number }) => {
+                const reason = editorial?.similar_reasons?.[String(m.id)];
+                return (
+                  <div key={m.id} className="flex flex-col justify-between">
+                    <Link
+                      to="/movie/$id"
+                      params={{ id: String(m.id) }}
+                      className="group block flex-1"
+                    >
+                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
+                        {m.poster ? (
+                          <img
+                            src={m.poster}
+                            alt={m.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full grid place-items-center">
+                            <Film className="w-8 h-8 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-primary text-primary" />
+                          {m.rating}
+                        </div>
+                      </div>
+                      <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
+                        {m.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{m.year}</p>
+                    </Link>
+
+                    {reason && (
+                      <div className="mt-2 text-[11px] leading-tight text-primary/90 bg-primary/10 border border-primary/20 rounded-xl p-2 font-medium">
+                        💡 {reason}
+                      </div>
                     )}
-                    <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-primary text-primary" />
-                      {m.rating}
-                    </div>
                   </div>
-                  <p className="mt-2 text-sm truncate group-hover:text-primary transition">
-                    {m.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{m.year}</p>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
+
+        {/* External Data Attribution Notice at bottom */}
+        <section className="rounded-2xl border border-border/60 bg-secondary/30 p-5 text-xs text-muted-foreground space-y-1.5">
+          <div className="flex items-center gap-2 font-semibold text-foreground">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            {ar ? "إشعار الشفافية ومصادر البيانات:" : "Transparency & Attribution Notice:"}
+          </div>
+          <p>
+            {ar
+              ? "البيانات الواقعية (تاريخ الإصدار، طاقم العمل، الملصقات، وبيانات شباك التذاكر) مستمدة من TMDB. التحليلات النقدية، حكم فلمك، ونقاط القوة والضعف وأسباب الترشيح هي محتوى تحريري أصلي خاص بمنصة فلمك."
+              : "Factual metadata is provided by TMDB. FILMAK Verdict scores, critical commentary, strengths/weaknesses, and recommendation reasons are original editorial creations of FILMAK."}
+          </p>
+        </section>
       </div>
+
       {data.trailerKey && (
         <TrailerModal
           trailerKey={data.trailerKey}
@@ -725,6 +1039,22 @@ function Content() {
           onIndex={setLightboxIndex}
         />
       )}
+    </div>
+  );
+}
+
+function ScoreBar({ label, score }: { label: string; score: number | null | undefined }) {
+  if (!score || score <= 0) return null;
+  const pct = Math.min(100, Math.max(0, (score / 10) * 100));
+  return (
+    <div className="bg-secondary/40 border border-border rounded-xl p-3 space-y-1.5">
+      <div className="flex items-center justify-between text-xs font-semibold">
+        <span className="text-muted-foreground truncate">{label}</span>
+        <span className="text-primary font-bold">{score.toFixed(1)}/10</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+        <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
@@ -762,7 +1092,7 @@ function ProviderGroup({
     <div className="mb-4">
       <p className="text-sm text-muted-foreground mb-2">{label}</p>
       <div className="flex flex-wrap gap-3">
-        {items.map((p) => (
+        {items.map((p) =>
           link ? (
             <a
               key={p.name}
@@ -783,8 +1113,8 @@ function ProviderGroup({
               <img src={p.logo} alt={p.name} className="w-8 h-8 rounded" />
               <span className="text-sm">{p.name}</span>
             </div>
-          )
-        ))}
+          ),
+        )}
       </div>
     </div>
   );

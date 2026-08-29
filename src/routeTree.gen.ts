@@ -9,60 +9,43 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as DiscoverRouteImport } from './routes/discover'
-import { Route as CallbackRouteImport } from './routes/callback'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as TvIdRouteImport } from './routes/tv.$id'
-import { Route as PersonIdRouteImport } from './routes/person.$id'
-import { Route as MovieIdRouteImport } from './routes/movie.$id'
-import { Route as GenreIdRouteImport } from './routes/genre.$id'
-import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
-import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ArticlesRouteImport } from './routes/articles'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CallbackRouteImport } from './routes/callback'
+import { Route as CollectionsRouteImport } from './routes/collections'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as DmcaRouteImport } from './routes/dmca'
+import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as MovieNightRouteImport } from './routes/movie-night'
+import { Route as PickRouteImport } from './routes/pick'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TasteRouteImport } from './routes/taste'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TonightRouteImport } from './routes/tonight'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
-import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
-import { Route as AuthenticatedAdminSeoStatusRouteImport } from './routes/_authenticated/_admin.seo-status'
+import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
+import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
+import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
+import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
+import { Route as GenreIdRouteImport } from './routes/genre.$id'
+import { Route as MovieIdRouteImport } from './routes/movie.$id'
+import { Route as PersonIdRouteImport } from './routes/person.$id'
+import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin.admin'
+import { Route as AuthenticatedAdminSeoStatusRouteImport } from './routes/_authenticated/_admin.seo-status'
+import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscoverRoute = DiscoverRouteImport.update({
-  id: '/discover',
-  path: '/discover',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CallbackRoute = CallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -74,34 +57,98 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TvIdRoute = TvIdRouteImport.update({
-  id: '/tv/$id',
-  path: '/tv/$id',
+const ArticlesRoute = ArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PersonIdRoute = PersonIdRouteImport.update({
-  id: '/person/$id',
-  path: '/person/$id',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MovieIdRoute = MovieIdRouteImport.update({
-  id: '/movie/$id',
-  path: '/movie/$id',
+const CallbackRoute = CallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GenreIdRoute = GenreIdRouteImport.update({
-  id: '/genre/$id',
-  path: '/genre/$id',
+const CollectionsRoute = CollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DmcaRoute = DmcaRouteImport.update({
+  id: '/dmca',
+  path: '/dmca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditorialPolicyRoute = EditorialPolicyRouteImport.update({
+  id: '/editorial-policy',
+  path: '/editorial-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MovieNightRoute = MovieNightRouteImport.update({
+  id: '/movie-night',
+  path: '/movie-night',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PickRoute = PickRouteImport.update({
+  id: '/pick',
+  path: '/pick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasteRoute = TasteRouteImport.update({
+  id: '/taste',
+  path: '/taste',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TonightRoute = TonightRouteImport.update({
+  id: '/tonight',
+  path: '/tonight',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
@@ -109,14 +156,45 @@ const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/_admin',
+const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
-  id: '/api/public/indexnow',
-  path: '/api/public/indexnow',
+const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ArticlesRoute,
+} as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CollectionsRoute,
+} as any)
+const GenreIdRoute = GenreIdRouteImport.update({
+  id: '/genre/$id',
+  path: '/genre/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MovieIdRoute = MovieIdRouteImport.update({
+  id: '/movie/$id',
+  path: '/movie/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonIdRoute = PersonIdRouteImport.update({
+  id: '/person/$id',
+  path: '/person/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TvIdRoute = TvIdRouteImport.update({
+  id: '/tv/$id',
+  path: '/tv/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminSeoStatusRoute =
   AuthenticatedAdminSeoStatusRouteImport.update({
@@ -124,24 +202,37 @@ const AuthenticatedAdminSeoStatusRoute =
     path: '/seo-status',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedAdminRoute,
+const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
+  id: '/api/public/indexnow',
+  path: '/api/public/indexnow',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/articles': typeof ArticlesRouteWithChildren
   '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
+  '/faq': typeof FaqRoute
+  '/movie-night': typeof MovieNightRoute
+  '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taste': typeof TasteRoute
+  '/terms': typeof TermsRoute
+  '/tonight': typeof TonightRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -154,14 +245,27 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/articles': typeof ArticlesRouteWithChildren
   '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
+  '/faq': typeof FaqRoute
+  '/movie-night': typeof MovieNightRoute
+  '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taste': typeof TasteRoute
+  '/terms': typeof TermsRoute
+  '/tonight': typeof TonightRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -176,15 +280,28 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/articles': typeof ArticlesRouteWithChildren
   '/auth': typeof AuthRoute
   '/callback': typeof CallbackRoute
+  '/collections': typeof CollectionsRouteWithChildren
+  '/contact': typeof ContactRoute
   '/discover': typeof DiscoverRoute
+  '/dmca': typeof DmcaRoute
+  '/editorial-policy': typeof EditorialPolicyRoute
+  '/faq': typeof FaqRoute
+  '/movie-night': typeof MovieNightRoute
+  '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/taste': typeof TasteRoute
+  '/terms': typeof TermsRoute
+  '/tonight': typeof TonightRoute
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/articles/$slug': typeof ArticlesSlugRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/genre/$id': typeof GenreIdRoute
   '/movie/$id': typeof MovieIdRoute
   '/person/$id': typeof PersonIdRoute
@@ -199,14 +316,27 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/articles'
     | '/auth'
     | '/callback'
+    | '/collections'
+    | '/contact'
     | '/discover'
+    | '/dmca'
+    | '/editorial-policy'
+    | '/faq'
+    | '/movie-night'
+    | '/pick'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/taste'
+    | '/terms'
+    | '/tonight'
     | '/favorites'
     | '/stats'
+    | '/articles/$slug'
+    | '/collections/$slug'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -219,14 +349,27 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/articles'
     | '/auth'
     | '/callback'
+    | '/collections'
+    | '/contact'
     | '/discover'
+    | '/dmca'
+    | '/editorial-policy'
+    | '/faq'
+    | '/movie-night'
+    | '/pick'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/taste'
+    | '/terms'
+    | '/tonight'
     | '/favorites'
     | '/stats'
+    | '/articles/$slug'
+    | '/collections/$slug'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -240,15 +383,28 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/$'
     | '/about'
+    | '/articles'
     | '/auth'
     | '/callback'
+    | '/collections'
+    | '/contact'
     | '/discover'
+    | '/dmca'
+    | '/editorial-policy'
+    | '/faq'
+    | '/movie-night'
+    | '/pick'
     | '/privacy'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/taste'
+    | '/terms'
+    | '/tonight'
     | '/_authenticated/_admin'
     | '/_authenticated/favorites'
     | '/_authenticated/stats'
+    | '/articles/$slug'
+    | '/collections/$slug'
     | '/genre/$id'
     | '/movie/$id'
     | '/person/$id'
@@ -263,12 +419,23 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  ArticlesRoute: typeof ArticlesRouteWithChildren
   AuthRoute: typeof AuthRoute
   CallbackRoute: typeof CallbackRoute
+  CollectionsRoute: typeof CollectionsRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DiscoverRoute: typeof DiscoverRoute
+  DmcaRoute: typeof DmcaRoute
+  EditorialPolicyRoute: typeof EditorialPolicyRoute
+  FaqRoute: typeof FaqRoute
+  MovieNightRoute: typeof MovieNightRoute
+  PickRoute: typeof PickRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TasteRoute: typeof TasteRoute
+  TermsRoute: typeof TermsRoute
+  TonightRoute: typeof TonightRoute
   GenreIdRoute: typeof GenreIdRoute
   MovieIdRoute: typeof MovieIdRoute
   PersonIdRoute: typeof PersonIdRoute
@@ -278,53 +445,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/discover': {
-      id: '/discover'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof DiscoverRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/callback': {
-      id: '/callback'
-      path: '/callback'
-      fullPath: '/callback'
-      preLoaderRoute: typeof CallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -341,46 +466,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/articles': {
+      id: '/articles'
+      path: '/articles'
+      fullPath: '/articles'
+      preLoaderRoute: typeof ArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/callback': {
+      id: '/callback'
+      path: '/callback'
+      fullPath: '/callback'
+      preLoaderRoute: typeof CallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections': {
+      id: '/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dmca': {
+      id: '/dmca'
+      path: '/dmca'
+      fullPath: '/dmca'
+      preLoaderRoute: typeof DmcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/editorial-policy': {
+      id: '/editorial-policy'
+      path: '/editorial-policy'
+      fullPath: '/editorial-policy'
+      preLoaderRoute: typeof EditorialPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movie-night': {
+      id: '/movie-night'
+      path: '/movie-night'
+      fullPath: '/movie-night'
+      preLoaderRoute: typeof MovieNightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pick': {
+      id: '/pick'
+      path: '/pick'
+      fullPath: '/pick'
+      preLoaderRoute: typeof PickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/taste': {
+      id: '/taste'
+      path: '/taste'
+      fullPath: '/taste'
+      preLoaderRoute: typeof TasteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tonight': {
+      id: '/tonight'
+      path: '/tonight'
+      fullPath: '/tonight'
+      preLoaderRoute: typeof TonightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tv/$id': {
-      id: '/tv/$id'
-      path: '/tv/$id'
-      fullPath: '/tv/$id'
-      preLoaderRoute: typeof TvIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/person/$id': {
-      id: '/person/$id'
-      path: '/person/$id'
-      fullPath: '/person/$id'
-      preLoaderRoute: typeof PersonIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/movie/$id': {
-      id: '/movie/$id'
-      path: '/movie/$id'
-      fullPath: '/movie/$id'
-      preLoaderRoute: typeof MovieIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/genre/$id': {
-      id: '/genre/$id'
-      path: '/genre/$id'
-      fullPath: '/genre/$id'
-      preLoaderRoute: typeof GenreIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/stats': {
-      id: '/_authenticated/stats'
-      path: '/stats'
-      fullPath: '/stats'
-      preLoaderRoute: typeof AuthenticatedStatsRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/favorites': {
@@ -390,19 +606,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/_admin': {
-      id: '/_authenticated/_admin'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/stats': {
+      id: '/_authenticated/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof AuthenticatedStatsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/indexnow': {
-      id: '/api/public/indexnow'
-      path: '/api/public/indexnow'
-      fullPath: '/api/public/indexnow'
-      preLoaderRoute: typeof ApiPublicIndexnowRouteImport
+    '/articles/$slug': {
+      id: '/articles/$slug'
+      path: '/$slug'
+      fullPath: '/articles/$slug'
+      preLoaderRoute: typeof ArticlesSlugRouteImport
+      parentRoute: typeof ArticlesRoute
+    }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
+      parentRoute: typeof CollectionsRoute
+    }
+    '/genre/$id': {
+      id: '/genre/$id'
+      path: '/genre/$id'
+      fullPath: '/genre/$id'
+      preLoaderRoute: typeof GenreIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/movie/$id': {
+      id: '/movie/$id'
+      path: '/movie/$id'
+      fullPath: '/movie/$id'
+      preLoaderRoute: typeof MovieIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/person/$id': {
+      id: '/person/$id'
+      path: '/person/$id'
+      fullPath: '/person/$id'
+      preLoaderRoute: typeof PersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tv/$id': {
+      id: '/tv/$id'
+      path: '/tv/$id'
+      fullPath: '/tv/$id'
+      preLoaderRoute: typeof TvIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_admin/admin': {
+      id: '/_authenticated/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/_admin/seo-status': {
       id: '/_authenticated/_admin/seo-status'
@@ -411,12 +669,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSeoStatusRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/_admin/admin': {
-      id: '/_authenticated/_admin/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+    '/api/public/indexnow': {
+      id: '/api/public/indexnow'
+      path: '/api/public/indexnow'
+      fullPath: '/api/public/indexnow'
+      preLoaderRoute: typeof ApiPublicIndexnowRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -449,17 +707,52 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ArticlesRouteChildren {
+  ArticlesSlugRoute: typeof ArticlesSlugRoute
+}
+
+const ArticlesRouteChildren: ArticlesRouteChildren = {
+  ArticlesSlugRoute: ArticlesSlugRoute,
+}
+
+const ArticlesRouteWithChildren = ArticlesRoute._addFileChildren(
+  ArticlesRouteChildren,
+)
+
+interface CollectionsRouteChildren {
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
+}
+
+const CollectionsRouteChildren: CollectionsRouteChildren = {
+  CollectionsSlugRoute: CollectionsSlugRoute,
+}
+
+const CollectionsRouteWithChildren = CollectionsRoute._addFileChildren(
+  CollectionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  ArticlesRoute: ArticlesRouteWithChildren,
   AuthRoute: AuthRoute,
   CallbackRoute: CallbackRoute,
+  CollectionsRoute: CollectionsRouteWithChildren,
+  ContactRoute: ContactRoute,
   DiscoverRoute: DiscoverRoute,
+  DmcaRoute: DmcaRoute,
+  EditorialPolicyRoute: EditorialPolicyRoute,
+  FaqRoute: FaqRoute,
+  MovieNightRoute: MovieNightRoute,
+  PickRoute: PickRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TasteRoute: TasteRoute,
+  TermsRoute: TermsRoute,
+  TonightRoute: TonightRoute,
   GenreIdRoute: GenreIdRoute,
   MovieIdRoute: MovieIdRoute,
   PersonIdRoute: PersonIdRoute,

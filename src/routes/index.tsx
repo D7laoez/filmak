@@ -2,7 +2,30 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
-import { Sparkles, Search, Star, Loader2, Film, TrendingUp, Award, Flame, Clapperboard, CalendarClock, Heart, LogOut, User, Tv, Tags, Compass, CheckCircle2 } from "lucide-react";
+import {
+  Sparkles,
+  Search,
+  Star,
+  Loader2,
+  Film,
+  TrendingUp,
+  Award,
+  Flame,
+  Clapperboard,
+  CalendarClock,
+  Heart,
+  LogOut,
+  User,
+  Tv,
+  Tags,
+  Compass,
+  CheckCircle2,
+  BookOpen,
+  ArrowRight,
+  ArrowLeft,
+  Clock,
+  LibraryBig,
+} from "lucide-react";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Spinner } from "@/components/Spinner";
@@ -27,6 +50,7 @@ import {
   type TvCard,
 } from "@/lib/tv.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
+import { getEditorialPickOfTheWeek, getEditorialArticles } from "@/lib/editorial.functions";
 
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,9 +68,9 @@ export const Route = createFileRoute("/")({
   validateSearch: (r: Record<string, unknown>) =>
     z.object({ q: z.string().optional() }).parse(r),
   head: () => {
-    const title = "فلمك — Filmak · دليل أفلام ومسلسلات بالذكاء الاصطناعي";
+    const title = "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية";
     const description =
-      "اكتشف أفضل الأفلام والمسلسلات التي تناسب ذوقك باستخدام الذكاء الاصطناعي. ابحث عما تريد مشاهدته وسيقوم فلمك بالعثور على الخيار المثالي لك.";
+      "منصة اكتشاف وتحليل سينمائي: ترشيحات بالذكاء الاصطناعي، مراجعات نقدية أصلية، وأدلة مشاهدة لأفضل الأفلام والمسلسلات.";
     const url = "https://filmak.site/";
     const image = "https://filmak.site/icon-512.png";
     return {
@@ -95,7 +119,6 @@ export const Route = createFileRoute("/")({
       ]);
     } catch (err) {
       console.error("Home loader failed:", err);
-      // Re-throw so errorComponent or global error boundary catches it with context
       throw err;
     }
   },
@@ -122,7 +145,10 @@ function Home() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { locale, dir, t, toggle } = useLocale();
+  const ar = locale === "ar";
+  const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const { q: urlQ } = Route.useSearch();
+
   const trending = useQuery({
     queryKey: ["trending", locale],
     queryFn: () => getTrending({ data: { lang: locale } }),
@@ -144,23 +170,30 @@ function Home() {
     queryFn: () => getUpcoming({ data: { lang: locale } }),
   });
 
+  const pickOfTheWeek = useQuery({
+    queryKey: ["editorial-pick-of-week"],
+    queryFn: () => getEditorialPickOfTheWeek(),
+  });
+
+  const articlesQuery = useQuery({
+    queryKey: ["editorial-articles-home"],
+    queryFn: () => getEditorialArticles({ data: { limit: 3 } }),
+  });
+
   const [searchQ, setSearchQ] = useState(urlQ ?? "");
   const [activeSearch, setActiveSearch] = useState(urlQ ?? "");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  // Keep the search field in sync when the URL ?q= changes (e.g. TopBar submit).
   useEffect(() => {
     setSearchQ(urlQ ?? "");
   }, [urlQ]);
 
-  // Live search: debounce the input so typing "هوس" shows results instantly.
   useEffect(() => {
     const q = searchQ.trim();
     const h = setTimeout(() => setActiveSearch(q), 250);
     return () => clearTimeout(h);
   }, [searchQ]);
 
-  // Prevent body scroll while the mobile search overlay is open.
   useEffect(() => {
     if (typeof document === "undefined") return;
     if (mobileSearchOpen) {
@@ -235,8 +268,7 @@ function Home() {
   }
 
   return (
-    <div dir={dir} className="min-h-screen bg-background text-foreground">
-
+    <div dir={dir} className="min-h-screen bg-background text-foreground pb-20">
       {mobileSearchOpen && (
         <MobileSearchOverlay
           value={searchQ}
@@ -251,169 +283,252 @@ function Home() {
         />
       )}
 
+      {/* Hero Carousel */}
+      <HeroCarousel
+        movies={trending.data ?? []}
+        searchValue={searchQ}
+        onSearchChange={setSearchQ}
+        onOpenMobileSearch={() => setMobileSearchOpen(true)}
+      />
 
-      {tab === "movie" && trending.data && trending.data.length > 0 && (
-        <HeroCarousel movies={trending.data} />
+      {/* ========================================================================= */}
+      {/* 1. FILMAK PICK OF THE WEEK (FEATURED EDITORIAL SPOTLIGHT) */}
+      {/* ========================================================================= */}
+      {pickOfTheWeek.data && (
+        <section className="max-w-7xl mx-auto px-4 pt-10">
+          <div className="relative overflow-hidden rounded-3xl border border-primary/40 bg-card shadow-2xl p-6 md:p-8">
+            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div className="grid md:grid-cols-12 gap-6 items-center">
+              <div className="md:col-span-8 space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/15 px-3.5 py-1 text-xs text-primary font-bold">
+                  <Award className="w-4 h-4" />
+                  {ar ? "فيلم الأسبوع المختار تحريرياً" : "FILMAK Editorial Pick of the Week"}
+                </div>
+                <h2 className="text-2xl md:text-4xl font-black">
+                  {ar ? pickOfTheWeek.data.movie_title_ar : pickOfTheWeek.data.movie_title_en}
+                </h2>
+                <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/30 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
+                  "{ar ? pickOfTheWeek.data.editorial_reason_ar : pickOfTheWeek.data.editorial_reason_en}"
+                </blockquote>
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Link
+                    to="/movie/$id"
+                    params={{ id: String(pickOfTheWeek.data.movie_id) }}
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/20"
+                  >
+                    <Film className="w-4 h-4" />
+                    {ar ? "قراءة حكم فلمك الكامل" : "Read Full Verdict"}
+                  </Link>
+                  <span className="text-xs text-muted-foreground">
+                    ✍️ {ar ? "اختيار فريق التحرير" : "Curated by Editorial Board"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="md:col-span-4 aspect-video md:aspect-[4/3] rounded-2xl overflow-hidden bg-muted shadow-lg">
+                {pickOfTheWeek.data.backdrop ? (
+                  <img
+                    src={pickOfTheWeek.data.backdrop}
+                    alt={pickOfTheWeek.data.movie_title_ar}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full grid place-items-center bg-secondary">
+                    <Film className="w-12 h-12 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* AI prompt hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-accent/5 to-transparent pointer-events-none" />
-        <div className="max-w-4xl mx-auto px-4 pt-16 pb-12 text-center relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
-            {t("tagline_ai")}
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            {t("hero_1")}
-            <br />
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {t("hero_2")}
-            </span>
-          </h1>
-          <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-            {t("hero_sub")}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm text-muted-foreground font-medium opacity-80">
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              أفضل ترشيحات
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              تغطية عالمية
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-primary" />
-              دقة عالية
-            </span>
+      {/* ========================================================================= */}
+      {/* 2. LATEST EDITORIAL GUIDES & ARTICLES */}
+      {/* ========================================================================= */}
+      {articlesQuery.data && articlesQuery.data.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 pt-12 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-primary" />
+                {ar ? "أحدث الأدلة والمقالات السينمائية" : "Latest Cinema Guides & Articles"}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                {ar
+                  ? "تحليلات معمقة وقوائم منتقاة من هيئة تحرير فلمك."
+                  : "Original critical deep dives and viewing roadmaps."}
+              </p>
+            </div>
+            <Link
+              to="/articles"
+              className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1"
+            >
+              {ar ? "كل المقالات" : "All Articles"}
+              <Arrow className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {articlesQuery.data.map((art) => (
+              <Link
+                key={art.id}
+                to="/articles/$slug"
+                params={{ slug: art.slug }}
+                className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:border-primary/40 hover:shadow-xl transition flex flex-col justify-between"
+              >
+                <div className="aspect-video bg-muted overflow-hidden relative">
+                  {art.featured_image ? (
+                    <img
+                      src={art.featured_image}
+                      alt={ar ? art.title_ar : art.title_en}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full grid place-items-center bg-secondary">
+                      <BookOpen className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur text-[10px] text-white px-2.5 py-0.5 rounded-full font-semibold">
+                    {ar ? art.category_label_ar : art.category_label_en}
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-bold text-sm leading-snug group-hover:text-primary transition line-clamp-2">
+                      {ar ? art.title_ar : art.title_en}
+                    </h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
+                      {ar ? art.excerpt_ar : art.excerpt_en}
+                    </p>
+                  </div>
+                  <div className="border-t border-border/40 pt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>✍️ {art.author_name}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {art.reading_time_minutes} {ar ? "د" : "min"}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. AI NATURAL LANGUAGE RECOMMENDATIONS */}
+      {/* ========================================================================= */}
+      <section className="max-w-7xl mx-auto px-4 pt-12">
+        <div className="bg-card border border-border/80 rounded-3xl p-6 md:p-8 space-y-4">
+          <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+            <Sparkles className="w-5 h-5" />
+            <span>{t("ask_ai")}</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black">
+            {t("describe_mood")}
+          </h2>
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
-              if (prompt.trim().length < 2) return;
-              recMutation.mutate(prompt.trim());
+              if (prompt.trim()) recMutation.mutate(prompt);
             }}
-            className="max-w-2xl mx-auto"
+            className="flex flex-col sm:flex-row gap-2"
           >
-            <div className="relative">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                rows={3}
-                placeholder={t("prompt_placeholder")}
-                className="w-full bg-card border border-border rounded-2xl p-4 pb-14 text-base outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-              />
-              <button
-                type="submit"
-                disabled={recMutation.isPending || prompt.trim().length < 2}
-                className={`absolute bottom-3 ${dir === "rtl" ? "left-3" : "right-3"} inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition`}
-              >
-                {recMutation.isPending ? (
+            <input
+              type="text"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder={t("ai_placeholder")}
+              className="flex-1 bg-secondary/50 border border-border rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            <button
+              type="submit"
+              disabled={recMutation.isPending || !prompt.trim()}
+              className="bg-primary text-primary-foreground font-semibold rounded-xl px-6 py-3 text-sm hover:opacity-90 disabled:opacity-50 transition flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-primary/20"
+            >
+              {recMutation.isPending ? (
+                <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
+                  <span>{t("searching_ai")}</span>
+                </>
+              ) : (
+                <>
                   <Sparkles className="w-4 h-4" />
-                )}
-                {t("recommend_btn")}
-              </button>
-            </div>
-
-            <div className="flex flex-wrap gap-2 justify-center mt-4">
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setPrompt(s)}
-                  className="text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+                  <span>{t("recommend_btn")}</span>
+                </>
+              )}
+            </button>
           </form>
 
-          {recMutation.isError && (
-            <p className="mt-6 text-destructive text-sm">
-              {(recMutation.error as Error).message}
-            </p>
+          {/* AI Quick Suggestions */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            {suggestions.map((s: string) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => {
+                  setPrompt(s);
+                  recMutation.mutate(s);
+                }}
+                className="text-xs bg-secondary/60 hover:bg-secondary border border-border rounded-full px-3 py-1 text-muted-foreground hover:text-foreground transition"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* AI Results */}
+          {recMutation.isPending && (
+            <div className="py-12 text-center text-muted-foreground">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary" />
+              <p className="text-sm font-medium">{t("searching_ai")}</p>
+            </div>
           )}
 
           {recMutation.data && (
-            <div className={`mt-10 ${dir === "rtl" ? "text-right" : "text-left"}`}>
-              {recMutation.data.intro && (
-                <p className="text-muted-foreground mb-4">{recMutation.data.intro}</p>
-              )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recMutation.data.recommendations.map((r) => {
-                  const isTv = r.mediaType === "tv";
-                  const body = (
-                    <>
+            <div className="pt-4 space-y-4">
+              <h3 className="font-bold text-lg">{t("recommendations_for")}: "{prompt}"</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {recMutation.data.map((r) => (
+                  <Link
+                    key={r.id}
+                    to="/movie/$id"
+                    params={{ id: String(r.id) }}
+                    className="group block"
+                  >
+                    <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
                       {r.poster ? (
                         <img
                           src={r.poster}
                           alt={r.title}
-                          className="w-20 h-28 object-cover rounded-md shrink-0"
                           loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                         />
                       ) : (
-                        <div className="w-20 h-28 rounded-md bg-muted shrink-0" />
+                        <div className="w-full h-full grid place-items-center">
+                          <Film className="w-8 h-8 text-muted-foreground" />
+                        </div>
                       )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="font-semibold truncate">{r.title}</h3>
-                          <span className="text-xs text-muted-foreground">{r.year}</span>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                              isTv
-                                ? "bg-accent/20 text-accent border border-accent/40"
-                                : "bg-primary/15 text-primary border border-primary/30"
-                            }`}
-                          >
-                            {isTv ? <Tv className="w-3 h-3" /> : <Film className="w-3 h-3" />}
-                            {isTv ? t("tv_series") : t("movie")}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-primary mb-2">
-                          <Star className="w-3 h-3 fill-primary" />
-                          {r.rating}
-                        </div>
-                        <p className="text-sm text-muted-foreground line-clamp-3">{r.reason}</p>
+                      <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-primary text-primary" />
+                        {r.rating}
                       </div>
-                    </>
-                  );
-                  const cls =
-                    "group flex gap-4 bg-card border border-border rounded-xl p-3 hover:border-primary/50 transition";
-                  if (isTv) {
-                    return (
-                      <a
-                        key={`tv-${r.id}`}
-                        href={`https://www.themoviedb.org/tv/${r.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cls}
-                      >
-                        {body}
-                      </a>
-                    );
-                  }
-                  return (
-                    <Link
-                      key={`movie-${r.id}`}
-                      to="/movie/$id"
-                      params={{ id: String(r.id) }}
-                      className={cls}
-                    >
-                      {body}
-                    </Link>
-                  );
-                })}
+                    </div>
+                    <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{r.title}</p>
+                    <p className="text-xs text-muted-foreground">{r.year}</p>
+                  </Link>
+                ))}
               </div>
             </div>
           )}
         </div>
       </section>
 
+      {/* Live search results */}
       {activeSearch && (
         <Row
           title={`${t("search_results")}: "${activeSearch}"`}
@@ -438,7 +553,7 @@ function Home() {
       )}
 
       {/* Tabs: Movies / Series */}
-      <section className="max-w-7xl mx-auto px-4 pt-8">
+      <section className="max-w-7xl mx-auto px-4 pt-10">
         <div className="flex items-center gap-2 border-b border-border/50 mb-6">
           <button
             onClick={() => setTab("movie")}
@@ -464,7 +579,7 @@ function Home() {
           </button>
         </div>
 
-        {/* Genre chips → link to /genre/$id */}
+        {/* Genre chips */}
         <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
           <Tags className="w-4 h-4 text-primary" />
           {t("browse_by_genre")}
@@ -507,7 +622,6 @@ function Home() {
           <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={(popularTv.data ?? []).map(tvToCard)} type="tv" />
         </>
       )}
-
     </div>
   );
 }
@@ -544,18 +658,16 @@ function Row({
         <div className="py-12 flex flex-col items-center justify-center text-center">
           <img
             src="/icon-192.png"
-          srcSet="/icon-192.png 1x, /icon-512.png 2x"
-          decoding="async"
+            srcSet="/icon-192.png 1x, /icon-512.png 2x"
+            decoding="async"
             alt=""
             aria-hidden="true"
-            className="w-14 h-14 md:w-16 md:h-16 opacity-70 mb-3"
+            className="w-16 h-16 md:w-20 md:h-20 opacity-70 mb-3"
           />
-          <p className="text-sm font-medium">{emptyLabel}</p>
-          {emptySub && (
-            <p className="text-xs text-muted-foreground mt-1">{emptySub}</p>
-          )}
+          <p className="text-base font-medium">{emptyLabel}</p>
+          {emptySub && <p className="text-sm text-muted-foreground mt-1">{emptySub}</p>}
         </div>
-      ) : (
+      ) : movies.length === 0 ? null : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {movies.map((m) => (
             <Link
@@ -564,50 +676,33 @@ function Row({
               params={{ id: String(m.id) }}
               className="group block"
             >
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-muted">
+              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
                 {m.poster ? (
                   <img
                     src={m.poster}
                     alt={m.title}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    <Film className="w-8 h-8" />
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Film className="w-8 h-8 text-muted-foreground" />
                   </div>
                 )}
-                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-primary text-primary" />
                   {m.rating}
                 </div>
-                <FavoriteButton
-                  movie={{
-                    id: m.id,
-                    title: m.title,
-                    poster: m.poster,
-                    year: m.year,
-                    rating: m.rating,
-                  }}
-                  variant="icon"
-                />
+                <FavoriteButton movie={m} variant="icon" />
               </div>
-              <div className="mt-2">
-                <h3 className="text-sm font-medium truncate group-hover:text-primary transition">
-                  {m.title}
-                </h3>
-                <p className="text-xs text-muted-foreground">{m.year}</p>
-              </div>
+              <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{m.title}</p>
+              <p className="text-xs text-muted-foreground">{m.year}</p>
             </Link>
           ))}
         </div>
       )}
     </section>
   );
-}
-
-function tvToCard(t: TvCard): MovieCard {
-  return t as unknown as MovieCard;
 }
 
 function MobileSearchOverlay({
@@ -631,108 +726,138 @@ function MobileSearchOverlay({
   loading: boolean;
   dir: "rtl" | "ltr";
 }) {
-  const t = useLocale().t;
-  const results: MovieCard[] = tab === "tv" ? tvResults.map(tvToCard) : movieResults;
-  const trimmed = value.trim();
+  const { t } = useLocale();
+  const results = tab === "tv" ? tvResults.map(tvToCard) : movieResults;
 
   return (
-    <div dir={dir} className="fixed inset-0 z-[60] bg-background flex flex-col">
-      <div className="sticky top-0 border-b border-border/40 bg-background/95 backdrop-blur px-3 py-3 flex items-center gap-2">
-        <button
-          onClick={onClose}
-          className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition shrink-0"
-          aria-label="Close"
-        >
-          <X className="w-4 h-4" />
-        </button>
+    <div
+      role="dialog"
+      aria-modal="true"
+      dir={dir}
+      className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex flex-col p-4 md:hidden"
+    >
+      <div className="flex items-center gap-2 pb-3 border-b border-border">
         <div className="relative flex-1">
           <Search
-            className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+            className={`absolute ${
+              dir === "rtl" ? "right-3" : "left-3"
+            } top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
           />
           <input
             autoFocus
+            type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={t("search_placeholder")}
-            dir="auto"
-            className={`w-full bg-secondary/60 border border-border rounded-full py-2.5 text-base outline-none focus:ring-2 focus:ring-primary/50 ${dir === "rtl" ? "pr-10 pl-4" : "pl-10 pr-4"}`}
+            className={`w-full bg-secondary border border-border rounded-full py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 ${
+              dir === "rtl" ? "pr-9 pl-8" : "pl-9 pr-8"
+            }`}
           />
+          {value && (
+            <button
+              onClick={() => onChange("")}
+              className={`absolute ${
+                dir === "rtl" ? "left-2.5" : "right-2.5"
+              } top-1/2 -translate-y-1/2 p-0.5 rounded-full text-muted-foreground hover:text-foreground`}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
-      </div>
-
-      <div className="flex items-center gap-2 border-b border-border/50 px-4">
         <button
-          onClick={() => setTab("movie")}
-          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-            tab === "movie" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
-          }`}
+          onClick={onClose}
+          className="text-xs px-3 py-2 rounded-full border border-border bg-secondary"
         >
-          <Film className="w-4 h-4" />
-          {t("tab_movies")}
-        </button>
-        <button
-          onClick={() => setTab("tv")}
-          className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-            tab === "tv" ? "border-primary text-primary" : "border-transparent text-muted-foreground"
-          }`}
-        >
-          <Tv className="w-4 h-4" />
-          {t("tab_series")}
+          {t("close")}
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {trimmed.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center mt-8">
-            {t("search_placeholder")}
-          </p>
-        ) : loading ? (
-          <div className="py-10 flex items-center justify-center">
+      {value && (
+        <div className="flex items-center gap-2 py-2 border-b border-border/50">
+          <button
+            onClick={() => setTab("movie")}
+            className={`text-xs px-3 py-1 rounded-full border ${
+              tab === "movie"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground"
+            }`}
+          >
+            {t("tab_movies")} ({movieResults.length})
+          </button>
+          <button
+            onClick={() => setTab("tv")}
+            className={`text-xs px-3 py-1 rounded-full border ${
+              tab === "tv"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground"
+            }`}
+          >
+            {t("tab_series")} ({tvResults.length})
+          </button>
+        </div>
+      )}
+
+      <div className="flex-1 overflow-y-auto pt-3">
+        {loading ? (
+          <div className="py-12 flex items-center justify-center">
             <Spinner size={48} label={t("loading")} />
           </div>
+        ) : !value ? (
+          <p className="text-xs text-muted-foreground text-center py-8">
+            {t("type_to_search")}
+          </p>
         ) : results.length === 0 ? (
-          <div className="py-10 text-center">
+          <div className="text-center py-8">
             <p className="text-sm font-medium">{t("no_results")}</p>
-            <p className="text-xs text-muted-foreground mt-1">{t("no_results_sub")}</p>
           </div>
         ) : (
-          <ul className="divide-y divide-border/60">
+          <div className="grid grid-cols-2 gap-3">
             {results.map((m) => (
-              <li key={`${tab}-${m.id}`}>
-                <Link
-                  to={tab === "tv" ? "/tv/$id" : "/movie/$id"}
-                  params={{ id: String(m.id) }}
-                  onClick={onClose}
-                  className="flex items-center gap-3 py-3"
-                >
+              <Link
+                key={m.id}
+                to={tab === "tv" ? "/tv/$id" : "/movie/$id"}
+                params={{ id: String(m.id) }}
+                onClick={onClose}
+                className="group block"
+              >
+                <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted">
                   {m.poster ? (
                     <img
                       src={m.poster}
                       alt={m.title}
-                      loading="lazy"
-                      className="w-12 h-16 rounded-md object-cover shrink-0"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-12 h-16 rounded-md bg-muted flex items-center justify-center shrink-0">
-                      <Film className="w-5 h-5 text-muted-foreground" />
+                    <div className="w-full h-full grid place-items-center">
+                      <Film className="w-6 h-6 text-muted-foreground" />
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium truncate">{m.title}</h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                      <span>{m.year}</span>
-                      <span className="inline-flex items-center gap-1 text-primary">
-                        <Star className="w-3 h-3 fill-primary" />
-                        {m.rating}
-                      </span>
-                    </p>
+                  <div className="absolute top-1.5 right-1.5 bg-black/75 text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 fill-primary text-primary" />
+                    {m.rating}
                   </div>
-                </Link>
-              </li>
+                </div>
+                <p className="mt-1 text-xs font-semibold truncate">{m.title}</p>
+                <p className="text-[10px] text-muted-foreground">{m.year}</p>
+              </Link>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
   );
+}
+
+function tvToCard(t: TvCard): MovieCard {
+  return {
+    id: t.id,
+    title: t.name,
+    poster: t.poster,
+    backdrop: t.backdrop,
+    rating: t.rating,
+    year: t.firstAirDate?.slice(0, 4) || "",
+    overview: t.overview,
+    voteCount: t.voteCount,
+    genres: [],
+  };
 }
