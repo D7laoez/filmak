@@ -27,47 +27,47 @@ const langSchema = z.enum(["ar", "en"]).default("ar");
 const langOnly = (d: unknown) => z.object({ lang: langSchema }).parse(d ?? {});
 
 export const getTrendingTv = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>("/trending/tv/week", {}, data.lang);
-    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
   });
 
 export const getPopularTv = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>("/tv/popular", {}, data.lang);
-    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
   });
 
 export const getTopRatedTv = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>("/tv/top_rated", {}, data.lang);
-    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
   });
 
 export const getOnAirTv = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>("/tv/on_the_air", {}, data.lang);
-    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
   });
 
 export const getAiringTodayTv = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>("/tv/airing_today", {}, data.lang);
-    return r.results.filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
   });
 
 export const searchTv = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ q: z.string().min(1), lang: langSchema }).parse(d))
+  .validator((d: unknown) => z.object({ q: z.string().min(1).max(200), lang: langSchema }).parse(d))
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ results: any[] }>(
@@ -75,11 +75,11 @@ export const searchTv = createServerFn({ method: "GET" })
       { query: data.q },
       data.lang,
     );
-    return r.results.filter((m) => m.poster_path).slice(0, 24).map(toCard);
+    return (r.results || []).filter((m) => m.poster_path).slice(0, 24).map(toCard);
   });
 
 export const getTvGenres = createServerFn({ method: "GET" })
-  .inputValidator(langOnly)
+  .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const r = await tmdbGet<{ genres: { id: number; name: string }[] }>(
@@ -87,11 +87,11 @@ export const getTvGenres = createServerFn({ method: "GET" })
       {},
       data.lang,
     );
-    return r.genres;
+    return r.genres || [];
   });
 
 export const getTvByGenre = createServerFn({ method: "GET" })
-  .inputValidator((d) =>
+  .validator((d: unknown) =>
     z
       .object({
         genreIds: z.array(z.number()).min(1),
@@ -124,13 +124,13 @@ export const getTvByGenre = createServerFn({ method: "GET" })
       data.lang,
     );
     return {
-      results: r.results.filter((m) => m.poster_path).map(toCard),
-      totalPages: Math.min(r.total_pages, 20),
+      results: (r.results || []).filter((m) => m.poster_path).map(toCard),
+      totalPages: Math.min(r.total_pages || 1, 20),
     };
   });
 
 export const getTvDetails = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ id: z.number(), lang: langSchema }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.number().int().positive(), lang: langSchema }).parse(d))
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const [details, videos, providers, credits, similar] = await Promise.all([

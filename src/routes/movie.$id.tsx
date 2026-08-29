@@ -41,6 +41,7 @@ import { NavToggles } from "@/components/NavToggles";
 import { TrailerModal } from "@/components/TrailerModal";
 import { MediaLightbox } from "@/components/MediaLightbox";
 import { AdSlot } from "@/components/AdSlot";
+import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/movie/$id")({
   component: MoviePage,
@@ -160,8 +161,8 @@ export const Route = createFileRoute("/movie/$id")({
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
-        ...(movieLd ? [{ type: "application/ld+json", children: JSON.stringify(movieLd) }] : []),
-        ...(breadcrumbLd ? [{ type: "application/ld+json", children: JSON.stringify(breadcrumbLd) }] : []),
+        ...(movieLd ? [{ type: "application/ld+json", children: safeJsonLd(movieLd) }] : []),
+        ...(breadcrumbLd ? [{ type: "application/ld+json", children: safeJsonLd(breadcrumbLd) }] : []),
       ],
     };
   },
@@ -1049,15 +1050,25 @@ function Content() {
 
 function ScoreBar({ label, score }: { label: string; score: number | null | undefined }) {
   if (!score || score <= 0) return null;
-  const pct = Math.min(100, Math.max(0, (score / 10) * 100));
+  const percentage = Math.min(100, Math.max(0, (score / 10) * 100));
+  const getColor = (val: number) => {
+    if (val >= 8.5) return "from-amber-400 to-emerald-400";
+    if (val >= 7.0) return "from-primary to-emerald-500";
+    if (val >= 5.0) return "from-amber-500 to-primary";
+    return "from-rose-500 to-amber-500";
+  };
+
   return (
-    <div className="bg-secondary/40 border border-border rounded-xl p-3 space-y-1.5">
+    <div className="rounded-xl border border-border/80 bg-card/60 backdrop-blur-md p-3.5 space-y-2 hover:border-primary/40 transition-colors">
       <div className="flex items-center justify-between text-xs font-semibold">
-        <span className="text-muted-foreground truncate">{label}</span>
+        <span className="text-foreground/90">{label}</span>
         <span className="text-primary font-bold">{score.toFixed(1)}/10</span>
       </div>
-      <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-        <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+      <div className="h-2 w-full bg-secondary/80 rounded-full overflow-hidden">
+        <div
+          className={`h-full bg-gradient-to-r ${getColor(score)} rounded-full transition-all duration-700 ease-out`}
+          style={{ width: `${percentage}%` }}
+        />
       </div>
     </div>
   );

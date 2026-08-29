@@ -35,7 +35,7 @@ const baseInput = z.object({
 });
 
 export const getMovieNightPicks = createServerFn({ method: "GET" })
-  .inputValidator((d) => baseInput.parse(d))
+  .validator((d: unknown) => baseInput.parse(d))
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const params: Record<string, string> = {
@@ -51,20 +51,26 @@ export const getMovieNightPicks = createServerFn({ method: "GET" })
     if (data.minRuntime !== null) params["with_runtime.gte"] = String(data.minRuntime);
     if (data.maxRuntime !== null) params["with_runtime.lte"] = String(data.maxRuntime);
 
-    const r = await tmdbGet<{ results: any[]; total_pages: number }>("/discover/movie", params, data.lang);
+    const r = await tmdbGet<{ results: any[]; total_pages: number }>(
+      "/discover/movie",
+      params,
+      data.lang,
+    );
     return {
-      results: r.results.filter((m) => m.poster_path).map(toCard).slice(0, 12),
-      totalPages: Math.min(r.total_pages, 20),
+      results: (r.results || []).filter((m) => m.poster_path).map(toCard).slice(0, 12),
+      totalPages: Math.min(r.total_pages || 1, 20),
     };
   });
 
 export const getRandomMoviePick = createServerFn({ method: "GET" })
-  .inputValidator((d) =>
-    z.object({
-      lang: langSchema,
-      ratingMode: z.enum(["any", "high"]).default("any"),
-      nonce: z.number().int().min(0).default(0),
-    }).parse(d),
+  .validator((d: unknown) =>
+    z
+      .object({
+        lang: langSchema,
+        ratingMode: z.enum(["any", "high"]).default("any"),
+        nonce: z.number().int().min(0).default(0),
+      })
+      .parse(d),
   )
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
@@ -77,7 +83,7 @@ export const getRandomMoviePick = createServerFn({ method: "GET" })
     if (data.ratingMode === "high") params["vote_average.gte"] = "7.5";
 
     const r = await tmdbGet<{ results: any[] }>("/discover/movie", params, data.lang);
-    const pool = r.results.filter((m) => m.poster_path).map(toCard);
+    const pool = (r.results || []).filter((m) => m.poster_path).map(toCard);
     if (!pool.length) return null;
     const index = (data.nonce * 7 + Math.floor(Math.random() * pool.length)) % pool.length;
     return pool[index];

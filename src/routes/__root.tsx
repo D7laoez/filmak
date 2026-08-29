@@ -20,6 +20,8 @@ import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
 
+import { safeJsonLd } from "@/lib/seo";
+
 function NotFoundComponent() {
   const navigate = useNavigate();
   const [isCompletingAuth, setIsCompletingAuth] = useState(false);
@@ -222,8 +224,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "manifest", href: "/manifest.webmanifest" },
       ],
       scripts: [
-        { type: "application/ld+json", children: JSON.stringify(websiteLd) },
-        { type: "application/ld+json", children: JSON.stringify(organizationLd) },
+        { type: "application/ld+json", children: safeJsonLd(websiteLd) },
+        { type: "application/ld+json", children: safeJsonLd(organizationLd) },
         { async: true, src: "https://www.googletagmanager.com/gtag/js?id=G-0JV72533H2" },
         {
           children:

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Sparkles, Star, Film, BookOpen } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { getCollectionMovies, COLLECTIONS_DATA } from "@/lib/editorial.functions";
+import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections/$slug")({
   loader: async ({ params }) => {
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/collections/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: safeJsonLd({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: title,
@@ -55,7 +56,7 @@ export const Route = createFileRoute("/collections/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify(breadcrumbLd),
+          children: safeJsonLd(breadcrumbLd),
         },
       ],
     };

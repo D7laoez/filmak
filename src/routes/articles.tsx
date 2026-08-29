@@ -16,6 +16,7 @@ import {
 import { getEditorialArticles, type Article } from "@/lib/editorial.functions";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
+import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/articles")({
   head: () => {
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/articles")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: safeJsonLd({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: title,
@@ -245,7 +246,7 @@ function ArticlesIndexPage() {
                   {gridArticles.map((art) => (
                     <article
                       key={art.id}
-                      className="group flex flex-col rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:border-primary/40 hover:shadow-lg transition flex-1"
+                      className="group flex flex-col rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md overflow-hidden shadow-sm hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex-1"
                     >
                       <Link
                         to="/articles/$slug"

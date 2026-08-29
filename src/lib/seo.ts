@@ -20,3 +20,16 @@ export function tvTitle(title: string, year?: string | number | null) {
   const suffix = year ? ` (${year})` : "";
   return `${title}${suffix} | مسلسل | فلمك Filmak`;
 }
+
+/**
+ * Escapes characters that could be used to break out of a <script> tag or execute XSS.
+ * Safely stringifies structured data objects for JSON-LD scripts.
+ */
+export function safeJsonLd(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}

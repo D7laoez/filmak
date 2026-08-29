@@ -967,7 +967,7 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
 
 // 1. Get editorial review for a movie
 export const getEditorialReview = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ movieId: z.number().int().positive() }).parse(d))
+  .validator((d: unknown) => z.object({ movieId: z.number().int().positive() }).parse(d))
   .handler(async ({ data }): Promise<EditorialReview | null> => {
     // 1) Try Supabase DB
     try {
@@ -1023,8 +1023,8 @@ export const getEditorialReview = createServerFn({ method: "GET" })
 
 // 2. Get list of editorial articles
 export const getEditorialArticles = createServerFn({ method: "GET" })
-  .inputValidator(
-    (d) =>
+  .validator(
+    (d: unknown) =>
       z
         .object({
           category: z.string().optional(),
@@ -1100,7 +1100,7 @@ export const getEditorialArticles = createServerFn({ method: "GET" })
 
 // 3. Get single article by slug
 export const getEditorialArticleBySlug = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ slug: z.string().min(1) }).parse(d))
+  .validator((d: unknown) => z.object({ slug: z.string().min(1) }).parse(d))
   .handler(async ({ data }): Promise<Article | null> => {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -1148,7 +1148,7 @@ export const getEditorialArticleBySlug = createServerFn({ method: "GET" })
 
 // 4. Get genre editorial information
 export const getGenreEditorial = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ genreId: z.number().int().positive() }).parse(d))
+  .validator((d: unknown) => z.object({ genreId: z.number().int().positive() }).parse(d))
   .handler(async ({ data }): Promise<GenreEditorialInfo | null> => {
     return GENRE_EDITORIAL_DATA[data.genreId] ?? null;
   });
@@ -1303,7 +1303,7 @@ export const COLLECTIONS_DATA: Record<
 };
 
 export const getCollectionMovies = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ slug: z.string() }).parse(d))
+  .validator((d: unknown) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
     const c = COLLECTIONS_DATA[data.slug];
     if (!c) return { collection: null, items: [] };

@@ -92,7 +92,7 @@ export type InspectionResult = {
 
 export const inspectSeoUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { path: string }) =>
+  .validator((input: unknown) =>
     z
       .object({
         path: z.string().trim().min(1).max(500),

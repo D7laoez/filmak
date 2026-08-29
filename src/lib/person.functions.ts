@@ -33,7 +33,7 @@ const input = z.object({
 });
 
 export const getPersonDetails = createServerFn({ method: "GET" })
-  .inputValidator((d) => input.parse(d))
+  .validator((d: unknown) => input.parse(d))
   .handler(async ({ data }): Promise<PersonDetails> => {
     const { tmdbGet } = await import("./tmdb.server");
     const [details, credits] = await Promise.all([

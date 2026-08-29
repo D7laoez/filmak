@@ -25,7 +25,7 @@ type Intent = {
 };
 
 export const recommendMovies = createServerFn({ method: "POST" })
-  .inputValidator((d) =>
+  .validator((d: unknown) =>
     z
       .object({
         prompt: z.string().min(2).max(500),
@@ -35,7 +35,6 @@ export const recommendMovies = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<{ recommendations: Rec[]; intro: string }> => {
     const tmdbKey = process.env.TMDB_API_KEY;
-    if (!tmdbKey) throw new Error("TMDB_API_KEY missing");
     const lang: "ar" | "en" = data.lang ?? "ar";
 
     // --- Token conservation: cache + rate limit ---

@@ -22,6 +22,7 @@ import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { ShareButton } from "@/components/ShareButton";
 import { AdSlot } from "@/components/AdSlot";
+import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/articles/$slug")({
   loader: async ({ context, params }) => {
@@ -125,8 +126,8 @@ export const Route = createFileRoute("/articles/$slug")({
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
-        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
-        { type: "application/ld+json", children: JSON.stringify(breadcrumbLd) },
+        { type: "application/ld+json", children: safeJsonLd(jsonLd) },
+        { type: "application/ld+json", children: safeJsonLd(breadcrumbLd) },
       ],
     };
   },
