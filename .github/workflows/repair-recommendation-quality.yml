@@ -1,0 +1,101 @@
+name: Repair recommendation quality
+on:
+  push:
+    paths:
+      - automation/recommendation-quality.trigger
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply recommendation quality repair
+        shell: python
+        run: |
+          from pathlib import Path
+
+          p = Path('src/lib/recommend.functions.ts')
+          s = p.read_text(encoding='utf-8')
+
+          s = s.replace(
+              '  mood: string | null;\n};',
+              '  mood: string | null;\n  runtimeMax: number | null;\n};'
+          )
+          s = s.replace(
+              'const cacheKey = createHash("sha256").update(`${lang}::${normalizedPrompt}`).digest("hex");',
+              'const cacheKey = createHash("sha256").update(`v2::${lang}::${normalizedPrompt}`).digest("hex");'
+          )
+          s = s.replace(
+              '  : (lang === "en" ? "These picks match the mood and preferences you described." : "هاي الاختيارات الأقرب للمزاج والتفضيلات اللي وصفتها."));',
+              '  : (lang === "en" ? "These picks match the mood and preferences you described." : "هاي الاختيارات الأقرب للمزاج والتفضيلات اللي وصفتها."));'
+          )
+
+          s = s.replace(
+              'Schema:\n{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null},"intro":"short sentence","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"short reason"}]}\nRules: movie-only requests must use ["movie"]; series/show-only requests must use ["tv"]; otherwise use ["movie","tv"]. Detect country/language and mood. Return 8-12 real titles. Titles must be English TMDB titles. Every item must have kind, title, year when known, and reason.',
+              'Schema:\n{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null,"runtimeMax":null},"intro":"short sentence","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"short reason"}]}\nRules: movie-only requests must use ["movie"]; series/show-only requests must use ["tv"]; otherwise use ["movie","tv"]. Detect explicit genre, country, language, mood, and runtime constraints. If the user says romance/romantic, include genre ID 10749 in genres. If the user says short/brief/under 2 hours, set runtimeMax in minutes and only recommend titles that satisfy it. Return 8-12 real titles, but NEVER sacrifice hard constraints just to reach 8. Titles must be English TMDB titles. Every item must have kind, title, year when known, and reason.'
+          )
+          s = s.replace(
+              'المخطط:\n{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null},"intro":"جملة قصيرة","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"سبب قصير"}]}\nالقواعد: طلب فلم فقط = ["movie"]، طلب مسلسل فقط = ["tv"]، وإذا كان الطلب عاماً أو الاثنين = ["movie","tv"]. افهم الجنسية واللغة والمزاج. أعد 8-12 عنواناً حقيقياً موجوداً على TMDB. العناوين بالإنجليزية كما في TMDB. كل عنصر يجب أن يحتوي النوع والعنوان والسنة إن عُرفت وسبب الترشيح.',
+              'المخطط:\n{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null,"runtimeMax":null},"intro":"جملة قصيرة","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"سبب قصير"}]}\nالقواعد: طلب فلم فقط = ["movie"]، طلب مسلسل فقط = ["tv"]، وإذا كان الطلب عاماً أو الاثنين = ["movie","tv"]. افهم الجنسية واللغة والمزاج والمدة المطلوبة. إذا قال المستخدم رومانسي/رومانسية فأضف genre 10749. إذا قال قصير/قصيرة/أقل من ساعتين فحدّد runtimeMax بالدقائق، ولا ترشح أي عنوان يخالفه. أعد 8-12 عنواناً حقيقياً على TMDB، لكن لا تضحّي بالقيود الصريحة حتى تكمل 8. العناوين بالإنجليزية كما في TMDB. كل عنصر يجب أن يحتوي النوع والعنوان والسنة إن عُرفت وسبب الترشيح.'
+          )
+
+          old = '''function normalizeIntent(raw: Partial<Intent> | undefined, prompt: string): Intent {\n  const p = prompt.toLowerCase();\n  const explicitTv = /مسلسل|مسلسلات|سلسلة|series|show|shows|tv/.test(p);\n  const explicitMovie = /فلم|فيلم|افلام|أفلام|movie|movies|film/.test(p);\n  let kinds: ("movie" | "tv")[] = raw?.kinds?.filter((k): k is "movie" | "tv" => k === "movie" || k === "tv") ?? [];\n  if (!kinds.length) kinds = explicitTv && !explicitMovie ? ["tv"] : explicitMovie && !explicitTv ? ["movie"] : ["movie", "tv"];\n  if (explicitMovie && !explicitTv) kinds = ["movie"];\n  if (explicitTv && !explicitMovie) kinds = ["tv"];\n\n  let country = raw?.country ?? null;\n  let language = raw?.language ?? null;\n  const maps: Array<[RegExp, string, string]> = [\n    [/مصري|مصرية|egypt/i, "EG", "ar"], [/تركي|تركية|turkish|turkey/i, "TR", "tr"],\n    [/كوري|كورية|korean|korea/i, "KR", "ko"], [/ياباني|يابانية|japanese|japan/i, "JP", "ja"],\n    [/هندي|هندية|بوليوود|indian|india/i, "IN", "hi"], [/أمريكي|امريكي|american|usa|us/i, "US", "en"],\n  ];\n  for (const [re, c, l] of maps) if (re.test(p)) { country ??= c; language ??= l; break; }\n  if (/عربي|عربية|سوري|سورية|لبناني|لبنانية|خليجي|عراقي|عراقية/.test(p)) language ??= "ar";\n  return {\n    kinds, country, language,\n    genres: Array.isArray(raw?.genres) ? raw!.genres!.filter(Boolean).slice(0, 4) : [],\n    min_year: Number.isInteger(raw?.min_year) ? raw!.min_year! : null,\n    max_year: Number.isInteger(raw?.max_year) ? raw!.max_year! : null,\n    mood: raw?.mood ?? null,\n  };\n}\n'''
+          new = '''function normalizeIntent(raw: Partial<Intent> | undefined, prompt: string): Intent {\n  const p = prompt.toLowerCase();\n  const explicitTv = /مسلسل|مسلسلات|سلسلة|series|show|shows|tv/.test(p);\n  const explicitMovie = /فلم|فيلم|افلام|أفلام|movie|movies|film/.test(p);\n  let kinds: ("movie" | "tv")[] = raw?.kinds?.filter((k): k is "movie" | "tv" => k === "movie" || k === "tv") ?? [];\n  if (!kinds.length) kinds = explicitTv && !explicitMovie ? ["tv"] : explicitMovie && !explicitTv ? ["movie"] : ["movie", "tv"];\n  if (explicitMovie && !explicitTv) kinds = ["movie"];\n  if (explicitTv && !explicitMovie) kinds = ["tv"];\n\n  let country = raw?.country ?? null;\n  let language = raw?.language ?? null;\n  const maps: Array<[RegExp, string, string]> = [\n    [/مصري|مصرية|egypt/i, "EG", "ar"], [/تركي|تركية|turkish|turkey/i, "TR", "tr"],\n    [/كوري|كورية|korean|korea/i, "KR", "ko"], [/ياباني|يابانية|japanese|japan/i, "JP", "ja"],\n    [/هندي|هندية|بوليوود|indian|india/i, "IN", "hi"], [/أمريكي|امريكي|american|usa|us/i, "US", "en"],\n  ];\n  for (const [re, c, l] of maps) if (re.test(p)) { country ??= c; language ??= l; break; }\n  if (/عربي|عربية|سوري|سورية|لبناني|لبنانية|خليجي|عراقي|عراقية/.test(p)) language ??= "ar";\n\n  const rawGenres = Array.isArray(raw?.genres) ? raw!.genres!.filter(Boolean).map(String).slice(0, 4) : [];\n  const wantsRomance = /رومانسي|رومانسية|حب|romantic|romance/.test(p);\n  const genres = wantsRomance && !rawGenres.some((g) => normalizeGenre(g) === 10749)\n    ? [...rawGenres, "romance"]\n    : rawGenres;\n\n  let runtimeMax = Number.isInteger(raw?.runtimeMax) ? raw!.runtimeMax! : null;\n  if (/قصير(?:ة|ين)?|مختصر|short|brief/.test(p)) runtimeMax = runtimeMax ?? 100;\n  if (/قصير(?:ة|ين)?\s*جداً|very short/.test(p)) runtimeMax = Math.min(runtimeMax ?? 90, 90);\n  if (/اقل من ساعتين|أقل من ساعتين|under 2 hours|less than 2 hours/.test(p)) runtimeMax = Math.min(runtimeMax ?? 119, 119);\n  const hourMatch = p.match(/(?:اقل|أقل)\s*من\s*(\d+(?:\.\d+)?)\s*ساع(?:ة|ات)/);\n  if (hourMatch) runtimeMax = Math.min(runtimeMax ?? Number(hourMatch[1]) * 60 - 1, Number(hourMatch[1]) * 60 - 1);\n  const minuteMatch = p.match(/(?:اقل|أقل)\s*من\s*(\d+)\s*(?:دقيقة|دقائق|minutes?)/i);\n  if (minuteMatch) runtimeMax = Math.min(runtimeMax ?? Number(minuteMatch[1]) - 1, Number(minuteMatch[1]) - 1);\n\n  return {\n    kinds, country, language, genres,\n    min_year: Number.isInteger(raw?.min_year) ? raw!.min_year! : null,\n    max_year: Number.isInteger(raw?.max_year) ? raw!.max_year! : null,\n    mood: raw?.mood ?? null,\n    runtimeMax,\n  };\n}\n'''
+          if old not in s:
+              raise SystemExit('normalizeIntent block not found')
+          s = s.replace(old, new)
+
+          old = '''async function resolveAIItems(key: string, items: AIItem[], intent: Intent, lang: "ar" | "en") {\n  const results = await Promise.all(items.slice(0, 12).map(async (item) => {\n    const kind = item.kind === "tv" ? "tv" : "movie";\n    const hit = await tmdbSearchBest(key, kind, item.title!, item.year, intent);\n    if (!hit) return null;\n    return toRec(hit, kind, item.reason || (lang === "en" ? "Matches your request." : "يناسب طلبك."));\n  }));\n  return mergeUnique([], results.filter(Boolean) as Rec[]);\n}\n'''
+          new = '''async function resolveAIItems(key: string, items: AIItem[], intent: Intent, lang: "ar" | "en") {\n  const results = await Promise.all(items.slice(0, 12).map(async (item) => {\n    const kind = item.kind === "tv" ? "tv" : "movie";\n    if (!intent.kinds.includes(kind)) return null;\n    const hit = await tmdbSearchBest(key, kind, item.title!, item.year, intent);\n    if (!hit || !matchesHardConstraints(hit, kind, intent)) return null;\n    const reason = item.reason || (lang === "en" ? "Matches your request." : "يناسب طلبك.");\n    return toRec(hit, kind, reason);\n  }));\n  return mergeUnique([], results.filter(Boolean) as Rec[]);\n}\n'''
+          if old not in s:
+              raise SystemExit('resolveAIItems block not found')
+          s = s.replace(old, new)
+
+          old = '''async function tmdbSearchBest(key: string, kind: "movie" | "tv", title: string, year: string | undefined, intent: Intent): Promise<any | null> {\n  try {\n    const url = new URL(`https://api.themoviedb.org/3/search/${kind}`);\n    url.searchParams.set("api_key", key);\n    // AI returns English TMDB titles, so searching in English is more reliable than using the UI locale.\n    url.searchParams.set("language", "en-US");\n    url.searchParams.set("query", title);\n    url.searchParams.set("include_adult", "false");\n    if (year && /^\\d{4}$/.test(year)) url.searchParams.set(kind === "movie" ? "year" : "first_air_date_year", year);\n    const r = await fetch(url.toString(), { headers: { accept: "application/json" } });\n    if (!r.ok) return null;\n    const j = await r.json();\n    const list: any[] = (j.results || []).filter((x: any) => x.poster_path);\n    if (!list.length) return null;\n    list.sort((a, b) => scoreTmdb(b, intent, year) - scoreTmdb(a, intent, year));\n    return list[0];\n  } catch { return null; }\n}\n'''
+          new = '''async function tmdbSearchBest(key: string, kind: "movie" | "tv", title: string, year: string | undefined, intent: Intent): Promise<any | null> {\n  try {\n    const url = new URL(`https://api.themoviedb.org/3/search/${kind}`);\n    url.searchParams.set("api_key", key);\n    url.searchParams.set("language", "en-US");\n    url.searchParams.set("query", title);\n    url.searchParams.set("include_adult", "false");\n    if (year && /^\\d{4}$/.test(year)) url.searchParams.set(kind === "movie" ? "year" : "first_air_date_year", year);\n    const r = await fetch(url.toString(), { headers: { accept: "application/json" } });\n    if (!r.ok) return null;\n    const j = await r.json();\n    let list: any[] = (j.results || []).filter((x: any) => x.poster_path);\n    if (!list.length) return null;\n    list.sort((a, b) => scoreTmdb(b, intent, year) - scoreTmdb(a, intent, year));\n\n    for (const candidate of list.slice(0, 6)) {\n      let hit = candidate;\n      if (intent.runtimeMax != null) {\n        const detailUrl = new URL(`https://api.themoviedb.org/3/${kind}/${candidate.id}`);\n        detailUrl.searchParams.set("api_key", key);\n        detailUrl.searchParams.set("language", "en-US");\n        const detailRes = await fetch(detailUrl.toString(), { headers: { accept: "application/json" } });\n        if (detailRes.ok) hit = await detailRes.json();\n      }\n      if (matchesHardConstraints(hit, kind, intent)) return hit;\n    }\n    return null;\n  } catch { return null; }\n}\n\nfunction matchesHardConstraints(it: any, kind: "movie" | "tv", intent: Intent) {\n  const requiredGenres = intent.genres.map(normalizeGenre).filter((x): x is number => Number.isInteger(x));\n  const candidateGenres = Array.isArray(it.genre_ids)\n    ? it.genre_ids\n    : Array.isArray(it.genres)\n      ? it.genres.map((g: any) => g?.id).filter((x: any) => Number.isInteger(x))\n      : [];\n  if (requiredGenres.length && requiredGenres.some((id) => !candidateGenres.includes(id))) return false;\n\n  if (intent.runtimeMax != null) {\n    const runtime = kind === "movie"\n      ? Number(it.runtime || 0)\n      : Array.isArray(it.episode_run_time) && it.episode_run_time.length\n        ? Math.max(...it.episode_run_time.map((n: any) => Number(n) || 0))\n        : 0;\n    if (!runtime || runtime > intent.runtimeMax) return false;\n  }\n  return true;\n}\n'''
+          if old not in s:
+              raise SystemExit('tmdbSearchBest block not found')
+          s = s.replace(old, new)
+
+          s = s.replace(
+              '      if (genres.length) url.searchParams.set("with_genres", genres.join(","));\n',
+              '      if (genres.length) url.searchParams.set("with_genres", genres.join(","));\n      if (intent.runtimeMax != null) url.searchParams.set("with_runtime.lte", String(intent.runtimeMax));\n'
+          )
+          s = s.replace(
+              '      for (const hit of (j.results || []).slice(0, 8)) {\n        if (hit.poster_path) out.push(toRec(hit, kind, lang === "en" ? "Selected from TMDB using your filters." : "اختيار مطابق للفلاتر المطلوبة."));\n      }',
+              '      for (const hit of (j.results || []).slice(0, 12)) {\n        if (hit.poster_path && matchesHardConstraints(hit, kind, intent)) {\n          out.push(toRec(hit, kind, lang === "en" ? "Selected from TMDB using your filters." : "اختيار مطابق للفلاتر المطلوبة."));\n        }\n      }'
+          )
+
+          p.write_text(s, encoding='utf-8')
+
+          # Verification checks
+          checks = [
+              'runtimeMax: number | null;',
+              'v2::${lang}::${normalizedPrompt}',
+              'wantsRomance',
+              'with_runtime.lte',
+              'matchesHardConstraints',
+              'genre ID 10749',
+          ]
+          for c in checks:
+              if c not in s:
+                  raise SystemExit(f'missing verification marker: {c}')
+      - name: Verify
+        shell: bash
+        run: |
+          grep -n "runtimeMax\|wantsRomance\|with_runtime.lte\|matchesHardConstraints\|v2::\$\{lang\}" src/lib/recommend.functions.ts
+          git diff --check
+      - name: Commit repair and remove one-time files
+        shell: bash
+        run: |
+          rm -f .github/workflows/repair-recommendation-quality.yml automation/recommendation-quality.trigger
+          git config user.name "D7laoez"
+          git config user.email "163064985+D7laoez@users.noreply.github.com"
+          git add src/lib/recommend.functions.ts
+          git add -u .github/workflows/repair-recommendation-quality.yml automation/recommendation-quality.trigger || true
+          git commit -m "fix(ai): enforce romance and runtime recommendation constraints"
+          git push origin HEAD:main
