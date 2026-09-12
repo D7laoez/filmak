@@ -22,6 +22,7 @@ type Intent = {
   min_year: number | null;
   max_year: number | null;
   mood: string | null;
+  runtimeMax: number | null;
 };
 
 type AIItem = { kind?: "movie" | "tv"; title?: string; year?: string; reason?: string };
@@ -44,7 +45,7 @@ export const recommendMovies = createServerFn({ method: "POST" })
     if (!tmdbKey) throw new Error(lang === "en" ? "TMDB is not configured." : "مفتاح TMDB غير مهيأ على الخادم.");
 
     const normalizedPrompt = data.prompt.toLowerCase().replace(/\s+/g, " ").trim();
-    const cacheKey = createHash("sha256").update(`${lang}::${normalizedPrompt}`).digest("hex");
+    const cacheKey = createHash("sha256").update(`v2::${lang}::${normalizedPrompt}`).digest("hex");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     try {
@@ -60,12 +61,12 @@ export const recommendMovies = createServerFn({ method: "POST" })
     const systemPrompt = lang === "en"
       ? `You are Filmak's movie and TV recommendation engine. Analyze the user's request and return VALID JSON ONLY. Do not use markdown, comments, or explanatory text outside JSON.
 Schema:
-{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null},"intro":"short sentence","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"short reason"}]}
-Rules: movie-only requests must use ["movie"]; series/show-only requests must use ["tv"]; otherwise use ["movie","tv"]. Detect country/language and mood. Return 8-12 real titles. Titles must be English TMDB titles. Every item must have kind, title, year when known, and reason.`
+{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null,"runtimeMax":null},"intro":"short sentence","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"short reason"}]}
+Rules: movie-only requests must use ["movie"]; series/show-only requests must use ["tv"]; otherwise use ["movie","tv"]. Detect explicit genre, country, language, mood, and runtime constraints. If the user says romance/romantic, include romance genre ID 10749. If the user says short/brief/under 2 hours, set runtimeMax in minutes and only recommend titles that satisfy it. Return 8-12 real titles, but NEVER sacrifice hard constraints just to reach 8. Titles must be English TMDB titles. Every item must have kind, title, year when known, and reason.`
       : `أنت محرك ترشيحات فلمك للأفلام والمسلسلات. حلّل طلب المستخدم وأعد JSON صالح فقط، بدون Markdown أو أي نص خارج JSON.
 المخطط:
-{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null},"intro":"جملة قصيرة","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"سبب قصير"}]}
-القواعد: طلب فلم فقط = ["movie"]، طلب مسلسل فقط = ["tv"]، وإذا كان الطلب عاماً أو الاثنين = ["movie","tv"]. افهم الجنسية واللغة والمزاج. أعد 8-12 عنواناً حقيقياً موجوداً على TMDB. العناوين بالإنجليزية كما في TMDB. كل عنصر يجب أن يحتوي النوع والعنوان والسنة إن عُرفت وسبب الترشيح.`;
+{"intent":{"kinds":["movie"],"country":null,"language":null,"genres":[],"min_year":null,"max_year":null,"mood":null,"runtimeMax":null},"intro":"جملة قصيرة","items":[{"kind":"movie","title":"English TMDB title","year":"YYYY","reason":"سبب قصير"}]}
+القواعد: طلب فلم فقط = ["movie"]، طلب مسلسل فقط = ["tv"]، وإذا كان الطلب عاماً أو الاثنين = ["movie","tv"]. افهم الجنسية واللغة والمزاج والمدة المطلوبة. إذا قال المستخدم رومانسي/رومانسية فأضف genre 10749. إذا قال قصير/قصيرة/أقل من ساعتين فحدّد runtimeMax بالدقائق، ولا ترشح أي عنوان يخالفه. أعد 8-12 عنواناً حقيقياً على TMDB، لكن لا تضحّي بالقيود الصريحة حتى تكمل 8. العناوين بالإنجليزية كما في TMDB. كل عنصر يجب أن يحتوي النوع والعنوان والسنة إن عُرفت وسبب الترشيح.`;
 
     let parsed: { intent?: Partial<Intent>; intro?: string; items?: AIItem[] } = {};
     let aiError = "";
@@ -81,7 +82,6 @@ Rules: movie-only requests must use ["movie"]; series/show-only requests must us
     const aiItems = (parsed.items ?? []).filter((x) => x.title && intent.kinds.includes(x.kind ?? "movie"));
     let recommendations = await resolveAIItems(tmdbKey, aiItems, intent, lang);
 
-    // If the AI is unavailable or returned unusable titles, still return useful results from TMDB.
     if (recommendations.length < 4) {
       const fallback = await discoverFallback(tmdbKey, intent, lang);
       recommendations = mergeUnique(recommendations, fallback);
@@ -140,20 +140,37 @@ function normalizeIntent(raw: Partial<Intent> | undefined, prompt: string): Inte
   ];
   for (const [re, c, l] of maps) if (re.test(p)) { country ??= c; language ??= l; break; }
   if (/عربي|عربية|سوري|سورية|لبناني|لبنانية|خليجي|عراقي|عراقية/.test(p)) language ??= "ar";
+
+  const rawGenres = Array.isArray(raw?.genres) ? raw!.genres!.filter(Boolean).map(String).slice(0, 4) : [];
+  const wantsRomance = /رومانسي|رومانسية|حب|romantic|romance/.test(p);
+  const genres = wantsRomance && !rawGenres.some((g) => normalizeGenre(g) === 10749)
+    ? [...rawGenres, "romance"]
+    : rawGenres;
+
+  let runtimeMax = Number.isInteger(raw?.runtimeMax) ? raw!.runtimeMax! : null;
+  if (/قصير(?:ة|ين)?|مختصر|short|brief/.test(p)) runtimeMax = runtimeMax ?? 100;
+  if (/قصير(?:ة|ين)?\s*جداً|very short/.test(p)) runtimeMax = Math.min(runtimeMax ?? 90, 90);
+  if (/اقل من ساعتين|أقل من ساعتين|under 2 hours|less than 2 hours/.test(p)) runtimeMax = Math.min(runtimeMax ?? 119, 119);
+  const hourMatch = p.match(/(?:اقل|أقل)\s*من\s*(\d+(?:\.\d+)?)\s*ساع(?:ة|ات)/);
+  if (hourMatch) runtimeMax = Math.min(runtimeMax ?? Number(hourMatch[1]) * 60 - 1, Number(hourMatch[1]) * 60 - 1);
+  const minuteMatch = p.match(/(?:اقل|أقل)\s*من\s*(\d+)\s*(?:دقيقة|دقائق|minutes?)/i);
+  if (minuteMatch) runtimeMax = Math.min(runtimeMax ?? Number(minuteMatch[1]) - 1, Number(minuteMatch[1]) - 1);
+
   return {
-    kinds, country, language,
-    genres: Array.isArray(raw?.genres) ? raw!.genres!.filter(Boolean).slice(0, 4) : [],
+    kinds, country, language, genres,
     min_year: Number.isInteger(raw?.min_year) ? raw!.min_year! : null,
     max_year: Number.isInteger(raw?.max_year) ? raw!.max_year! : null,
     mood: raw?.mood ?? null,
+    runtimeMax,
   };
 }
 
 async function resolveAIItems(key: string, items: AIItem[], intent: Intent, lang: "ar" | "en") {
   const results = await Promise.all(items.slice(0, 12).map(async (item) => {
     const kind = item.kind === "tv" ? "tv" : "movie";
+    if (!intent.kinds.includes(kind)) return null;
     const hit = await tmdbSearchBest(key, kind, item.title!, item.year, intent);
-    if (!hit) return null;
+    if (!hit || !matchesHardConstraints(hit, kind, intent)) return null;
     return toRec(hit, kind, item.reason || (lang === "en" ? "Matches your request." : "يناسب طلبك."));
   }));
   return mergeUnique([], results.filter(Boolean) as Rec[]);
@@ -163,7 +180,6 @@ async function tmdbSearchBest(key: string, kind: "movie" | "tv", title: string, 
   try {
     const url = new URL(`https://api.themoviedb.org/3/search/${kind}`);
     url.searchParams.set("api_key", key);
-    // AI returns English TMDB titles, so searching in English is more reliable than using the UI locale.
     url.searchParams.set("language", "en-US");
     url.searchParams.set("query", title);
     url.searchParams.set("include_adult", "false");
@@ -173,8 +189,27 @@ async function tmdbSearchBest(key: string, kind: "movie" | "tv", title: string, 
     const j = await r.json();
     const list: any[] = (j.results || []).filter((x: any) => x.poster_path);
     if (!list.length) return null;
+
     list.sort((a, b) => scoreTmdb(b, intent, year) - scoreTmdb(a, intent, year));
-    return list[0];
+    const candidates = list.slice(0, 6);
+    if (!intent.runtimeMax && !intent.genres.length) return candidates[0] ?? null;
+
+    for (const candidate of candidates) {
+      const detail = await fetchTmdbDetail(key, kind, candidate.id, "en-US");
+      if (detail && matchesHardConstraints(detail, kind, intent)) return detail;
+    }
+    return null;
+  } catch { return null; }
+}
+
+async function fetchTmdbDetail(key: string, kind: "movie" | "tv", id: number, language: string) {
+  try {
+    const url = new URL(`https://api.themoviedb.org/3/${kind}/${id}`);
+    url.searchParams.set("api_key", key);
+    url.searchParams.set("language", language);
+    const r = await fetch(url.toString(), { headers: { accept: "application/json" } });
+    if (!r.ok) return null;
+    return await r.json();
   } catch { return null; }
 }
 
@@ -185,6 +220,26 @@ function scoreTmdb(it: any, intent: Intent, year?: string) {
   const date = it.release_date || it.first_air_date || "";
   if (year && date.startsWith(year)) score += 50;
   return score;
+}
+
+function matchesHardConstraints(it: any, kind: "movie" | "tv", intent: Intent) {
+  const requiredGenres = intent.genres.map(normalizeGenre).filter((x): x is number => Number.isInteger(x));
+  if (requiredGenres.length) {
+    const actualGenres = Array.isArray(it.genre_ids) ? it.genre_ids : Array.isArray(it.genres) ? it.genres.map((g: any) => g.id) : [];
+    if (!requiredGenres.every((id) => actualGenres.includes(id))) return false;
+  }
+  if (intent.runtimeMax != null) {
+    const runtime = kind === "tv"
+      ? Number(Array.isArray(it.episode_run_time) ? it.episode_run_time[0] : 0)
+      : Number(it.runtime || 0);
+    if (!Number.isFinite(runtime) || runtime <= 0 || runtime > intent.runtimeMax) return false;
+  }
+  if (intent.country && Array.isArray(it.origin_country) && it.origin_country.length && !it.origin_country.includes(intent.country)) return false;
+  if (intent.language && it.original_language && it.original_language !== intent.language) return false;
+  const date = it.release_date || it.first_air_date || "";
+  if (intent.min_year && date && Number(date.slice(0, 4)) < intent.min_year) return false;
+  if (intent.max_year && date && Number(date.slice(0, 4)) > intent.max_year) return false;
+  return true;
 }
 
 async function discoverFallback(key: string, intent: Intent, lang: "ar" | "en"): Promise<Rec[]> {
@@ -203,11 +258,20 @@ async function discoverFallback(key: string, intent: Intent, lang: "ar" | "en"):
       if (intent.country) url.searchParams.set("with_origin_country", intent.country);
       if (intent.min_year) url.searchParams.set(kind === "movie" ? "primary_release_date.gte" : "first_air_date.gte", `${intent.min_year}-01-01`);
       if (intent.max_year) url.searchParams.set(kind === "movie" ? "primary_release_date.lte" : "first_air_date.lte", `${intent.max_year}-12-31`);
+      if (kind === "movie" && intent.runtimeMax != null) url.searchParams.set("with_runtime.lte", String(intent.runtimeMax));
       const r = await fetch(url.toString(), { headers: { accept: "application/json" } });
       if (!r.ok) continue;
       const j = await r.json();
-      for (const hit of (j.results || []).slice(0, 8)) {
-        if (hit.poster_path) out.push(toRec(hit, kind, lang === "en" ? "Selected from TMDB using your filters." : "اختيار مطابق للفلاتر المطلوبة."));
+      for (const hit of (j.results || []).slice(0, 12)) {
+        if (!hit.poster_path) continue;
+        if (intent.runtimeMax != null || genres.length || intent.country || intent.language || intent.min_year || intent.max_year) {
+          const detail = await fetchTmdbDetail(key, kind, hit.id, lang === "ar" ? "ar-SA" : "en-US");
+          if (!detail || !matchesHardConstraints(detail, kind, intent)) continue;
+          out.push(toRec(detail, kind, lang === "en" ? "Selected from TMDB using your filters." : "اختيار مطابق للفلاتر المطلوبة."));
+        } else {
+          out.push(toRec(hit, kind, lang === "en" ? "Selected from TMDB." : "اختيار من قاعدة بيانات فلمك."));
+        }
+        if (out.length >= 12) break;
       }
     } catch (e) { console.warn("TMDB discover fallback failed", e); }
   }
@@ -217,8 +281,13 @@ async function discoverFallback(key: string, intent: Intent, lang: "ar" | "en"):
 function normalizeGenre(g: string): number | null {
   const key = g.toLowerCase().replace(/[-_]/g, "").replace(/\s+/g, "");
   if (GENRE_IDS[key]) return GENRE_IDS[key];
-  const aliases: Record<string, string> = { رعب: "horror", كوميديا: "comedy", مضحك: "comedy", اكشن: "action", أكشن: "action", رومانسية: "romance", رومانسي: "romance", دراما: "drama", اثارة: "thriller", إثارة: "thriller", جريمة: "crime", غموض: "mystery", خيال: "fantasy", خيالعلمي: "sciencefiction" };
-  return GENRE_IDS[aliases[g] || ""] ?? null;
+  const normalizedArabic = key.replace(/[أإآ]/g, "ا");
+  const aliases: Record<string, string> = {
+    رعب: "horror", كوميديا: "comedy", مضحك: "comedy", اكشن: "action", رومانسية: "romance", رومانسي: "romance",
+    حب: "romance", دراما: "drama", اثارة: "thriller", إثارة: "thriller", جريمة: "crime", غموض: "mystery",
+    خيال: "fantasy", خيالعلمي: "sciencefiction",
+  };
+  return GENRE_IDS[aliases[g] || aliases[normalizedArabic] || ""] ?? null;
 }
 
 function toRec(hit: any, kind: "movie" | "tv", reason: string): Rec {
