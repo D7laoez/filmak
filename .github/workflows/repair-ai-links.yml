@@ -1,0 +1,47 @@
+name: One-time AI link repair
+
+on:
+  push:
+    paths:
+      - "automation/ai-links-repair.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repair AI recommendation links
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("src/routes/index.tsx")
+          text = path.read_text(encoding="utf-8")
+          old = '''                        <Link\n                          key={r.id}\n                          to="/movie/$id"\n                          params={{ id: String(r.id) }}'''
+          new = '''                        <Link\n                          key={`${r.mediaType}:${r.id}`}\n                          to={r.mediaType === "tv" ? "/tv/$id" : "/movie/$id"}\n                          params={{ id: String(r.id) }}'''
+
+          if text.count(old) != 1:
+              raise SystemExit(f"Expected exactly one recommendation link block, found {text.count(old)}")
+
+          path.write_text(text.replace(old, new), encoding="utf-8")
+
+      - name: Verify
+        shell: bash
+        run: |
+          grep -n 'r.mediaType === "tv"' src/routes/index.tsx
+          git diff --check
+
+      - name: Commit repair and remove one-time workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/repair-ai-links.yml automation/ai-links-repair.trigger
+          git add src/routes/index.tsx .github/workflows/repair-ai-links.yml automation/ai-links-repair.trigger
+          git commit -m "fix(ai): link TV recommendations to TV pages"
+          git push
