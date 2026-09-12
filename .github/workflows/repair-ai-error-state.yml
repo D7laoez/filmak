@@ -1,0 +1,47 @@
+name: One-time AI error-state repair
+
+on:
+  push:
+    paths:
+      - "automation/ai-error-state.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add AI error state
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("src/routes/index.tsx")
+          text = path.read_text(encoding="utf-8")
+          old = '''          {recMutation.isPending && (\n            <div className="py-12 text-center text-muted-foreground">\n              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary" />\n              <p className="text-sm font-medium">{t("searching_ai")}</p>\n            </div>\n          )}\n\n          {recMutation.data && ('''
+          new = '''          {recMutation.isPending && (\n            <div className="py-12 text-center text-muted-foreground">\n              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary" />\n              <p className="text-sm font-medium">{t("searching_ai")}</p>\n            </div>\n          )}\n\n          {recMutation.isError && (\n            <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">\n              <p className="text-sm font-semibold text-destructive">\n                {ar\n                  ? "تعذر تنفيذ الترشيحات حالياً. جرّب مرة ثانية بعد قليل."\n                  : "Recommendations are temporarily unavailable. Please try again."}\n              </p>\n              <button\n                type="button"\n                onClick={() => recMutation.mutate(prompt)}\n                disabled={!prompt.trim()}\n                className="rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-secondary disabled:opacity-50"\n              >\n                {ar ? "إعادة المحاولة" : "Retry"}\n              </button>\n            </div>\n          )}\n\n          {recMutation.data && ('''
+
+          if text.count(old) != 1:
+              raise SystemExit(f"Expected exactly one AI pending/data block, found {text.count(old)}")
+
+          path.write_text(text.replace(old, new), encoding="utf-8")
+
+      - name: Verify
+        shell: bash
+        run: |
+          grep -n 'recMutation.isError' src/routes/index.tsx
+          git diff --check
+
+      - name: Commit repair and remove one-time files
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/repair-ai-error-state.yml automation/ai-error-state.trigger
+          git add src/routes/index.tsx .github/workflows/repair-ai-error-state.yml automation/ai-error-state.trigger
+          git commit -m "fix(ai): show retry state when recommendations fail"
+          git push
