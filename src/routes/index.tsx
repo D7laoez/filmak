@@ -488,6 +488,24 @@ function Home() {
             </div>
           )}
 
+          {recMutation.isError && (
+            <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+              <p className="text-sm font-semibold text-destructive">
+                {ar
+                  ? "تعذر تنفيذ الترشيحات حالياً. جرّب مرة ثانية بعد قليل."
+                  : "Recommendations are temporarily unavailable. Please try again."}
+              </p>
+              <button
+                type="button"
+                onClick={() => recMutation.mutate(prompt)}
+                disabled={!prompt.trim()}
+                className="rounded-xl border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+              >
+                {ar ? "إعادة المحاولة" : "Retry"}
+              </button>
+            </div>
+          )}
+
           {recMutation.data && (
             (() => {
               const recList = Array.isArray(recMutation.data)
