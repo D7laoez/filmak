@@ -13,8 +13,12 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /movie/null
+Disallow: /tv/null
+Disallow: /movie/undefined
+Disallow: /tv/undefined
 
-# Google Search crawler: public content is crawlable; private/function endpoints are excluded.
+# Google Search crawler: public content is crawlable; private/function endpoints and invalid media URLs are excluded.
 User-agent: Googlebot
 Allow: /
 Disallow: /_serverFn/
@@ -27,6 +31,10 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /movie/null
+Disallow: /tv/null
+Disallow: /movie/undefined
+Disallow: /tv/undefined
 
 # AdSense crawler: public monetizable content must remain crawlable.
 User-agent: Mediapartners-Google
@@ -41,6 +49,10 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /movie/null
+Disallow: /tv/null
+Disallow: /movie/undefined
+Disallow: /tv/undefined
 
 # Google Ads verification crawler: public content is crawlable.
 User-agent: Google-Display-Ads-Bot
@@ -55,6 +67,10 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /movie/null
+Disallow: /tv/null
+Disallow: /movie/undefined
+Disallow: /tv/undefined
 
 # High-volume non-search crawlers: do not crawl Filmak.
 User-agent: GPTBot
