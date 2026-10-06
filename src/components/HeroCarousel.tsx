@@ -80,6 +80,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
             <Link
               to="/movie/$id"
               params={{ id: String(m.id) }}
+                      reloadDocument
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition shadow-lg shadow-primary/30"
             >
               <Play className="w-4 h-4 fill-current" />
@@ -88,6 +89,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
             <Link
               to="/movie/$id"
               params={{ id: String(m.id) }}
+                      reloadDocument
               className="inline-flex items-center gap-2 bg-secondary/70 backdrop-blur border border-border rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-secondary transition"
             >
               <Info className="w-4 h-4" />
