@@ -107,7 +107,8 @@ function MovieNightPage() {
           ) : movies.data?.results.length ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {movies.data.results.map((m) => (
-                <Link key={m.id} to="/movie/$id" params={{ id: String(m.id) }} className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-primary/50 transition">
+                <Link key={m.id} to="/movie/$id" params={{ id: String(m.id) }}
+                      reloadDocument className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-primary/50 transition">
                   <img src={m.poster ?? "/icon-192.png"} alt={m.title} className="w-full aspect-[2/3] object-cover group-hover:scale-[1.02] transition" loading="lazy" />
                   <div className="p-3">
                     <h3 className="font-semibold line-clamp-1">{m.title}</h3>
