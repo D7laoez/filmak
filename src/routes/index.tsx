@@ -61,7 +61,6 @@ import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HeroCarousel } from "@/components/HeroCarousel";
-import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -645,9 +644,6 @@ function Home() {
         <>
           <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={trending.data ?? []} />
           <Row title={t("now_playing")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={nowPlaying.data ?? []} />
-          <div className="max-w-7xl mx-auto px-4 my-4">
-            <AdSlot slot="1234567890" editorialEligible className="min-h-[100px]" />
-          </div>
           <Row title={t("upcoming")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={upcoming.data ?? []} />
           <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={topRated.data ?? []} />
           <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={popular.data ?? []} />
@@ -656,9 +652,6 @@ function Home() {
         <>
           <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={(trendingTv.data ?? []).map(tvToCard)} type="tv" />
           <Row title={t("airing_today")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={(airingTodayTv.data ?? []).map(tvToCard)} type="tv" />
-          <div className="max-w-7xl mx-auto px-4 my-4">
-            <AdSlot slot="1234567890" className="min-h-[100px]" />
-          </div>
           <Row title={t("on_the_air")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={(onAirTv.data ?? []).map(tvToCard)} type="tv" />
           <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={(topRatedTv.data ?? []).map(tvToCard)} type="tv" />
           <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={(popularTv.data ?? []).map(tvToCard)} type="tv" />
