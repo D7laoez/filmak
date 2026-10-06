@@ -974,7 +974,7 @@ function Content() {
                   <div key={m.id} className="flex flex-col justify-between">
                     <Link
                       to="/movie/$id"
-                      params={{ id: String(m.id) }}
+                      params={{ id: String(m.id) }} reloadDocument
                       className="group block flex-1"
                     >
                       <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
