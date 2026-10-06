@@ -43,10 +43,9 @@ export function AdSlot({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const path = window.location.pathname;
-    // Articles are always eligible. A movie page may opt in only when it has
-    // a published first-party editorial review loaded by the route.
-    setEligible(path === "/articles" || path.startsWith("/articles/") || editorialEligible);
+    // Ad eligibility is an explicit route decision. Catalogue, search, person,
+    // TV and discovery pages never load AdSense unless a route opts in.
+    setEligible(editorialEligible);
   }, []);
 
   // Ignore the old placeholder slot so it can never accidentally be served.
