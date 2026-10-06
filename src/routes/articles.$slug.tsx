@@ -19,7 +19,7 @@ import {
 import {
   getEditorialArticleBySlug,
   getEditorialArticles,
-  hasSubstantialArticle,
+  hasEditorialDepth,
   type Article,
 } from "@/lib/editorial.functions";
 import { getMovieDetails } from "@/lib/movies.functions";
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/articles/$slug")({
     const description = article.excerpt_ar;
     const url = `https://filmak.site/articles/${params.slug}`;
     const image = article.featured_image || "https://filmak.site/icon-512.png";
-    const monetizable = hasSubstantialArticle(article);
+    const monetizable = hasEditorialDepth(article);
 
     const jsonLd = {
       "@context": "https://schema.org",
