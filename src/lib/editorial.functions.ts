@@ -30,6 +30,26 @@ export type EditorialReview = {
   updated_at: string;
 };
 
+export function hasSubstantialEditorial(review: EditorialReview | null | undefined): boolean {
+  if (!review || review.status !== "published") return false;
+
+  const reviewLength = review.review_content.trim().length;
+  const verdictLength = review.verdict.trim().length;
+  const strengths = review.strengths.filter((item) => item.trim().length > 20).length;
+  const weaknesses = review.weaknesses.filter((item) => item.trim().length > 20).length;
+
+  // Monetization/indexing gate: require a genuinely developed editorial layer,
+  // not just the presence of a short record or a TMDB synopsis.
+  return (
+    reviewLength >= 700 &&
+    verdictLength >= 120 &&
+    strengths >= 3 &&
+    weaknesses >= 1 &&
+    review.who_should_watch.trim().length >= 80 &&
+    review.why_watch.trim().length >= 100
+  );
+}
+
 export type Article = {
   id: string;
   slug: string;
