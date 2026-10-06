@@ -94,6 +94,34 @@ export type Article = {
   published_at: string;
   updated_at: string;
 };
+export const EDITORIAL_PRINCIPLES = {
+  ar: [
+    "المحتوى التحريري في Filmak يجب أن يضيف تحليلاً أو تجربة أو مقارنة أصلية، وليس إعادة صياغة لبيانات TMDB أو مصادر أخرى.",
+    "بيانات الأفلام الخارجية تُستخدم كمرجع كتالوجي، بينما الرأي والتوصية والاختيار يجب أن يكونا من Filmak.",
+    "لا ننشئ مقالات جماعية آلياً لمجرد زيادة عدد الصفحات المفهرسة.",
+  ],
+  en: [
+    "Filmak editorial content must add original analysis, experience, comparison, or curation rather than rewriting catalogue metadata.",
+    "Third-party movie metadata is treated as catalogue reference; recommendations and editorial judgments belong to Filmak.",
+    "Do not mass-produce articles merely to increase indexed page count.",
+  ],
+} as const;
+
+export function getEditorialContentWordCount(article: Article | null | undefined): number {
+  if (!article) return 0;
+  return article.content_ar.trim().split(/\s+/).filter(Boolean).length;
+}
+
+export function hasEditorialDepth(article: Article | null | undefined): boolean {
+  if (!hasSubstantialArticle(article)) return false;
+
+  const content = article.content_ar.trim();
+  const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim().length >= 80);
+  const wordCount = getEditorialContentWordCount(article);
+
+  return wordCount >= 700 && paragraphs.length >= 5;
+}
+
 
 export type EditorialCollection = {
   id: string;
