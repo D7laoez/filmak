@@ -101,6 +101,7 @@ function MovieRail({
             key={movie.id}
             to="/movie/$id"
             params={{ id: String(movie.id) }}
+                      reloadDocument
             className="group min-w-0 block"
           >
             <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-muted border border-border/60 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
