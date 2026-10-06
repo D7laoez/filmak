@@ -75,7 +75,7 @@ function EditorialPolicyPage() {
         {
           icon: Brain,
           title: "شفافية الذكاء الاصطناعي",
-          desc: "نستخدم الذكاء الاصطناعي كأداة بحث ذكية لمساعدة المستخدمين في العثور على الأفلام باللغة الطبيعية، بينما تُكتب المقالات النقدية والتقييمات التحريرية بأيدي فريق تحرير سينمائي.",
+          desc: "قد نستخدم الذكاء الاصطناعي للمساعدة في البحث والتنظيم والمسودات واكتشاف الأفلام. تتم مراجعة المحتوى التحريري قبل النشر، ولا نعتبر الذكاء الاصطناعي بديلاً عن الحكم التحريري.",
         },
         {
           icon: Users,
@@ -97,7 +97,7 @@ function EditorialPolicyPage() {
         {
           icon: Brain,
           title: "AI Transparency",
-          desc: "AI is utilized solely for natural-language discovery queries, while critical articles and editorial verdict scores are created by film curators.",
+          desc: "AI may assist with research, organization, drafting, and discovery workflows. Editorial material is reviewed before publication, and AI is not used as a substitute for editorial judgment.",
         },
         {
           icon: Users,
