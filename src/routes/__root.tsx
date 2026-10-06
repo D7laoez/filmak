@@ -167,7 +167,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       url: "https://filmak.site/",
       logo: "https://filmak.site/icon-512.png",
       description:
-        "منصة سينمائية عربية رائدة لترشيح واكتشاف وتحليل الأفلام والمسلسلات بالذكاء الاصطناعي وبقلم نقاد سينمائيين متخصصين.",
+        "منصة سينمائية عربية لاكتشاف وتحليل الأفلام والمسلسلات، تجمع بين أدوات الذكاء الاصطناعي وطبقة تحريرية أصلية ومختارات مشاهدة منظمة.",
     };
 
     return {
@@ -317,7 +317,7 @@ function RootContentWithLocale() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {ar
                   ? "منصة اكتشاف وتحليل سينمائي متكاملة، تجمع بين الترشيحات الذكية باللغة الطبيعية والمقالات النقدية وأدلة المشاهدة الأصلية المنتقاة بعناية."
-                  : "An intelligent movie discovery and editorial platform combining natural-language AI recommendations with curated critical guides."}
+                  : "An intelligent movie discovery and editorial platform combining natural-language AI recommendations with original editorial analysis and curated viewing guides."}
               </p>
               <div className="pt-1 flex items-center gap-2 text-xs text-muted-foreground">
                 <ShieldCheck className="w-4 h-4 text-primary" />
