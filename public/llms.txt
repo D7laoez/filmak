@@ -23,3 +23,6 @@ Filmak helps viewers discover films and series by title, mood, genre, cast, lang
 - [Robots](/robots.txt): Crawler rules.
 
 Private account pages such as authentication, favorites, stats and taste profiles should not be indexed.
+
+## Editorial quality
+Filmak separates first-party editorial work from third-party catalogue metadata. Editorial pages are eligible for indexing and monetization only when they meet the site's substantive-content quality gates.
