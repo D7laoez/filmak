@@ -476,6 +476,7 @@ function GenrePage() {
                   key={`${m.id}-${m.year}`}
                   to={isTv ? "/tv/$id" : "/movie/$id"}
                   params={{ id: String(m.id) }}
+                      reloadDocument
                   className="group block"
                 >
                   <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
