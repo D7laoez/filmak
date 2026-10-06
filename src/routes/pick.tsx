@@ -71,7 +71,8 @@ function PickPage() {
                   <div className="mt-2 flex gap-4 text-sm text-muted-foreground"><span className="flex items-center gap-1"><Star className="w-4 h-4 fill-current text-yellow-400" /> {picked.rating.toFixed(1)}</span><span>{picked.year || "—"}</span></div>
                   <p className="mt-4 text-sm text-muted-foreground line-clamp-4">{picked.overview || (locale === "ar" ? "فيلم يستحق التجربة الليلة." : "A movie worth trying tonight.")}</p>
                   <div className="mt-5 flex flex-wrap gap-2">
-                    <Link to="/movie/$id" params={{ id: String(picked.id) }} className="inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90">{locale === "ar" ? "شوف التفاصيل" : "View details"}</Link>
+                    <Link to="/movie/$id" params={{ id: String(picked.id) }}
+                      reloadDocument className="inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90">{locale === "ar" ? "شوف التفاصيل" : "View details"}</Link>
                     <button onClick={pickAgain} disabled={pick.isFetching} className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary disabled:opacity-50"><RotateCw className={`w-4 h-4 ${pick.isFetching ? "animate-spin" : ""}`} /> {locale === "ar" ? "اختيار ثاني" : "Pick again"}</button>
                   </div>
                 </div>
