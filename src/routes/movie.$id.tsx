@@ -70,7 +70,8 @@ export const Route = createFileRoute("/movie/$id")({
     const editorial = loaderData?.editorial;
     const backdrop = movie?.backdrop ?? movie?.poster ?? `${origin}/icon-512.png`;
     const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
-    const monetizableEditorial = hasSubstantialEditorial(editorial);\n    const scoreText = monetizableEditorial ? ` | تقييم فلمك: ${editorial!.editorial_score}/10` : "";
+    const monetizableEditorial = hasSubstantialEditorial(editorial);
+    const scoreText = monetizableEditorial ? ` | تقييم فلمك: ${editorial!.editorial_score}/10` : "";
     const title = movie ? `${movie.title} (${movie.year || ""}) — فلمك · مراجعة وتفاصيل الفيلم${scoreText}` : "فلمك";
     const desc = editorial
       ? `${editorial.verdict} — ${movie?.overview?.slice(0, 140) ?? ""}`
