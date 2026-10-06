@@ -57,7 +57,8 @@ function TonightPage() {
                 </div>
                 <p className="mt-6 leading-8 text-muted-foreground">{locale === "ar" ? "اخترناه من الأعمال الرائجة حاليًا حتى تحصل على اقتراح سريع بدون دوخة البحث." : "Picked from current trending titles so you can start watching without endless scrolling."}</p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <Link to="/movie/$id" params={{ id: String(selected.id) }} className="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">{locale === "ar" ? "شوف التفاصيل" : "View details"}</Link>
+                  <Link to="/movie/$id" params={{ id: String(selected.id) }}
+                      reloadDocument className="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">{locale === "ar" ? "شوف التفاصيل" : "View details"}</Link>
                   <button onClick={() => refetch()} className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-semibold"><Dices className="w-4 h-4" />{locale === "ar" ? "اختيار ثاني" : "Pick another"}</button>
                 </div>
               </div>
