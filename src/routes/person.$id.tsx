@@ -7,7 +7,6 @@ import { useT, useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
-import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/person/$id")({
   component: PersonPage,
@@ -227,7 +226,6 @@ function PersonInner() {
         )}
 
         <div className="my-8">
-          <AdSlot slot="1234567890" className="min-h-[100px]" />
         </div>
 
         {/* TV */}
