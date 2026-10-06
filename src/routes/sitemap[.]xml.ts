@@ -7,11 +7,8 @@ const BASE = "https://filmak.site";
 // curatorial, or product value instead of bulk-indexing TMDB catalogue pages.
 const INDEXABLE_ROUTES = [
   "/",
-  "/discover",
   "/articles",
   "/collections",
-  "/movie-night",
-  "/pick",
   "/about",
   "/editorial-policy",
   "/contact",
