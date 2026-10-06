@@ -391,6 +391,7 @@ function GenrePage() {
                       key={pick.id}
                       to="/movie/$id"
                       params={{ id: String(pick.id) }}
+                      reloadDocument
                       className="group rounded-xl border border-border bg-card p-3 space-y-1 hover:border-primary/40 transition block"
                     >
                       <div className="font-bold text-sm text-foreground group-hover:text-primary transition flex items-center justify-between">
