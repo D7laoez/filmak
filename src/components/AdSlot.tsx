@@ -18,6 +18,8 @@ type AdSlotProps = {
   responsive?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  /** Allow a substantially enriched first-party movie page to use an ad. */
+  editorialEligible?: boolean;
 };
 
 /**
@@ -32,6 +34,7 @@ export function AdSlot({
   responsive = true,
   className,
   style,
+  editorialEligible = false,
 }: AdSlotProps) {
   const ref = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
@@ -41,8 +44,9 @@ export function AdSlot({
     if (typeof window === "undefined") return;
 
     const path = window.location.pathname;
-    // Only monetize original, manually curated editorial articles for now.
-    setEligible(path === "/articles" || path.startsWith("/articles/"));
+    // Articles are always eligible. A movie page may opt in only when it has
+    // a published first-party editorial review loaded by the route.
+    setEligible(path === "/articles" || path.startsWith("/articles/") || editorialEligible);
   }, []);
 
   // Ignore the old placeholder slot so it can never accidentally be served.
