@@ -665,7 +665,11 @@ function Content() {
 
         {/* AdSense Slot (placed below the main high-value editorial verdict) */}
         <div className="my-6">
-          <AdSlot slot="1234567890" className="min-h-[100px]" />
+          <AdSlot
+            slot="1234567890"
+            editorialEligible={Boolean(editorial)}
+            className="min-h-[100px]"
+          />
         </div>
 
         {/* Watch providers */}
