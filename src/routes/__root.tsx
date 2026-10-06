@@ -210,6 +210,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "google-site-verification",
           content: "Ba8-EE-ouLI8m2vv00Ci4LWeeHuGdKKhDu4iW-sSwHg",
         },
+        // Keeps AdSense site association/verification without loading the ad runtime globally.
+        { name: "google-adsense-account", content: "ca-pub-2237012686036777" },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
