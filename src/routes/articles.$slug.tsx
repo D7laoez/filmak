@@ -16,7 +16,12 @@ import {
   UserCheck,
   Award,
 } from "lucide-react";
-import { getEditorialArticleBySlug, getEditorialArticles, type Article } from "@/lib/editorial.functions";
+import {
+  getEditorialArticleBySlug,
+  getEditorialArticles,
+  hasSubstantialArticle,
+  type Article,
+} from "@/lib/editorial.functions";
 import { getMovieDetails } from "@/lib/movies.functions";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
@@ -57,6 +62,7 @@ export const Route = createFileRoute("/articles/$slug")({
     const description = article.excerpt_ar;
     const url = `https://filmak.site/articles/${params.slug}`;
     const image = article.featured_image || "https://filmak.site/icon-512.png";
+    const monetizable = hasSubstantialArticle(article);
 
     const jsonLd = {
       "@context": "https://schema.org",
@@ -115,6 +121,7 @@ export const Route = createFileRoute("/articles/$slug")({
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: monetizable ? "index, follow" : "noindex, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
@@ -355,7 +362,9 @@ function ArticleReaderPage() {
 
         {/* AdSense slot placed below high-value editorial content */}
         <div className="pt-4">
-          <AdSlot slot="1234567890" className="min-h-[100px]" />
+          {monetizable ? (
+            <AdSlot slot="1234567890" editorialEligible className="min-h-[100px]" />
+          ) : null}
         </div>
 
         {/* Author Bio Box */}
