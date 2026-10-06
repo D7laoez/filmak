@@ -30,7 +30,7 @@ import {
   Share2,
 } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
-import { getEditorialReview, type EditorialReview } from "@/lib/editorial.functions";
+import { getEditorialReview, hasSubstantialEditorial, type EditorialReview } from "@/lib/editorial.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { useLocale } from "@/lib/i18n";
@@ -70,7 +70,7 @@ export const Route = createFileRoute("/movie/$id")({
     const editorial = loaderData?.editorial;
     const backdrop = movie?.backdrop ?? movie?.poster ?? `${origin}/icon-512.png`;
     const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
-    const scoreText = editorial ? ` | تقييم فلمك: ${editorial.editorial_score}/10` : "";
+    const monetizableEditorial = hasSubstantialEditorial(editorial);\n    const scoreText = monetizableEditorial ? ` | تقييم فلمك: ${editorial!.editorial_score}/10` : "";
     const title = movie ? `${movie.title} (${movie.year || ""}) — فلمك · مراجعة وتفاصيل الفيلم${scoreText}` : "فلمك";
     const desc = editorial
       ? `${editorial.verdict} — ${movie?.overview?.slice(0, 140) ?? ""}`
@@ -149,7 +149,7 @@ export const Route = createFileRoute("/movie/$id")({
         { title },
         { name: "description", content: desc },
         // TMDB-only movie pages are not index-worthy; only pages with original FILMAK editorial are indexable.
-        { name: "robots", content: editorial ? "index, follow" : "noindex, follow" },
+        { name: "robots", content: monetizableEditorial ? "index, follow" : "noindex, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.movie" },
@@ -667,7 +667,7 @@ function Content() {
         <div className="my-6">
           <AdSlot
             slot="1234567890"
-            editorialEligible={Boolean(editorial)}
+            editorialEligible={hasSubstantialEditorial(editorial)}
             className="min-h-[100px]"
           />
         </div>
