@@ -50,6 +50,25 @@ export function hasSubstantialEditorial(review: EditorialReview | null | undefin
   );
 }
 
+export function hasSubstantialArticle(article: Article | null | undefined): boolean {
+  if (!article) return false;
+
+  const title = article.title_ar.trim();
+  const excerpt = article.excerpt_ar.trim();
+  const content = article.content_ar.trim();
+  const author = article.author_name.trim();
+  const role = article.author_role.trim();
+
+  return (
+    title.length >= 12 &&
+    excerpt.length >= 120 &&
+    content.length >= 1400 &&
+    author.length >= 3 &&
+    role.length >= 8 &&
+    article.reading_time_minutes >= 4
+  );
+}
+
 export type Article = {
   id: string;
   slug: string;
