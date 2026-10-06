@@ -11,7 +11,7 @@ export const Route = createFileRoute("/tonight")({
   head: () => ({
     meta: [
       { title: "فلمك الليلة — اختيار فيلم لك | Filmak Tonight" },
-      { name: "description", content: "اختيار سريع من فلمك لفيلم يستحق المشاهدة الليلة." },
+      { name: "description", content: "اختيار سريع من فلمك لفيلم يستحق المشاهدة الليلة." },\n      { name: "robots", content: "noindex, follow" },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/tonight" }],
   }),
