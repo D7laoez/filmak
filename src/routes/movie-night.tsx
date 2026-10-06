@@ -9,7 +9,7 @@ export const Route = createFileRoute("/movie-night")({
   head: () => ({
     meta: [
       { title: "ليلة الفيلم — فلمك" },
-      { name: "description", content: "اختيارات أفلام حقيقية تناسب مزاجك وتقييمك ومدة وقتك." },
+      { name: "description", content: "اختيارات أفلام حقيقية تناسب مزاجك وتقييمك ومدة وقتك." },\n      { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "ليلة الفيلم — Filmak" },
       { property: "og:description", content: "اختيارات فيلم مناسبة لمزاجك ووقتك." },
       { property: "og:type", content: "website" },
