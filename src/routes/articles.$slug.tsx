@@ -327,6 +327,7 @@ function ArticleReaderPage() {
                   key={m.id}
                   to="/movie/$id"
                   params={{ id: String(m.id) }}
+                      reloadDocument
                   className="group flex gap-3 bg-secondary/40 border border-border rounded-xl p-3 hover:border-primary/50 transition"
                 >
                   {m.poster ? (
