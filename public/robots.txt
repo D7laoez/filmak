@@ -1,5 +1,7 @@
 # Filmak robots policy
 # Public movie/TV pages are crawlable; private account and admin areas are not.
+# Thin catalogue pages are additionally controlled with route-level noindex metadata.
+# Monetizable editorial pages remain crawlable for Google Search and AdSense.
 
 User-agent: *
 Allow: /
