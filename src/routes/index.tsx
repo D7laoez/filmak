@@ -76,7 +76,8 @@ export const Route = createFileRoute("/")({
     return {
       meta: [
         { title },
-        { name: "description", content: description },\n        ...(search.q?.trim() ? [{ name: "robots", content: "noindex, follow" }] : []),
+        { name: "description", content: description },
+        ...(search.q?.trim() ? [{ name: "robots", content: "noindex, follow" }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
