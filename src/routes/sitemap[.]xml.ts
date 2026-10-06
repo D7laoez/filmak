@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getEditorialArticles } from "@/lib/editorial.functions";
+import { getEditorialArticles, hasSubstantialArticle } from "@/lib/editorial.functions";
 
 const BASE = "https://filmak.site";
 
@@ -46,7 +46,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const articles = await getEditorialArticles({ data: { limit: 100 } }).catch(() => []);
         const articleUrls = articles
-          .filter((article) => article?.slug)
+          .filter((article) => article?.slug && hasSubstantialArticle(article))
           .map((article) => `/articles/${article.slug}`);
         const collectionUrls = COLLECTION_SLUGS.map((slug) => `/collections/${slug}`);
 
