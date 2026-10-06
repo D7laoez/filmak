@@ -477,6 +477,35 @@ function Content() {
           </div>
         </div>
 
+        {/* 30-second viewing decision: a compact editorial tool built from reviewed FILMAK fields */}
+        {editorial && hasSubstantialEditorial(editorial) ? (
+          <section
+            aria-label={ar ? "قرار المشاهدة خلال 30 ثانية" : "30-second viewing decision"}
+            className="rounded-3xl border border-border bg-card/80 backdrop-blur p-5 md:p-7 shadow-lg"
+          >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+              <div>
+                <div className="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                  {ar ? "قرار سريع قبل المشاهدة" : "Quick viewing decision"}
+                </div>
+                <h2 className="text-xl md:text-2xl font-black">
+                  {ar ? "هل يستحق وقتك؟" : "Is it worth your time?"}
+                </h2>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
+                <CheckCircle2 className="w-4 h-4" />
+                {ar ? "حكم فلمك" : "FILMAK Verdict"}: {editorial.editorial_score}/10
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <DecisionCard icon={<ThumbsUp className="w-4 h-4" />} label={ar ? "أنصح به إذا" : "Watch if"} value={editorial.who_should_watch} />
+              <DecisionCard icon={<ThumbsDown className="w-4 h-4" />} label={ar ? "قد لا يناسبك إذا" : "Skip if"} value={editorial.who_may_not_enjoy} />
+              <DecisionCard icon={<Lightbulb className="w-4 h-4" />} label={ar ? "أفضل سبب للمشاهدة" : "Best reason"} value={editorial.why_watch} />
+              <DecisionCard icon={<Clock className="w-4 h-4" />} label={ar ? "أفضل جلسة مشاهدة" : "Best setup"} value={editorial.recommended_viewing} />
+            </div>
+          </section>
+        )}
+
         {/* ========================================================================= */}
         {/* PROMINENT ORIGINAL FILMAK EDITORIAL SECTION: FILMAK VERDICT & SCORES */}
         {/* ========================================================================= */}
@@ -1051,6 +1080,26 @@ function Content() {
           onIndex={setLightboxIndex}
         />
       )}
+    </div>
+  );
+}
+
+function DecisionCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/70 bg-secondary/20 p-4 space-y-2">
+      <div className="flex items-center gap-2 text-xs font-bold text-primary">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <p className="text-xs md:text-sm leading-relaxed text-muted-foreground">{value}</p>
     </div>
   );
 }
