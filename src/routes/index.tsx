@@ -313,6 +313,7 @@ function Home() {
                   <Link
                     to="/movie/$id"
                     params={{ id: String(pickOfTheWeek.data.movieId) }}
+                    reloadDocument
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/20"
                   >
                     <Film className="w-4 h-4" />
