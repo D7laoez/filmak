@@ -535,6 +535,7 @@ function Home() {
                           key={`${r.mediaType}:${r.id}`}
                           to={r.mediaType === "tv" ? "/tv/$id" : "/movie/$id"}
                           params={{ id: String(r.id) }}
+                      reloadDocument
                           className="group block"
                         >
                           <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
