@@ -7,7 +7,7 @@ declare global {
 }
 
 const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-const ADSENSE_CLIENT = env.VITE_ADSENSE_CLIENT_ID || "";
+const ADSENSE_CLIENT = env.VITE_ADSENSE_CLIENT_ID || "ca-pub-2237012686036777";
 const EDITORIAL_AD_SLOT = env.VITE_ADSENSE_ARTICLE_SLOT_ID || "";
 const PLACEHOLDER_SLOT = "1234567890";
 
@@ -50,12 +50,33 @@ export function AdSlot({
 
   useEffect(() => {
     if (!eligible || !ADSENSE_CLIENT || !resolvedSlot || pushed.current) return;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushed.current = true;
-    } catch (e) {
-      console.debug("AdSense push failed", e);
+
+    const pushAd = () => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        pushed.current = true;
+      } catch (e) {
+        console.debug("AdSense push failed", e);
+      }
+    };
+
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[data-filmak-adsense="true"]',
+    );
+
+    if (existing) {
+      if (window.adsbygoogle) pushAd();
+      else existing.addEventListener("load", pushAd, { once: true });
+      return;
     }
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+    script.dataset.filmakAdsense = "true";
+    script.addEventListener("load", pushAd, { once: true });
+    document.head.appendChild(script);
   }, [eligible, resolvedSlot]);
 
   if (!eligible || !ADSENSE_CLIENT || !resolvedSlot) return null;
