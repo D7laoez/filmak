@@ -76,7 +76,7 @@ export function TopBar() {
   };
   const openMovie = (id: number) => {
     setSearchFocused(false);
-    navigate({ to: "/movie/$id", params: { id: String(id) } });
+    window.location.assign("/movie/" + id);
   };
   const openTv = (id: number) => {
     setSearchFocused(false);
