@@ -145,9 +145,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const origin = loaderData?.origin ?? "";
     const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
-    const adsenseClient =
-      (import.meta as unknown as { env: Record<string, string | undefined> }).env
-        .VITE_ADSENSE_CLIENT_ID || "ca-pub-2237012686036777";
+
 
     const websiteLd = {
       "@context": "https://schema.org",
@@ -212,7 +210,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "google-site-verification",
           content: "Ba8-EE-ouLI8m2vv00Ci4LWeeHuGdKKhDu4iW-sSwHg",
         },
-        ...(adsenseClient ? [{ name: "google-adsense-account", content: adsenseClient }] : []),
       ],
       links: [
         { rel: "stylesheet", href: appCss },
@@ -231,15 +228,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           children:
             "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0JV72533H2');",
         },
-        ...(adsenseClient
-          ? [
-              {
-                async: true,
-                src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`,
-                crossOrigin: "anonymous" as const,
-              },
-            ]
-          : []),
       ],
     };
   },
