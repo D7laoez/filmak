@@ -137,6 +137,7 @@ function CollectionDetailPage() {
               key={m.id}
               to="/movie/$id"
               params={{ id: String(m.id) }}
+                      reloadDocument
               className="group block space-y-2"
             >
               <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted border border-border/50 shadow-sm group-hover:-translate-y-1 group-hover:shadow-xl transition duration-300">
