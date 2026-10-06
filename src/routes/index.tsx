@@ -67,7 +67,7 @@ export const Route = createFileRoute("/")({
   component: Home,
   validateSearch: (r: Record<string, unknown>) =>
     z.object({ q: z.string().optional() }).parse(r),
-  head: () => {
+  head: ({ search }) => {
     const title = "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية";
     const description =
       "منصة اكتشاف وتحليل سينمائي: ترشيحات بالذكاء الاصطناعي، مراجعات نقدية أصلية، وأدلة مشاهدة لأفضل الأفلام والمسلسلات.";
@@ -76,7 +76,7 @@ export const Route = createFileRoute("/")({
     return {
       meta: [
         { title },
-        { name: "description", content: description },
+        { name: "description", content: description },\n        ...(search.q?.trim() ? [{ name: "robots", content: "noindex, follow" }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
