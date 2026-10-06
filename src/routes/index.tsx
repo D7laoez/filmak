@@ -631,7 +631,7 @@ function Home() {
             <Link
               key={g.id}
               to="/genre/$id"
-              params={{ id: String(g.id) }}
+              params={{ id: String(g.id) }} reloadDocument
               search={{ type: tab, sort: "popularity.desc", page: 1, minRating: 0, year: null, ol: null, ids: "" }}
               className="snap-start shrink-0 text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
@@ -646,7 +646,7 @@ function Home() {
           <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={trending.data ?? []} />
           <Row title={t("now_playing")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={nowPlaying.data ?? []} />
           <div className="max-w-7xl mx-auto px-4 my-4">
-            <AdSlot slot="1234567890" className="min-h-[100px]" />
+            <AdSlot slot="1234567890" editorialEligible className="min-h-[100px]" />
           </div>
           <Row title={t("upcoming")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={upcoming.data ?? []} />
           <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={topRated.data ?? []} />
