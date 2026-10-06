@@ -10,6 +10,7 @@ export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
       { title: "اكتشف — فلمك · استكشاف الأفلام والمسلسلات" },
+      { name: "robots", content: "noindex, follow" },
       {
         name: "description",
         content:
