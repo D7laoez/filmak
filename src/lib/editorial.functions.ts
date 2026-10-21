@@ -53,16 +53,21 @@ export function hasSubstantialEditorial(review: EditorialReview | null | undefin
 export function hasSubstantialArticle(article: Article | null | undefined): boolean {
   if (!article) return false;
 
-  const title = article.title_ar.trim();
-  const excerpt = article.excerpt_ar.trim();
-  const content = article.content_ar.trim();
+  // Support either fully developed language version; do not make an otherwise
+  // substantial English article fail solely because its Arabic version is shorter.
+  const arabicComplete =
+    article.title_ar.trim().length >= 12 &&
+    article.excerpt_ar.trim().length >= 120 &&
+    article.content_ar.trim().length >= 1400;
+  const englishComplete =
+    article.title_en.trim().length >= 12 &&
+    article.excerpt_en.trim().length >= 120 &&
+    article.content_en.trim().length >= 1400;
   const author = article.author_name.trim();
   const role = article.author_role.trim();
 
   return (
-    title.length >= 12 &&
-    excerpt.length >= 120 &&
-    content.length >= 1400 &&
+    (arabicComplete || englishComplete) &&
     author.length >= 3 &&
     role.length >= 8 &&
     article.reading_time_minutes >= 4
@@ -109,15 +114,23 @@ export const EDITORIAL_PRINCIPLES = {
 
 export function getEditorialContentWordCount(article: Article | null | undefined): number {
   if (!article) return 0;
-  return article.content_ar.trim().split(/\s+/).filter(Boolean).length;
+  const arCount = article.content_ar.trim().split(/\s+/).filter(Boolean).length;
+  const enCount = article.content_en.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(arCount, enCount);
 }
 
 export function hasEditorialDepth(article: Article | null | undefined): boolean {
   if (!hasSubstantialArticle(article)) return false;
 
-  const content = article.content_ar.trim();
+  // Evaluate the richer available language body. Thin pages remain noindex and
+  // ineligible for ads; language choice alone must not suppress strong content.
+  const bodies = [article.content_ar.trim(), article.content_en.trim()];
+  const content = bodies.sort(
+    (a, b) =>
+      b.split(/\s+/).filter(Boolean).length - a.split(/\s+/).filter(Boolean).length,
+  )[0];
   const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim().length >= 80);
-  const wordCount = getEditorialContentWordCount(article);
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
 
   return wordCount >= 700 && paragraphs.length >= 5;
 }
