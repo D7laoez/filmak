@@ -20,6 +20,7 @@ import {
   getEditorialArticleBySlug,
   getEditorialArticles,
   hasEditorialDepth,
+  hasEditorialDepthForLocale,
   type Article,
 } from "@/lib/editorial.functions";
 import { getMovieDetails } from "@/lib/movies.functions";
@@ -181,6 +182,7 @@ function ArticleReaderPage() {
   const subtitle = ar ? article.subtitle_ar : article.subtitle_en;
   const content = ar ? article.content_ar : article.content_en;
   const excerpt = ar ? article.excerpt_ar : article.excerpt_en;
+  const monetizable = hasEditorialDepthForLocale(article, locale);
 
   return (
     <main dir={dir} className="min-h-screen bg-background text-foreground pb-24">
