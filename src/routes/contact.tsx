@@ -34,8 +34,19 @@ function ContactPage() {
       toast.error(ar ? "يرجى ملء جميع الحقول المطلوبة." : "Please fill in all required fields.");
       return;
     }
+    const subjectLabels: Record<string, string> = {
+      general: ar ? "استفسار عام" : "General Inquiry",
+      editorial: ar ? "اقتراح أو تصحيح تحريري" : "Editorial Suggestion / Correction",
+      technical: ar ? "مشكلة تقنية في الموقع" : "Technical Issue",
+      dmca: ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice",
+    };
+    const mailSubject = encodeURIComponent(`[Filmak] ${subjectLabels[subject] || subject}`);
+    const mailBody = encodeURIComponent(
+      `${ar ? "الاسم" : "Name"}: ${name}\n${ar ? "البريد" : "Email"}: ${email}\n\n${message}`,
+    );
+    // This form opens the visitor's email app; it does not submit to a server.
+    window.location.href = `mailto:contact@filmak.site?subject=${mailSubject}&body=${mailBody}`;
     setSubmitted(true);
-    toast.success(ar ? "تم إرسال رسالتك بنجاح! سنرد عليك قريباً." : "Your message was sent successfully!");
   };
 
   return (
@@ -105,7 +116,9 @@ function ContactPage() {
                 <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
                 <h3 className="text-xl font-bold">{ar ? "شكراً لتواصلك معنا!" : "Thank You for Reaching Out!"}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {ar ? "تم استلام رسالتك وسيقوم فريقنا بمراجعتها والرد في أقرب وقت." : "We have received your message and will respond shortly."}
+                  {ar
+                    ? "فتحنا تطبيق البريد لإرسال رسالتك. اضغط «إرسال» داخل تطبيق البريد لإتمام الإرسال."
+                    : "Your email app should open with this message prepared. Press Send in your email app to complete delivery."}
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
