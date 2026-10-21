@@ -135,6 +135,17 @@ export function hasEditorialDepth(article: Article | null | undefined): boolean 
   return wordCount >= 700 && paragraphs.length >= 5;
 }
 
+export function hasEditorialDepthForLocale(
+  article: Article | null | undefined,
+  locale: string,
+): boolean {
+  if (!hasSubstantialArticle(article)) return false;
+  const content = (locale === "ar" ? article.content_ar : article.content_en).trim();
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim().length >= 80);
+  return wordCount >= 700 && paragraphs.length >= 5;
+}
+
 
 export type EditorialCollection = {
   id: string;
