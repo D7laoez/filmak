@@ -56,7 +56,12 @@ export const Route = createFileRoute("/articles/$slug")({
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
     if (!article) {
-      return { meta: [{ title: "المقال غير موجود — فلمك" }] };
+      return {
+        meta: [
+          { title: "المقال غير موجود — فلمك" },
+          { name: "robots", content: "noindex, nofollow" },
+        ],
+      };
     }
     const title = `${article.title_ar} — مجلة فلمك | Filmak`;
     const description = article.excerpt_ar;
