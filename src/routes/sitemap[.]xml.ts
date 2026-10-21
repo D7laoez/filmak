@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getEditorialArticles, hasEditorialDepth } from "@/lib/editorial.functions";
+import { getEditorialArticles, getCollectionMovies, hasEditorialDepth } from "@/lib/editorial.functions";
 
 const BASE = "https://filmak.site";
 
@@ -48,7 +48,23 @@ export const Route = createFileRoute("/sitemap.xml")({
         const articleUrls = articles
           .filter((article) => article?.slug && hasEditorialDepth(article))
           .map((article) => `/articles/${article.slug}`);
-        const collectionUrls = COLLECTION_SLUGS.map((slug) => `/collections/${slug}`);
+        // Keep the sitemap aligned with collection pages' indexability rule:
+        // include only collections that currently render enough real items.
+        const collectionResults = await Promise.all(
+          COLLECTION_SLUGS.map(async (slug) => {
+            try {
+              const result = await getCollectionMovies({ data: { slug } });
+              return result.collection && (result.items?.length ?? 0) >= 5
+                ? `/collections/${slug}`
+                : null;
+            } catch {
+              return null;
+            }
+          }),
+        );
+        const collectionUrls = collectionResults.filter(
+          (url): url is string => url !== null,
+        );
 
         const uniqueUrls = [
           ...new Set([...INDEXABLE_ROUTES, ...articleUrls, ...collectionUrls]),
