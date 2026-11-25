@@ -291,30 +291,31 @@ function Home() {
       {/* ========================================================================= */}
       {pickOfTheWeek.data && (
         <section className="max-w-7xl mx-auto px-4 pt-10">
-          <div className="relative overflow-hidden rounded-3xl border border-primary/40 bg-card shadow-2xl p-6 md:p-8">
-            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl border border-primary/35 bg-gradient-to-br from-card via-card to-primary/5 shadow-xl p-6 md:p-8">
+            <div className="absolute top-0 right-0 -mt-12 -mr-12 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
             <div className="grid md:grid-cols-12 gap-6 items-center">
               <div className="md:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/15 px-3.5 py-1 text-xs text-primary font-bold">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/15 px-3.5 py-1 text-xs text-primary font-bold">
                   <Award className="w-4 h-4" />
                   {ar ? pickOfTheWeek.data.badge_ar : pickOfTheWeek.data.badge_en}
                 </div>
-                <h2 className="text-2xl md:text-4xl font-black">{pickOfTheWeek.data.title}</h2>
-                <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/30 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
+                <h2 className="text-2xl md:text-4xl font-black tracking-tight">
+                  {pickOfTheWeek.data.title}
+                </h2>
+                <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/40 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
                   "{ar ? pickOfTheWeek.data.why_picked_ar : pickOfTheWeek.data.why_picked_en}"
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <Link
                     to="/movie/$id"
                     params={{ id: String(pickOfTheWeek.data.movieId) }}
-                    reloadDocument
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/20"
+                    className="inline-flex items-center gap-2 min-h-[44px] rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/25"
                   >
                     <Film className="w-4 h-4" />
                     {ar ? "قراءة حكم فلمك الكامل" : "Read Full Verdict"}
                   </Link>
-                  <span className="text-xs text-muted-foreground">
-                    ✍️ {ar ? "اختيار فريق التحرير" : "Curated by Editorial Board"}
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {ar ? "اختيار هيئة تحرير فلمك" : "Curated by Filmak Editorial Board"}
                   </span>
                 </div>
               </div>
@@ -417,12 +418,40 @@ function Home() {
       {/* 3. AI NATURAL LANGUAGE RECOMMENDATIONS */}
       {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 pt-12">
-        <div className="bg-card border border-border/80 rounded-3xl p-6 md:p-8 space-y-4">
-          <div className="flex items-center gap-2 text-primary font-semibold text-sm">
-            <Sparkles className="w-5 h-5" />
-            <span>{t("ask_ai")}</span>
+        <div className="relative overflow-hidden bg-gradient-to-br from-card via-card to-primary/5 border border-primary/25 rounded-3xl p-6 md:p-8 space-y-5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-primary font-bold text-xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t("ask_ai")}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Link
+                to="/discover"
+                className="rounded-full border border-border bg-secondary/60 px-3 py-1 hover:border-primary/50 hover:text-primary transition"
+              >
+                {ar ? "تصفح الأفلام" : "Discover"}
+              </Link>
+              <Link
+                to="/movie-night"
+                className="rounded-full border border-border bg-secondary/60 px-3 py-1 hover:border-primary/50 hover:text-primary transition"
+              >
+                {ar ? "ليلة الفيلم" : "Movie Night"}
+              </Link>
+              <Link
+                to="/pick"
+                className="rounded-full border border-border bg-secondary/60 px-3 py-1 hover:border-primary/50 hover:text-primary transition"
+              >
+                {ar ? "اختارلي فيلم" : "Random Pick"}
+              </Link>
+              <Link
+                to="/tonight"
+                className="rounded-full border border-border bg-secondary/60 px-3 py-1 hover:border-primary/50 hover:text-primary transition"
+              >
+                {ar ? "فلمك الليلة" : "Tonight"}
+              </Link>
+            </div>
           </div>
-          <h1 className="text-2xl md:text-3xl font-black">{t("describe_mood")}</h1>
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight">{t("describe_mood")}</h1>
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
