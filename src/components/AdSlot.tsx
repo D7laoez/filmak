@@ -46,7 +46,7 @@ export function AdSlot({
     // Ad eligibility is an explicit route decision. Catalogue, search, person,
     // TV and discovery pages never load AdSense unless a route opts in.
     setEligible(editorialEligible);
-  }, []);
+  }, [editorialEligible]);
 
   // Ignore the old placeholder slot so it can never accidentally be served.
   const resolvedSlot = slot && slot !== PLACEHOLDER_SLOT ? slot : EDITORIAL_AD_SLOT;

@@ -83,9 +83,7 @@ export const recordSiteVisit = createServerFn({ method: "POST" })
     const country = request.headers.get("cf-ipcountry") ?? null;
     const city = request.headers.get("cf-ipcity") ?? null;
     const path =
-      typeof data?.path === "string" && data.path.startsWith("/")
-        ? data.path.slice(0, 500)
-        : "/";
+      typeof data?.path === "string" && data.path.startsWith("/") ? data.path.slice(0, 500) : "/";
     const sessionId =
       typeof data?.sessionId === "string" && data.sessionId.length >= 8
         ? data.sessionId.slice(0, 128)

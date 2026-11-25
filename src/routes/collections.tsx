@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Sparkles, Flame, Star, Clock3, Heart, ArrowLeft, ArrowRight, LibraryBig, Film, Compass } from "lucide-react";
+import {
+  Sparkles,
+  Flame,
+  Star,
+  Clock3,
+  Heart,
+  ArrowLeft,
+  ArrowRight,
+  LibraryBig,
+  Film,
+  Compass,
+} from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { getPopular, getTopRated, getTrending, type MovieCard } from "@/lib/movies.functions";
 
@@ -11,7 +22,8 @@ export const Route = createFileRoute("/collections")({
       { title: "مجموعات ومختارات فلمك التحريرية — Filmak Collections" },
       {
         name: "description",
-        content: "مجموعات وقوائم أفلام منتقاة بعناية: اختيارات السهرة، أعمال الخيال العلمي، روائع السينما الكورية، وأفضل الأعمال تقييماً.",
+        content:
+          "مجموعات وقوائم أفلام منتقاة بعناية: اختيارات السهرة، أعمال الخيال العلمي، روائع السينما الكورية، وأفضل الأعمال تقييماً.",
       },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/collections" }],
@@ -92,7 +104,11 @@ function MovieRail({
           className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
         >
           {dir === "rtl" ? "اكتشف الكل" : "Explore all"}
-          {dir === "rtl" ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+          {dir === "rtl" ? (
+            <ArrowLeft className="w-3.5 h-3.5" />
+          ) : (
+            <ArrowRight className="w-3.5 h-3.5" />
+          )}
         </Link>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
@@ -101,7 +117,7 @@ function MovieRail({
             key={movie.id}
             to="/movie/$id"
             params={{ id: String(movie.id) }}
-                      reloadDocument
+            reloadDocument
             className="group min-w-0 block"
           >
             <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-muted border border-border/60 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
@@ -164,7 +180,9 @@ function CollectionsPage() {
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
             {ar ? "مو عارف شتشوف الليلة؟" : "Not Sure What to Watch?"}
             <br />
-            <span className="text-primary">{ar ? "ابدأ من هذه المجموعات." : "Start with Our Curated Collections."}</span>
+            <span className="text-primary">
+              {ar ? "ابدأ من هذه المجموعات." : "Start with Our Curated Collections."}
+            </span>
           </h1>
           <p className="max-w-2xl text-muted-foreground text-base md:text-lg leading-relaxed">
             {ar

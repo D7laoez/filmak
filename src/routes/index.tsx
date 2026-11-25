@@ -64,9 +64,10 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  validateSearch: (r: Record<string, unknown>) =>
-    z.object({ q: z.string().optional() }).parse(r),
-  head: ({ search }) => {
+  validateSearch: (r: Record<string, unknown>) => z.object({ q: z.string().optional() }).parse(r),
+  head: ({ matches }) => {
+    const lastMatch = matches?.[matches.length - 1];
+    const searchQ = (lastMatch?.search as { q?: string } | undefined)?.q;
     const title = "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية";
     const description =
       "منصة اكتشاف وتحليل سينمائي: ترشيحات بالذكاء الاصطناعي، مراجعات نقدية أصلية، وأدلة مشاهدة لأفضل الأفلام والمسلسلات.";
@@ -76,7 +77,7 @@ export const Route = createFileRoute("/")({
       meta: [
         { title },
         { name: "description", content: description },
-        ...(search.q?.trim() ? [{ name: "robots", content: "noindex, follow" }] : []),
+        ...(searchQ?.trim() ? [{ name: "robots", content: "noindex, follow" }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
@@ -283,12 +284,7 @@ function Home() {
       )}
 
       {/* Hero Carousel */}
-      <HeroCarousel
-        movies={trending.data ?? []}
-        searchValue={searchQ}
-        onSearchChange={setSearchQ}
-        onOpenMobileSearch={() => setMobileSearchOpen(true)}
-      />
+      <HeroCarousel movies={trending.data ?? []} />
 
       {/* ========================================================================= */}
       {/* 1. FILMAK PICK OF THE WEEK (FEATURED EDITORIAL SPOTLIGHT) */}
@@ -303,9 +299,7 @@ function Home() {
                   <Award className="w-4 h-4" />
                   {ar ? pickOfTheWeek.data.badge_ar : pickOfTheWeek.data.badge_en}
                 </div>
-                <h2 className="text-2xl md:text-4xl font-black">
-                  {pickOfTheWeek.data.title}
-                </h2>
+                <h2 className="text-2xl md:text-4xl font-black">{pickOfTheWeek.data.title}</h2>
                 <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/30 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
                   "{ar ? pickOfTheWeek.data.why_picked_ar : pickOfTheWeek.data.why_picked_en}"
                 </blockquote>
@@ -428,9 +422,7 @@ function Home() {
             <Sparkles className="w-5 h-5" />
             <span>{t("ask_ai")}</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black">
-            {t("describe_mood")}
-          </h2>
+          <h2 className="text-2xl md:text-3xl font-black">{t("describe_mood")}</h2>
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
@@ -490,7 +482,10 @@ function Home() {
           )}
 
           {recMutation.isError && (
-            <div role="alert" className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+            <div
+              role="alert"
+              className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-3"
+            >
               <p className="text-sm font-semibold text-destructive">
                 {ar
                   ? "تعذر تنفيذ الترشيحات حالياً. جرّب مرة ثانية بعد قليل."
@@ -507,7 +502,7 @@ function Home() {
             </div>
           )}
 
-          {recMutation.data && (
+          {recMutation.data &&
             (() => {
               const recList = Array.isArray(recMutation.data)
                 ? recMutation.data
@@ -517,7 +512,9 @@ function Home() {
               return (
                 <div className="pt-4 space-y-4">
                   <div className="space-y-1">
-                    <h3 className="font-bold text-lg">{t("recommendations_for")}: "{prompt}"</h3>
+                    <h3 className="font-bold text-lg">
+                      {t("recommendations_for")}: "{prompt}"
+                    </h3>
                     {recIntro && (
                       <p className="text-sm text-muted-foreground leading-relaxed bg-secondary/40 p-3.5 rounded-xl border border-border/60">
                         {recIntro}
@@ -526,16 +523,17 @@ function Home() {
                   </div>
                   {recList.length === 0 ? (
                     <p className="text-xs text-muted-foreground py-4 text-center">
-                      {ar ? "لم نتمكن من إيجاد أفلام تطابق هذا الوصف بدقة، جرّب صياغة أخرى." : "No matching movies found, please try another prompt."}
+                      {ar
+                        ? "لم نتمكن من إيجاد أفلام تطابق هذا الوصف بدقة، جرّب صياغة أخرى."
+                        : "No matching movies found, please try another prompt."}
                     </p>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                      {recList.map((r: any) => (
+                      {recList.map((r) => (
                         <Link
                           key={`${r.mediaType}:${r.id}`}
                           to={r.mediaType === "tv" ? "/tv/$id" : "/movie/$id"}
                           params={{ id: String(r.id) }}
-                      reloadDocument
                           className="group block"
                         >
                           <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
@@ -556,7 +554,9 @@ function Home() {
                               {r.rating}
                             </div>
                           </div>
-                          <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{r.title}</p>
+                          <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
+                            {r.title}
+                          </p>
                           <p className="text-xs text-muted-foreground">{r.year}</p>
                         </Link>
                       ))}
@@ -564,8 +564,7 @@ function Home() {
                   )}
                 </div>
               );
-            })()
-          )}
+            })()}
         </div>
       </section>
 
@@ -574,11 +573,7 @@ function Home() {
         <Row
           title={`${t("search_results")}: "${activeSearch}"`}
           icon={<Search className="w-5 h-5" />}
-          movies={
-            tab === "tv"
-              ? (searchTvRes.data ?? []).map(tvToCard)
-              : (searchRes.data ?? [])
-          }
+          movies={tab === "tv" ? (searchTvRes.data ?? []).map(tvToCard) : (searchRes.data ?? [])}
           loading={tab === "tv" ? searchTvRes.isLoading : searchRes.isLoading}
           type={tab}
           emptyLabel={
@@ -630,8 +625,17 @@ function Home() {
             <Link
               key={g.id}
               to="/genre/$id"
-              params={{ id: String(g.id) }} reloadDocument
-              search={{ type: tab, sort: "popularity.desc", page: 1, minRating: 0, year: null, ol: null, ids: "" }}
+              params={{ id: String(g.id) }}
+              reloadDocument
+              search={{
+                type: tab,
+                sort: "popularity.desc",
+                page: 1,
+                minRating: 0,
+                year: null,
+                ol: null,
+                ids: "",
+              }}
               className="snap-start shrink-0 text-xs px-3 py-1.5 rounded-full border bg-secondary/60 border-border hover:bg-secondary hover:border-primary/50 transition"
             >
               {g.name}
@@ -642,19 +646,64 @@ function Home() {
 
       {tab === "movie" ? (
         <>
-          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={trending.data ?? []} />
-          <Row title={t("now_playing")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={nowPlaying.data ?? []} />
-          <Row title={t("upcoming")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={upcoming.data ?? []} />
-          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={topRated.data ?? []} />
-          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={popular.data ?? []} />
+          <Row
+            title={t("trending")}
+            icon={<Flame className="w-5 h-5 text-accent" />}
+            movies={trending.data ?? []}
+          />
+          <Row
+            title={t("now_playing")}
+            icon={<Clapperboard className="w-5 h-5 text-accent" />}
+            movies={nowPlaying.data ?? []}
+          />
+          <Row
+            title={t("upcoming")}
+            icon={<CalendarClock className="w-5 h-5 text-primary" />}
+            movies={upcoming.data ?? []}
+          />
+          <Row
+            title={t("top_rated")}
+            icon={<Award className="w-5 h-5 text-primary" />}
+            movies={topRated.data ?? []}
+          />
+          <Row
+            title={t("popular")}
+            icon={<TrendingUp className="w-5 h-5" />}
+            movies={popular.data ?? []}
+          />
         </>
       ) : (
         <>
-          <Row title={t("trending")} icon={<Flame className="w-5 h-5 text-accent" />} movies={(trendingTv.data ?? []).map(tvToCard)} type="tv" />
-          <Row title={t("airing_today")} icon={<Clapperboard className="w-5 h-5 text-accent" />} movies={(airingTodayTv.data ?? []).map(tvToCard)} type="tv" />
-          <Row title={t("on_the_air")} icon={<CalendarClock className="w-5 h-5 text-primary" />} movies={(onAirTv.data ?? []).map(tvToCard)} type="tv" />
-          <Row title={t("top_rated")} icon={<Award className="w-5 h-5 text-primary" />} movies={(topRatedTv.data ?? []).map(tvToCard)} type="tv" />
-          <Row title={t("popular")} icon={<TrendingUp className="w-5 h-5" />} movies={(popularTv.data ?? []).map(tvToCard)} type="tv" />
+          <Row
+            title={t("trending")}
+            icon={<Flame className="w-5 h-5 text-accent" />}
+            movies={(trendingTv.data ?? []).map(tvToCard)}
+            type="tv"
+          />
+          <Row
+            title={t("airing_today")}
+            icon={<Clapperboard className="w-5 h-5 text-accent" />}
+            movies={(airingTodayTv.data ?? []).map(tvToCard)}
+            type="tv"
+          />
+          <Row
+            title={t("on_the_air")}
+            icon={<CalendarClock className="w-5 h-5 text-primary" />}
+            movies={(onAirTv.data ?? []).map(tvToCard)}
+            type="tv"
+          />
+          <Row
+            title={t("top_rated")}
+            icon={<Award className="w-5 h-5 text-primary" />}
+            movies={(topRatedTv.data ?? []).map(tvToCard)}
+            type="tv"
+          />
+          <Row
+            title={t("popular")}
+            icon={<TrendingUp className="w-5 h-5" />}
+            movies={(popularTv.data ?? []).map(tvToCard)}
+            type="tv"
+          />
         </>
       )}
     </div>
@@ -730,7 +779,9 @@ function Row({
                 </div>
                 <FavoriteButton movie={m} variant="icon" />
               </div>
-              <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{m.title}</p>
+              <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
+                {m.title}
+              </p>
               <p className="text-xs text-muted-foreground">{m.year}</p>
             </Link>
           ))}
@@ -838,9 +889,7 @@ function MobileSearchOverlay({
             <Spinner size={48} label={t("loading")} />
           </div>
         ) : !value ? (
-          <p className="text-xs text-muted-foreground text-center py-8">
-            {t("type_to_search")}
-          </p>
+          <p className="text-xs text-muted-foreground text-center py-8">{t("type_to_search")}</p>
         ) : results.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-sm font-medium">{t("no_results")}</p>
@@ -857,11 +906,7 @@ function MobileSearchOverlay({
               >
                 <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted">
                   {m.poster ? (
-                    <img
-                      src={m.poster}
-                      alt={m.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={m.poster} alt={m.title} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full grid place-items-center">
                       <Film className="w-6 h-6 text-muted-foreground" />
@@ -886,13 +931,11 @@ function MobileSearchOverlay({
 function tvToCard(t: TvCard): MovieCard {
   return {
     id: t.id,
-    title: t.name,
+    title: t.title,
     poster: t.poster,
     backdrop: t.backdrop,
     rating: t.rating,
-    year: t.firstAirDate?.slice(0, 4) || "",
+    year: t.year,
     overview: t.overview,
-    voteCount: t.voteCount,
-    genres: [],
   };
 }

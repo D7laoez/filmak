@@ -30,7 +30,11 @@ import {
   Share2,
 } from "lucide-react";
 import { getMovieDetails } from "@/lib/movies.functions";
-import { getEditorialReview, hasSubstantialEditorial, type EditorialReview } from "@/lib/editorial.functions";
+import {
+  getEditorialReview,
+  hasSubstantialEditorial,
+  type EditorialReview,
+} from "@/lib/editorial.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { useLocale } from "@/lib/i18n";
@@ -72,7 +76,9 @@ export const Route = createFileRoute("/movie/$id")({
     const abs = backdrop?.startsWith("http") ? backdrop : `${origin}${backdrop}`;
     const monetizableEditorial = hasSubstantialEditorial(editorial);
     const scoreText = monetizableEditorial ? ` | تقييم فلمك: ${editorial!.editorial_score}/10` : "";
-    const title = movie ? `${movie.title} (${movie.year || ""}) — فلمك · مراجعة وتفاصيل الفيلم${scoreText}` : "فلمك";
+    const title = movie
+      ? `${movie.title} (${movie.year || ""}) — فلمك · مراجعة وتفاصيل الفيلم${scoreText}`
+      : "فلمك";
     const desc = editorial
       ? `${editorial.verdict} — ${movie?.overview?.slice(0, 140) ?? ""}`
       : (movie?.overview?.slice(0, 200) ?? "");
@@ -165,40 +171,44 @@ export const Route = createFileRoute("/movie/$id")({
       links: [{ rel: "canonical", href: url }],
       scripts: [
         ...(movieLd ? [{ type: "application/ld+json", children: safeJsonLd(movieLd) }] : []),
-        ...(breadcrumbLd ? [{ type: "application/ld+json", children: safeJsonLd(breadcrumbLd) }] : []),
+        ...(breadcrumbLd
+          ? [{ type: "application/ld+json", children: safeJsonLd(breadcrumbLd) }]
+          : []),
       ],
     };
   },
-  errorComponent: ({ error, reset }) => {
-    const router = useRouter();
-    const t = useT();
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6 text-center">
-        <div>
-          <img
-            src="/icon-192.png"
-            srcSet="/icon-192.png 1x, /icon-512.png 2x"
-            decoding="async"
-            alt={t("brand")}
-            className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
-          />
-          <h1 className="text-2xl font-bold mb-2">{t("error_load_movie")}</h1>
-          <p className="text-muted-foreground mb-4 text-sm">{error.message}</p>
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
-          >
-            {t("retry")}
-          </button>
-        </div>
-      </div>
-    );
-  },
+  errorComponent: MovieErrorComponent,
   notFoundComponent: NotFoundInline,
 });
+
+function MovieErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  const t = useT();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 text-center">
+      <div>
+        <img
+          src="/icon-192.png"
+          srcSet="/icon-192.png 1x, /icon-512.png 2x"
+          decoding="async"
+          alt={t("brand")}
+          className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 opacity-90"
+        />
+        <h1 className="text-2xl font-bold mb-2">{t("error_load_movie")}</h1>
+        <p className="text-muted-foreground mb-4 text-sm">{error.message}</p>
+        <button
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
+          className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
+        >
+          {t("retry")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function MoviePage() {
   const t = useT();
@@ -279,8 +289,7 @@ function Content() {
 
   const overview = data.overview ?? "";
   const overviewLong = overview.length > 260;
-  const galleryImages =
-    galleryTab === "backdrops" ? data.images.backdrops : data.images.posters;
+  const galleryImages = galleryTab === "backdrops" ? data.images.backdrops : data.images.posters;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground pb-24">
@@ -384,9 +393,7 @@ function Content() {
               </p>
             )}
 
-            {data.tagline && (
-              <p className="text-muted-foreground italic mb-4">"{data.tagline}"</p>
-            )}
+            {data.tagline && <p className="text-muted-foreground italic mb-4">"{data.tagline}"</p>}
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm mb-4">
               {data.year && (
@@ -489,7 +496,9 @@ function Content() {
                 <Sparkles className="w-4 h-4" />
                 {ar ? "رؤية فلمك النقدية والتحريرية" : "FILMAK Original Editorial Analysis"}
               </div>
-              <h2 className="text-2xl md:text-3xl font-black">{ar ? "حكم فلمك (FILMAK Verdict)" : "The FILMAK Verdict"}</h2>
+              <h2 className="text-2xl md:text-3xl font-black">
+                {ar ? "حكم فلمك (FILMAK Verdict)" : "The FILMAK Verdict"}
+              </h2>
             </div>
 
             {editorial ? (
@@ -504,7 +513,9 @@ function Content() {
                 </div>
                 <div className="h-10 w-px bg-border/60" />
                 <div className="text-xs space-y-0.5">
-                  <div className="font-bold text-foreground">{ar ? "تقييم المحرر" : "Editorial Rating"}</div>
+                  <div className="font-bold text-foreground">
+                    {ar ? "تقييم المحرر" : "Editorial Rating"}
+                  </div>
                   <div className="text-muted-foreground">{editorial.author_name}</div>
                 </div>
               </div>
@@ -520,16 +531,30 @@ function Content() {
 
               {/* Editorial Breakdown Progress Bars */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <ScoreBar label={ar ? "القصة والسيناريو" : "Story & Script"} score={editorial.story_score} />
-                <ScoreBar label={ar ? "الأداء التمثيلي" : "Acting"} score={editorial.acting_score} />
-                <ScoreBar label={ar ? "الإخراج والبصريات" : "Visuals & Craft"} score={editorial.visuals_score} />
-                <ScoreBar label={ar ? "المتعة العامة" : "Entertainment"} score={editorial.entertainment_score} />
+                <ScoreBar
+                  label={ar ? "القصة والسيناريو" : "Story & Script"}
+                  score={editorial.story_score}
+                />
+                <ScoreBar
+                  label={ar ? "الأداء التمثيلي" : "Acting"}
+                  score={editorial.acting_score}
+                />
+                <ScoreBar
+                  label={ar ? "الإخراج والبصريات" : "Visuals & Craft"}
+                  score={editorial.visuals_score}
+                />
+                <ScoreBar
+                  label={ar ? "المتعة العامة" : "Entertainment"}
+                  score={editorial.entertainment_score}
+                />
               </div>
 
               {/* Long-form review body */}
               {editorial.review_content && (
                 <div className="space-y-3 pt-2">
-                  <h3 className="text-lg font-bold text-foreground">{ar ? "التحليل السينمائي والنقدي" : "Critical Analysis"}</h3>
+                  <h3 className="text-lg font-bold text-foreground">
+                    {ar ? "التحليل السينمائي والنقدي" : "Critical Analysis"}
+                  </h3>
                   <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
                     {editorial.review_content}
                   </p>
@@ -596,7 +621,9 @@ function Content() {
                       <span className="font-semibold text-emerald-400 block">
                         {ar ? "من يُنصح بمشاهدته:" : "Best For:"}
                       </span>
-                      <p className="text-muted-foreground leading-relaxed">{editorial.who_should_watch}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {editorial.who_should_watch}
+                      </p>
                     </div>
                   )}
                   {editorial.who_may_not_enjoy && (
@@ -604,7 +631,9 @@ function Content() {
                       <span className="font-semibold text-amber-400 block">
                         {ar ? "من قد لا يناسبه:" : "May Not Enjoy:"}
                       </span>
-                      <p className="text-muted-foreground leading-relaxed">{editorial.who_may_not_enjoy}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {editorial.who_may_not_enjoy}
+                      </p>
                     </div>
                   )}
                   {editorial.mood && (
@@ -620,7 +649,9 @@ function Content() {
                       <span className="font-semibold text-primary block">
                         {ar ? "جلسة المشاهدة المقترحة:" : "Viewing Setup:"}
                       </span>
-                      <p className="text-muted-foreground leading-relaxed">{editorial.recommended_viewing}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {editorial.recommended_viewing}
+                      </p>
                     </div>
                   )}
                   {editorial.experience_level && (
@@ -628,7 +659,9 @@ function Content() {
                       <span className="font-semibold text-primary block">
                         {ar ? "مستوى الخبرة السينمائية:" : "Cinematic Level:"}
                       </span>
-                      <p className="text-muted-foreground leading-relaxed">{editorial.experience_level}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {editorial.experience_level}
+                      </p>
                     </div>
                   )}
                   {editorial.content_notes && (
@@ -636,7 +669,9 @@ function Content() {
                       <span className="font-semibold text-primary block">
                         {ar ? "ملاحظات المحتوى:" : "Content Notes:"}
                       </span>
-                      <p className="text-muted-foreground leading-relaxed">{editorial.content_notes}</p>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {editorial.content_notes}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -689,7 +724,11 @@ function Content() {
               const link = data.watch.link || fallback;
               return (
                 <>
-                  <ProviderGroup label={t("by_subscription")} items={data.watch.flatrate} link={link} />
+                  <ProviderGroup
+                    label={t("by_subscription")}
+                    items={data.watch.flatrate}
+                    link={link}
+                  />
                   <ProviderGroup label={t("rent")} items={data.watch.rent} link={link} />
                   <ProviderGroup label={t("buy")} items={data.watch.buy} link={link} />
                 </>
@@ -808,40 +847,45 @@ function Content() {
               {t("cast")}
             </h2>
             <div className="flex md:grid md:grid-cols-4 lg:grid-cols-8 gap-4 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-2">
-              {data.cast.map((c: { id?: number; name: string; character: string; profile: string | null }) => (
-                <Link
-                  key={`${c.id ?? c.name}-${c.character}`}
-                  to="/person/$id"
-                  params={{ id: String(c.id ?? "") }}
-                  disabled={!c.id}
-                  className="text-center shrink-0 w-24 md:w-auto snap-start group"
-                >
-                  {c.profile ? (
-                    <img
-                      src={c.profile}
-                      alt={c.name}
-                      loading="lazy"
-                      className="w-full aspect-square object-cover rounded-full mb-2 group-hover:ring-2 group-hover:ring-primary/60 transition"
-                    />
-                  ) : (
-                    <div className="w-full aspect-square bg-muted rounded-full mb-2 grid place-items-center">
-                      <Users className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                  )}
-                  <p className="text-sm font-medium truncate group-hover:text-primary transition">{c.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{c.character}</p>
-                </Link>
-              ))}
+              {data.cast.map(
+                (c: { id?: number; name: string; character: string; profile: string | null }) => (
+                  <Link
+                    key={`${c.id ?? c.name}-${c.character}`}
+                    to="/person/$id"
+                    params={{ id: String(c.id ?? "") }}
+                    disabled={!c.id}
+                    className="text-center shrink-0 w-24 md:w-auto snap-start group"
+                  >
+                    {c.profile ? (
+                      <img
+                        src={c.profile}
+                        alt={c.name}
+                        loading="lazy"
+                        className="w-full aspect-square object-cover rounded-full mb-2 group-hover:ring-2 group-hover:ring-primary/60 transition"
+                      />
+                    ) : (
+                      <div className="w-full aspect-square bg-muted rounded-full mb-2 grid place-items-center">
+                        <Users className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    <p className="text-sm font-medium truncate group-hover:text-primary transition">
+                      {c.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">{c.character}</p>
+                  </Link>
+                ),
+              )}
             </div>
           </section>
         )}
 
         {/* Crew */}
-        {(data.crew.director.length +
+        {data.crew.director.length +
           data.crew.writers.length +
           data.crew.composer.length +
           data.crew.cinematographer.length +
-          data.crew.editor.length) > 0 && (
+          data.crew.editor.length >
+          0 && (
           <section className="space-y-4">
             <h2 className="text-xl font-bold">{t("crew")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -865,10 +909,7 @@ function Content() {
               {data.status && <Row label={t("status")} value={data.status} />}
               {data.releaseDate && <Row label={t("year")} value={data.releaseDate} />}
               {data.originalLanguage && (
-                <Row
-                  label={t("original_language")}
-                  value={data.originalLanguage.toUpperCase()}
-                />
+                <Row label={t("original_language")} value={data.originalLanguage.toUpperCase()} />
               )}
               {data.spokenLanguages.length > 0 && (
                 <Row label={t("languages")} value={data.spokenLanguages.join(", ")} />
@@ -877,10 +918,7 @@ function Content() {
                 <Row label={t("countries")} value={data.productionCountries.join(", ")} />
               )}
               {data.popularity > 0 && (
-                <Row
-                  label={t("popularity_label")}
-                  value={numberFmt.format(data.popularity)}
-                />
+                <Row label={t("popularity_label")} value={numberFmt.format(data.popularity)} />
               )}
             </dl>
           </div>
@@ -894,10 +932,7 @@ function Content() {
               <Row label={t("budget")} value={money(data.budget)} />
               <Row label={t("revenue")} value={money(data.revenue)} />
               {data.budget > 0 && data.revenue > 0 && (
-                <Row
-                  label={t("profit")}
-                  value={money(data.revenue - data.budget)}
-                />
+                <Row label={t("profit")} value={money(data.revenue - data.budget)} />
               )}
             </dl>
             {data.budget > 0 && data.revenue > 0 && (
@@ -968,47 +1003,56 @@ function Content() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.similar.map((m: { id: number; title: string; poster: string | null; year: string; rating: number }) => {
-                const reason = editorial?.similar_reasons?.[String(m.id)];
-                return (
-                  <div key={m.id} className="flex flex-col justify-between">
-                    <Link
-                      to="/movie/$id"
-                      params={{ id: String(m.id) }} reloadDocument
-                      className="group block flex-1"
-                    >
-                      <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
-                        {m.poster ? (
-                          <img
-                            src={m.poster}
-                            alt={m.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full grid place-items-center">
-                            <Film className="w-8 h-8 text-muted-foreground" />
+              {data.similar.map(
+                (m: {
+                  id: number;
+                  title: string;
+                  poster: string | null;
+                  year: string;
+                  rating: number;
+                }) => {
+                  const reason = editorial?.similar_reasons?.[String(m.id)];
+                  return (
+                    <div key={m.id} className="flex flex-col justify-between">
+                      <Link
+                        to="/movie/$id"
+                        params={{ id: String(m.id) }}
+                        reloadDocument
+                        className="group block flex-1"
+                      >
+                        <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
+                          {m.poster ? (
+                            <img
+                              src={m.poster}
+                              alt={m.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full grid place-items-center">
+                              <Film className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-primary text-primary" />
+                            {m.rating}
                           </div>
-                        )}
-                        <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-primary text-primary" />
-                          {m.rating}
                         </div>
-                      </div>
-                      <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
-                        {m.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{m.year}</p>
-                    </Link>
+                        <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
+                          {m.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{m.year}</p>
+                      </Link>
 
-                    {reason && (
-                      <div className="mt-2 text-[11px] leading-tight text-primary/90 bg-primary/10 border border-primary/20 rounded-xl p-2 font-medium">
-                        💡 {reason}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {reason && (
+                        <div className="mt-2 text-[11px] leading-tight text-primary/90 bg-primary/10 border border-primary/20 rounded-xl p-2 font-medium">
+                          💡 {reason}
+                        </div>
+                      )}
+                    </div>
+                  );
+                },
+              )}
             </div>
           </section>
         )}

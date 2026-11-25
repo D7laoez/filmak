@@ -1,12 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 const OWNER_ADMIN_EMAIL = "ali.m2002121@gmail.com";
-type AdminContext = { supabase: any; userId: string; claims?: { email?: string } };
+type AdminContext = {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+  claims?: { email?: string };
+};
 
 async function getAuthenticatedEmail(ctx: AdminContext) {
-  const claimEmail = String(ctx.claims?.email ?? "").trim().toLowerCase();
+  const claimEmail = String(ctx.claims?.email ?? "")
+    .trim()
+    .toLowerCase();
   if (claimEmail) return claimEmail;
   const { data, error } = await ctx.supabase.auth.getUser();
   if (error || !data.user?.email) return "";
@@ -90,6 +98,7 @@ export const adminUpsertEditorialReview = createServerFn({ method: "POST" })
       .upsert(
         {
           ...data,
+          review_content: data.review_content ?? "",
           author_id: context.userId,
           updated_at: new Date().toISOString(),
         },

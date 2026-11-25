@@ -38,13 +38,17 @@ function NotFoundComponent() {
       const accessToken = hp.get("access_token");
       const refreshToken = hp.get("refresh_token");
 
-      if (!Boolean(code || accessToken || refreshToken || error)) return;
+      if (!code && !accessToken && !refreshToken && !error) return;
       setIsCompletingAuth(true);
       try {
         if (code) await supabase.auth.exchangeCodeForSession(code);
         if (accessToken && refreshToken)
-          await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
       } catch {
+        // Ignore invalid/expired auth callback params and redirect home
       } finally {
         if (!cancelled) navigate({ to: "/", replace: true });
       }
@@ -76,7 +80,9 @@ function NotFoundComponent() {
         />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">الصفحة غير موجودة</h2>
-        <p className="mt-2 text-sm text-muted-foreground">الرابط الذي طلبته غير متوفر أو تم نقله.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          الرابط الذي طلبته غير متوفر أو تم نقله.
+        </p>
         <div className="mt-6">
           <Link
             to="/"
@@ -146,7 +152,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     const origin = loaderData?.origin ?? "";
     const ogImage = origin ? `${origin}/icon-512.png` : "/icon-512.png";
 
-
     const websiteLd = {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -203,7 +208,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "twitter:title", content: "فلمك — Filmak" },
         {
           name: "twitter:description",
-          content: "AI movie & series recommendations, editorial verdict scores, and viewing guides.",
+          content:
+            "AI movie & series recommendations, editorial verdict scores, and viewing guides.",
         },
         { name: "twitter:image", content: ogImage },
         {
@@ -214,6 +220,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "google-adsense-account", content: "ca-pub-2237012686036777" },
       ],
       links: [
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+        { rel: "preconnect", href: "https://image.tmdb.org" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
+        },
         { rel: "stylesheet", href: appCss },
         { rel: "icon", href: "/icon-32.png", sizes: "32x32", type: "image/png" },
         { rel: "icon", href: "/icon-16.png", sizes: "16x16", type: "image/png" },
@@ -312,7 +325,9 @@ function RootContentWithLocale() {
             <div className="md:col-span-5 space-y-4">
               <div className="flex items-center gap-2">
                 <img src="/icon-192.png" alt="فلمك" className="w-8 h-8 rounded-lg" />
-                <span className="font-black text-xl tracking-tight">فلمك <span className="text-primary">Filmak</span></span>
+                <span className="font-black text-xl tracking-tight">
+                  فلمك <span className="text-primary">Filmak</span>
+                </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {ar
@@ -329,37 +344,121 @@ function RootContentWithLocale() {
             <div className="md:col-span-2 space-y-3">
               <h4 className="font-bold text-sm text-foreground">{ar ? "استكشف" : "Discover"}</h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><Link to="/" className="hover:text-primary transition">{ar ? "الرئيسية" : "Home"}</Link></li>
-                <li><Link to="/discover" className="hover:text-primary transition">{ar ? "تصفح الأفلام" : "Explore Movies"}</Link></li>
-                <li><Link to="/collections" className="hover:text-primary transition">{ar ? "مجموعات ومختارات" : "Collections"}</Link></li>
-                <li><Link to="/movie-night" className="hover:text-primary transition">{ar ? "ليلة الفيلم" : "Movie Night"}</Link></li>
-                <li><Link to="/pick" className="hover:text-primary transition">{ar ? "اختارلي فيلم" : "Random Pick"}</Link></li>
+                <li>
+                  <Link to="/" className="hover:text-primary transition">
+                    {ar ? "الرئيسية" : "Home"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/discover" className="hover:text-primary transition">
+                    {ar ? "تصفح الأفلام" : "Explore Movies"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/collections" className="hover:text-primary transition">
+                    {ar ? "مجموعات ومختارات" : "Collections"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/movie-night" className="hover:text-primary transition">
+                    {ar ? "ليلة الفيلم" : "Movie Night"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/pick" className="hover:text-primary transition">
+                    {ar ? "اختارلي فيلم" : "Random Pick"}
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Nav Column 2: Editorial & Magazine */}
             <div className="md:col-span-2 space-y-3">
-              <h4 className="font-bold text-sm text-foreground">{ar ? "المجلة والأدلة" : "Magazine & Guides"}</h4>
+              <h4 className="font-bold text-sm text-foreground">
+                {ar ? "المجلة والأدلة" : "Magazine & Guides"}
+              </h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><Link to="/articles" className="hover:text-primary transition">{ar ? "كل المقالات والأدلة" : "All Articles"}</Link></li>
-                <li><Link to="/articles/$slug" params={{ slug: "best-sci-fi-movies-21st-century" }} className="hover:text-primary transition">{ar ? "روائع الخيال العلمي" : "Sci-Fi Guide"}</Link></li>
-                <li><Link to="/articles/$slug" params={{ slug: "movies-like-interstellar" }} className="hover:text-primary transition">{ar ? "أفلام مثل Interstellar" : "Like Interstellar"}</Link></li>
-                <li><Link to="/articles/$slug" params={{ slug: "mind-bending-psychological-thrillers" }} className="hover:text-primary transition">{ar ? "إثارة نفسية وألغاز" : "Psychological Thrillers"}</Link></li>
-                <li><Link to="/editorial-policy" className="hover:text-primary transition">{ar ? "معايير التقييم النقدية" : "Rating Criteria"}</Link></li>
+                <li>
+                  <Link to="/articles" className="hover:text-primary transition">
+                    {ar ? "كل المقالات والأدلة" : "All Articles"}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/articles/$slug"
+                    params={{ slug: "best-sci-fi-movies-21st-century" }}
+                    className="hover:text-primary transition"
+                  >
+                    {ar ? "روائع الخيال العلمي" : "Sci-Fi Guide"}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/articles/$slug"
+                    params={{ slug: "movies-like-interstellar" }}
+                    className="hover:text-primary transition"
+                  >
+                    {ar ? "أفلام مثل Interstellar" : "Like Interstellar"}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/articles/$slug"
+                    params={{ slug: "mind-bending-psychological-thrillers" }}
+                    className="hover:text-primary transition"
+                  >
+                    {ar ? "إثارة نفسية وألغاز" : "Psychological Thrillers"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/editorial-policy" className="hover:text-primary transition">
+                    {ar ? "معايير التقييم النقدية" : "Rating Criteria"}
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Nav Column 3: Trust & Legal */}
             <div className="md:col-span-3 space-y-3">
-              <h4 className="font-bold text-sm text-foreground">{ar ? "الشفافية والقانونية" : "Trust & Legal"}</h4>
+              <h4 className="font-bold text-sm text-foreground">
+                {ar ? "الشفافية والقانونية" : "Trust & Legal"}
+              </h4>
               <ul className="space-y-2 text-xs text-muted-foreground">
-                <li><Link to="/about" className="hover:text-primary transition">{ar ? "من نحن" : "About Filmak"}</Link></li>
-                <li><Link to="/editorial-policy" className="hover:text-primary transition">{ar ? "السياسة التحريرية" : "Editorial Policy"}</Link></li>
-                <li><Link to="/contact" className="hover:text-primary transition">{ar ? "تواصل معنا" : "Contact Us"}</Link></li>
-                <li><Link to="/privacy" className="hover:text-primary transition">{ar ? "سياسة الخصوصية" : "Privacy Policy"}</Link></li>
-                <li><Link to="/terms" className="hover:text-primary transition">{ar ? "شروط الاستخدام" : "Terms of Service"}</Link></li>
-                <li><Link to="/dmca" className="hover:text-primary transition">{ar ? "حقوق الملكية الفكرية (DMCA)" : "DMCA Policy"}</Link></li>
-                <li><Link to="/faq" className="hover:text-primary transition">{ar ? "الأسئلة الشائعة" : "FAQ"}</Link></li>
+                <li>
+                  <Link to="/about" className="hover:text-primary transition">
+                    {ar ? "من نحن" : "About Filmak"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/editorial-policy" className="hover:text-primary transition">
+                    {ar ? "السياسة التحريرية" : "Editorial Policy"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-primary transition">
+                    {ar ? "تواصل معنا" : "Contact Us"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="hover:text-primary transition">
+                    {ar ? "سياسة الخصوصية" : "Privacy Policy"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/terms" className="hover:text-primary transition">
+                    {ar ? "شروط الاستخدام" : "Terms of Service"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dmca" className="hover:text-primary transition">
+                    {ar ? "حقوق الملكية الفكرية (DMCA)" : "DMCA Policy"}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/faq" className="hover:text-primary transition">
+                    {ar ? "الأسئلة الشائعة" : "FAQ"}
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -371,7 +470,10 @@ function RootContentWithLocale() {
                 ? "يستخدم هذا الموقع واجهة برمجة تطبيقات The Movie Database (TMDB) للحصول على البيانات الوصفية والإحصائية العامة، ولكنه غير معتمد أو مصدق عليه من قبل TMDB. المقالات التحريرية وحكم فلمك هي محتوى أصلي خاص."
                 : "This product uses the TMDB API for factual metadata but is not endorsed or certified by TMDB. Editorial reviews, verdict ratings, and curated guides are original creations of FILMAK."}
             </p>
-            <p>© {new Date().getFullYear()} فلمك — Filmak. {ar ? "جميع الحقوق محفوظة." : "All rights reserved."}</p>
+            <p>
+              © {new Date().getFullYear()} فلمك — Filmak.{" "}
+              {ar ? "جميع الحقوق محفوظة." : "All rights reserved."}
+            </p>
           </div>
         </div>
       </footer>

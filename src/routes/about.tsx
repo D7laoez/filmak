@@ -120,7 +120,9 @@ function AboutPage() {
             <p className="text-xs font-semibold text-primary uppercase tracking-wider">
               {ar ? "ما الذي يميزنا" : "What Makes Us Different"}
             </p>
-            <h2 className="text-2xl md:text-3xl font-black">{ar ? "ركائز منصة فلمك" : "The Pillars of Filmak"}</h2>
+            <h2 className="text-2xl md:text-3xl font-black">
+              {ar ? "ركائز منصة فلمك" : "The Pillars of Filmak"}
+            </h2>
           </div>
 
           <div className="grid gap-5 sm:grid-cols-2">
@@ -146,7 +148,9 @@ function AboutPage() {
         <section className="rounded-3xl border border-border bg-card p-7 md:p-10 space-y-6 shadow-sm">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-primary" />
-            {ar ? "كيف نصنع المحتوى التحريري والترشيحات؟" : "How We Create Content & Recommendations"}
+            {ar
+              ? "كيف نصنع المحتوى التحريري والترشيحات؟"
+              : "How We Create Content & Recommendations"}
           </h2>
 
           <div className="space-y-4 text-sm md:text-base leading-relaxed text-muted-foreground">

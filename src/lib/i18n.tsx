@@ -16,8 +16,7 @@ const DICT: Record<Locale, Dict> = {
     tagline_ai: "مدعوم بالذكاء الاصطناعي",
     hero_1: "صف الفلم اللي في بالك",
     hero_2: "ونجيبه لك",
-    hero_sub:
-      "بدل ما تضيع ساعة تدور، اكتب مزاجك أو نوع الفلم اللي تحبه واتركنا نرشح لك.",
+    hero_sub: "بدل ما تضيع ساعة تدور، اكتب مزاجك أو نوع الفلم اللي تحبه واتركنا نرشح لك.",
     prompt_placeholder: "مثال: أبي فلم إثارة نفسي مثل Inception بس أقصر…",
     recommend_btn: "رشّح لي",
     search_placeholder: "ابحث عن فلم…",
@@ -49,8 +48,7 @@ const DICT: Record<Locale, Dict> = {
     error_load_movie: "تعذّر تحميل الفلم",
     retry: "حاول مجدداً",
     favorites_title: "أفلامي المفضلة",
-    favorites_empty:
-      "ما عندك أفلام مفضلة بعد. تصفح واضغط القلب على أي فلم لحفظه هنا.",
+    favorites_empty: "ما عندك أفلام مفضلة بعد. تصفح واضغط القلب على أي فلم لحفظه هنا.",
     discover: "اكتشف أفلاماً",
     add_fav: "أضف إلى المفضلة",
     in_fav: "في المفضلة",
@@ -160,13 +158,21 @@ const DICT: Record<Locale, Dict> = {
     details: "تفاصيل",
     about_us: "من نحن",
     privacy_policy: "سياسة الخصوصية",
-    about_content: "فلمك هو منصة مدعومة بالذكاء الاصطناعي لمساعدتك في العثور على الأفلام والمسلسلات التي تناسب ذوقك. بدلاً من قضاء وقت طويل في البحث، يمكنك ببساطة وصف ما تبحث عنه وسنقوم بترشيح الأفضل لك.",
-    privacy_content: "نحن نهتم بخصوصيتك. يتم تخزين مفضلاتك وإحصائياتك محلياً على جهازك. نستخدم بيانات TMDB لعرض معلومات الأفلام ولا نقوم بجمع بيانات شخصية دون موافقتك.",
+    about_content:
+      "فلمك هو منصة مدعومة بالذكاء الاصطناعي لمساعدتك في العثور على الأفلام والمسلسلات التي تناسب ذوقك. بدلاً من قضاء وقت طويل في البحث، يمكنك ببساطة وصف ما تبحث عنه وسنقوم بترشيح الأفضل لك.",
+    privacy_content:
+      "نحن نهتم بخصوصيتك. يتم تخزين مفضلاتك وإحصائياتك محلياً على جهازك. نستخدم بيانات TMDB لعرض معلومات الأفلام ولا نقوم بجمع بيانات شخصية دون موافقتك.",
     why_filmak: "لماذا تختار فلمك؟",
     our_vision: "رؤيتنا وأهدافنا",
     terms_of_use: "شروط الاستخدام",
     user_rights: "حقوق المستخدم",
     data_protection: "حماية البيانات",
+    ask_ai: "اسأل الذكاء الاصطناعي",
+    describe_mood: "صف مزاجك أو نوع الفيلم الذي تريده",
+    ai_placeholder: "مثال: أريد فيلم غموض وإثارة نفسية بنهاية غير متوقعة…",
+    searching_ai: "جارٍ البحث عن ترشيحات ذكية…",
+    recommendations_for: "ترشيحات مقترحة لـ:",
+    type_to_search: "اكتب اسم فيلم أو مسلسل للبحث",
   },
   en: {
     brand: "Filmak",
@@ -191,8 +197,7 @@ const DICT: Record<Locale, Dict> = {
     tv_series: "Series",
     movie: "Movie",
     loading: "Loading…",
-    footer:
-      "This product uses the TMDB API but is not endorsed or certified by TMDB.",
+    footer: "This product uses the TMDB API but is not endorsed or certified by TMDB.",
     back: "Back",
     watch_trailer: "Watch official trailer",
     where_to_watch: "Where to watch",
@@ -207,8 +212,7 @@ const DICT: Record<Locale, Dict> = {
     error_load_movie: "Couldn't load this movie",
     retry: "Try again",
     favorites_title: "My favorite movies",
-    favorites_empty:
-      "No favorites yet. Browse and tap the heart on any movie to save it here.",
+    favorites_empty: "No favorites yet. Browse and tap the heart on any movie to save it here.",
     discover: "Discover movies",
     add_fav: "Add to favorites",
     in_fav: "In favorites",
@@ -319,13 +323,21 @@ const DICT: Record<Locale, Dict> = {
     details: "Details",
     about_us: "About Us",
     privacy_policy: "Privacy Policy",
-    about_content: "Filmak is an AI-powered platform designed to help you find the perfect movies and TV shows. Instead of scrolling for hours, just describe what you're looking for and let us recommend the best options for you.",
-    privacy_content: "We care about your privacy. Your favorites and stats are stored locally on your device. We use TMDB data for movie information and do not collect personal data without your consent.",
+    about_content:
+      "Filmak is an AI-powered platform designed to help you find the perfect movies and TV shows. Instead of scrolling for hours, just describe what you're looking for and let us recommend the best options for you.",
+    privacy_content:
+      "We care about your privacy. Your favorites and stats are stored locally on your device. We use TMDB data for movie information and do not collect personal data without your consent.",
     why_filmak: "Why Choose Filmak?",
     our_vision: "Our Vision & Goals",
     terms_of_use: "Terms of Use",
     user_rights: "User Rights",
     data_protection: "Data Protection",
+    ask_ai: "Ask AI",
+    describe_mood: "Describe your mood or the movie you want",
+    ai_placeholder: "e.g. A mind-bending thriller with an unexpected twist…",
+    searching_ai: "Finding smart recommendations…",
+    recommendations_for: "Recommendations for:",
+    type_to_search: "Type a movie or TV show name to search",
   },
 };
 
@@ -465,17 +477,23 @@ export type Dict = {
   close: string;
   imdb: string;
   tmdb: string;
-    details: string;
-    about_us: string;
-    privacy_policy: string;
-    about_content: string;
-    privacy_content: string;
-    why_filmak: string;
-    our_vision: string;
-    terms_of_use: string;
-    user_rights: string;
-    data_protection: string;
-  };
+  details: string;
+  about_us: string;
+  privacy_policy: string;
+  about_content: string;
+  privacy_content: string;
+  why_filmak: string;
+  our_vision: string;
+  terms_of_use: string;
+  user_rights: string;
+  data_protection: string;
+  ask_ai: string;
+  describe_mood: string;
+  ai_placeholder: string;
+  searching_ai: string;
+  recommendations_for: string;
+  type_to_search: string;
+};
 export type TKey = keyof Dict;
 
 type Ctx = {
@@ -493,7 +511,9 @@ function detectInitial(): Locale {
   try {
     const saved = window.localStorage.getItem("locale");
     if (saved === "ar" || saved === "en") return saved;
-  } catch {}
+  } catch {
+    // localStorage unavailable (e.g. private mode)
+  }
   const nav = (navigator.language || "ar").toLowerCase();
   return nav.startsWith("ar") ? "ar" : "en";
 }
@@ -517,7 +537,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((l: Locale) => {
     try {
       window.localStorage.setItem("locale", l);
-    } catch {}
+    } catch {
+      // localStorage unavailable
+    }
     setLocaleState(l);
   }, []);
 

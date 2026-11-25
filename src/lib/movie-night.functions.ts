@@ -13,10 +13,21 @@ const genreByMood: Record<Exclude<z.infer<typeof moodSchema>, "all">, number> = 
   sciFi: 878,
 };
 
-function toCard(m: any): MovieCard {
+type TmdbMovieItem = {
+  id: number;
+  title?: string;
+  original_title?: string;
+  poster_path?: string | null;
+  backdrop_path?: string | null;
+  release_date?: string;
+  vote_average?: number;
+  overview?: string;
+};
+
+function toCard(m: TmdbMovieItem): MovieCard {
   return {
     id: m.id,
-    title: m.title || m.original_title,
+    title: m.title || m.original_title || "",
     poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
     backdrop: m.backdrop_path ? `https://image.tmdb.org/t/p/w1280${m.backdrop_path}` : null,
     year: (m.release_date || "").slice(0, 4),
@@ -51,13 +62,16 @@ export const getMovieNightPicks = createServerFn({ method: "GET" })
     if (data.minRuntime !== null) params["with_runtime.gte"] = String(data.minRuntime);
     if (data.maxRuntime !== null) params["with_runtime.lte"] = String(data.maxRuntime);
 
-    const r = await tmdbGet<{ results: any[]; total_pages: number }>(
+    const r = await tmdbGet<{ results: TmdbMovieItem[]; total_pages: number }>(
       "/discover/movie",
       params,
       data.lang,
     );
     return {
-      results: (r.results || []).filter((m) => m.poster_path).map(toCard).slice(0, 12),
+      results: (r.results || [])
+        .filter((m) => m.poster_path)
+        .map(toCard)
+        .slice(0, 12),
       totalPages: Math.min(r.total_pages || 1, 20),
     };
   });
@@ -82,7 +96,7 @@ export const getRandomMoviePick = createServerFn({ method: "GET" })
     };
     if (data.ratingMode === "high") params["vote_average.gte"] = "7.5";
 
-    const r = await tmdbGet<{ results: any[] }>("/discover/movie", params, data.lang);
+    const r = await tmdbGet<{ results: TmdbMovieItem[] }>("/discover/movie", params, data.lang);
     const pool = (r.results || []).filter((m) => m.poster_path).map(toCard);
     if (!pool.length) return null;
     const index = (data.nonce * 7 + Math.floor(Math.random() * pool.length)) % pool.length;

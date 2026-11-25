@@ -25,7 +25,12 @@ export const Route = createFileRoute("/collections/$slug")({
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "الرئيسية", item: "https://filmak.site/" },
-        { "@type": "ListItem", position: 2, name: "المجموعات", item: "https://filmak.site/collections" },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "المجموعات",
+          item: "https://filmak.site/collections",
+        },
         { "@type": "ListItem", position: 3, name: c?.ar || "مجموعة", item: url },
       ],
     };
@@ -80,7 +85,9 @@ function CollectionDetailPage() {
       <main dir={dir} className="min-h-screen grid place-items-center bg-background px-4">
         <div className="text-center max-w-md">
           <Film className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold">{ar ? "المجموعة غير موجودة" : "Collection Not Found"}</h1>
+          <h1 className="text-2xl font-bold">
+            {ar ? "المجموعة غير موجودة" : "Collection Not Found"}
+          </h1>
           <Link to="/collections" className="text-primary mt-4 inline-block font-semibold">
             {ar ? "الرجوع للمجموعات" : "Back to Collections"}
           </Link>
@@ -104,7 +111,9 @@ function CollectionDetailPage() {
               {ar ? "المجموعات" : "Collections"}
             </Link>
             <span>/</span>
-            <span className="text-foreground font-medium">{ar ? collection.ar : collection.en}</span>
+            <span className="text-foreground font-medium">
+              {ar ? collection.ar : collection.en}
+            </span>
           </div>
 
           <div className="max-w-3xl space-y-3">
@@ -136,12 +145,11 @@ function CollectionDetailPage() {
 
         {/* Movies Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">
-          {items.map((m: any) => (
+          {items.map((m) => (
             <Link
               key={m.id}
               to="/movie/$id"
               params={{ id: String(m.id) }}
-                      reloadDocument
               className="group block space-y-2"
             >
               <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted border border-border/50 shadow-sm group-hover:-translate-y-1 group-hover:shadow-xl transition duration-300">

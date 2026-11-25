@@ -29,9 +29,7 @@ export function Spinner({ size = 48, label, className = "" }: Props) {
           }}
         />
       </div>
-      {label && (
-        <span className="text-sm text-muted-foreground">{label}</span>
-      )}
+      {label && <span className="text-sm text-muted-foreground">{label}</span>}
     </div>
   );
 }

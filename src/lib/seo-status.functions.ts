@@ -19,7 +19,10 @@ function gcHeaders() {
   };
 }
 
-async function requireAdmin(ctx: { supabase: any; userId: string }) {
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+async function requireAdmin(ctx: { supabase: SupabaseClient<Database>; userId: string }) {
   const { data, error } = await ctx.supabase.rpc("has_role", {
     _user_id: ctx.userId,
     _role: "admin",
@@ -105,14 +108,11 @@ export const inspectSeoUrl = createServerFn({ method: "POST" })
     const path = data.path.startsWith("/") ? data.path : `/${data.path}`;
     const inspectionUrl = new URL(path, SITE_URL).toString();
 
-    const res = await fetch(
-      `${GATEWAY_BASE}/v1/urlInspection/index:inspect`,
-      {
-        method: "POST",
-        headers: gcHeaders(),
-        body: JSON.stringify({ inspectionUrl, siteUrl: SITE_URL }),
-      },
-    );
+    const res = await fetch(`${GATEWAY_BASE}/v1/urlInspection/index:inspect`, {
+      method: "POST",
+      headers: gcHeaders(),
+      body: JSON.stringify({ inspectionUrl, siteUrl: SITE_URL }),
+    });
     if (!res.ok) {
       const body = await res.text();
       throw new Error(`URL inspection failed [${res.status}]: ${body}`);
@@ -214,18 +214,16 @@ export const resubmitSitemap = createServerFn({ method: "POST" })
       message = e instanceof Error ? e.message : String(e);
     }
 
-    const { error: insertErr } = await context.supabase
-      .from("sitemap_submissions")
-      .insert({
-        submitted_by: context.userId,
-        status,
-        http_status: httpStatus || null,
-        message,
-        submitted_urls: sitemap?.submitted ?? null,
-        indexed_urls: sitemap?.indexed ?? null,
-        errors: sitemap?.errors ?? null,
-        warnings: sitemap?.warnings ?? null,
-      });
+    const { error: insertErr } = await context.supabase.from("sitemap_submissions").insert({
+      submitted_by: context.userId,
+      status,
+      http_status: httpStatus || null,
+      message,
+      submitted_urls: sitemap?.submitted ?? null,
+      indexed_urls: sitemap?.indexed ?? null,
+      errors: sitemap?.errors ?? null,
+      warnings: sitemap?.warnings ?? null,
+    });
     if (insertErr) {
       console.error("Failed to log submission:", insertErr);
     }
@@ -239,7 +237,9 @@ export const getSubmissionHistory = createServerFn({ method: "GET" })
     await requireAdmin(context);
     const { data, error } = await context.supabase
       .from("sitemap_submissions")
-      .select("id, created_at, status, http_status, message, submitted_urls, indexed_urls, errors, warnings")
+      .select(
+        "id, created_at, status, http_status, message, submitted_urls, indexed_urls, errors, warnings",
+      )
       .order("created_at", { ascending: false })
       .limit(20);
     if (error) throw new Error(error.message);

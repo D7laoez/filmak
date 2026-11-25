@@ -19,8 +19,7 @@ export const Route = createFileRoute("/discover")({
       { property: "og:title", content: "اكتشف — Filmak Discover" },
       {
         property: "og:description",
-        content:
-          "Filter thousands of movies by genre, year, rating, and popularity.",
+        content: "Filter thousands of movies by genre, year, rating, and popularity.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://filmak.site/discover" },
@@ -29,8 +28,7 @@ export const Route = createFileRoute("/discover")({
       { name: "twitter:title", content: "اكتشف — Filmak Discover" },
       {
         name: "twitter:description",
-        content:
-          "Filter thousands of movies by genre, year, rating, and popularity.",
+        content: "Filter thousands of movies by genre, year, rating, and popularity.",
       },
       { name: "twitter:image", content: "https://filmak.site/icon-512.png" },
     ],
@@ -105,10 +103,7 @@ function DiscoverPage() {
     <div dir={dir} className="min-h-screen bg-background text-foreground pb-24">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-30 bg-background/85">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link
-            to="/"
-            className="text-sm text-muted-foreground hover:text-foreground transition"
-          >
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition">
             ← {t("brand")}
           </Link>
           <div className="mx-auto flex items-center gap-2">
@@ -136,9 +131,7 @@ function DiscoverPage() {
                   key={g.id}
                   onClick={() => {
                     setPage(1);
-                    setGenres((prev) =>
-                      on ? prev.filter((x) => x !== g.id) : [...prev, g.id],
-                    );
+                    setGenres((prev) => (on ? prev.filter((x) => x !== g.id) : [...prev, g.id]));
                   }}
                   className={`text-xs px-3 py-1.5 rounded-full border transition ${
                     on
@@ -155,9 +148,7 @@ function DiscoverPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {/* Sort */}
             <label className="flex flex-col gap-1 text-xs">
-              <span className="text-muted-foreground">
-                {locale === "ar" ? "الترتيب" : "Sort"}
-              </span>
+              <span className="text-muted-foreground">{locale === "ar" ? "الترتيب" : "Sort"}</span>
               <select
                 value={sort}
                 onChange={(e) => {
@@ -215,9 +206,7 @@ function DiscoverPage() {
 
             {/* Original language */}
             <label className="flex flex-col gap-1 text-xs">
-              <span className="text-muted-foreground">
-                {t("original_language")}
-              </span>
+              <span className="text-muted-foreground">{t("original_language")}</span>
               <select
                 value={lang ?? ""}
                 onChange={(e) => {
@@ -259,7 +248,7 @@ function DiscoverPage() {
                   key={m.id}
                   to="/movie/$id"
                   params={{ id: String(m.id) }}
-                      reloadDocument
+                  reloadDocument
                   className="group block"
                 >
                   <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted">

@@ -8,8 +8,7 @@ export function BottomNav() {
   const { t } = useLocale();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search }) as
-    | { tab?: string }
-    | undefined;
+    { tab?: string } | undefined;
 
   if (pathname === "/auth") return null;
 
@@ -22,8 +21,8 @@ export function BottomNav() {
   const statsTo = user ? "/stats" : "/auth";
 
   const item = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 min-h-11 py-1.5 text-[10px] transition ${
-      active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+    `flex flex-col items-center justify-center gap-0.5 flex-1 min-h-11 py-1.5 text-[10px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset ${
+      active ? "text-primary font-semibold" : "text-muted-foreground hover:text-foreground"
     }`;
 
   return (
@@ -32,7 +31,12 @@ export function BottomNav() {
       className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border/60 pb-[max(env(safe-area-inset-bottom),0.25rem)]"
     >
       <div className="flex items-stretch max-w-md mx-auto">
-        <Link to="/" className={item(isHome)} aria-label={t("brand")}>
+        <Link
+          to="/"
+          className={item(isHome)}
+          aria-label={t("brand")}
+          aria-current={isHome ? "page" : undefined}
+        >
           <Home className="w-5 h-5" aria-hidden />
           <span>{t("brand")}</span>
         </Link>
@@ -41,6 +45,7 @@ export function BottomNav() {
           search={{ tab: "favorite" }}
           className={item(isFav)}
           aria-label={t("my_favorites")}
+          aria-current={isFav ? "page" : undefined}
         >
           <Heart className={`w-5 h-5 ${isFav ? "fill-primary" : ""}`} aria-hidden />
           <span>{t("tab_favorites")}</span>
@@ -50,11 +55,17 @@ export function BottomNav() {
           search={{ tab: "watchlist" }}
           className={item(isWatchlist)}
           aria-label={t("tab_watchlist")}
+          aria-current={isWatchlist ? "page" : undefined}
         >
           <Clock className="w-5 h-5" aria-hidden />
           <span>{t("tab_watchlist")}</span>
         </Link>
-        <Link to={statsTo} className={item(isStats)} aria-label={t("my_stats")}>
+        <Link
+          to={statsTo}
+          className={item(isStats)}
+          aria-label={t("my_stats")}
+          aria-current={isStats ? "page" : undefined}
+        >
           <BarChart3 className="w-5 h-5" aria-hidden />
           <span>{t("my_stats")}</span>
         </Link>

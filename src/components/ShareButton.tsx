@@ -9,11 +9,20 @@ export function ShareButton({ title, text, url }: { title: string; text?: string
   const href = url ?? (typeof window !== "undefined" ? window.location.href : "");
 
   async function onClick() {
-    if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: (d: ShareData) => Promise<void> }).share) {
+    if (
+      typeof navigator !== "undefined" &&
+      (navigator as Navigator & { share?: (d: ShareData) => Promise<void> }).share
+    ) {
       try {
-        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share({ title, text, url: href });
+        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share({
+          title,
+          text,
+          url: href,
+        });
         return;
-      } catch { /* user cancelled */ }
+      } catch {
+        /* user cancelled */
+      }
     }
     try {
       await navigator.clipboard.writeText(href);

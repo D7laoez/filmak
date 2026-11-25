@@ -1,12 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 
 const OWNER_ADMIN_EMAIL = "ali.m2002121@gmail.com";
-type AdminContext = { supabase: any; userId: string; claims?: { email?: string } };
+type AdminContext = {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+  claims?: { email?: string };
+};
 
 async function getAuthenticatedEmail(ctx: AdminContext) {
-  const claimEmail = String(ctx.claims?.email ?? "").trim().toLowerCase();
+  const claimEmail = String(ctx.claims?.email ?? "")
+    .trim()
+    .toLowerCase();
   if (claimEmail) return claimEmail;
   const { data, error } = await ctx.supabase.auth.getUser();
   if (error || !data.user?.email) return "";
@@ -140,9 +148,7 @@ export const listUsers = createServerFn({ method: "GET" })
       supabaseAdmin.from("favorites").select("user_id").in("user_id", userIds),
       supabaseAdmin.from("user_lists").select("user_id").in("user_id", userIds),
     ]);
-    const adminSet = new Set(
-      (roles ?? []).filter((r) => r.role === "admin").map((r) => r.user_id),
-    );
+    const adminSet = new Set((roles ?? []).filter((r) => r.role === "admin").map((r) => r.user_id));
     const favCount = new Map<string, number>();
     (favs ?? []).forEach((f) => favCount.set(f.user_id, (favCount.get(f.user_id) ?? 0) + 1));
     const listCount = new Map<string, number>();

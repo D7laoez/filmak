@@ -35,9 +35,7 @@ function ttlFor(path: string): number {
   if (path.startsWith("/search/")) return 1000 * 60 * 15;
   if (path.startsWith("/movie/") || path.startsWith("/tv/") || path.startsWith("/person/")) {
     if (
-      /\/(movie|tv)\/(popular|top_rated|now_playing|upcoming|on_the_air|airing_today)/.test(
-        path,
-      )
+      /\/(movie|tv)\/(popular|top_rated|now_playing|upcoming|on_the_air|airing_today)/.test(path)
     ) {
       return 1000 * 60 * 30;
     }

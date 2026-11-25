@@ -3,10 +3,7 @@ import { checkIsAdmin, logUnauthorizedAdminAccess } from "@/lib/admin.functions"
 
 export const Route = createFileRoute("/_authenticated/_admin")({
   head: () => ({
-    meta: [
-      { title: "الإدارة — فلمك" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "الإدارة — فلمك" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   loader: async ({ location }) => {
     const { isAdmin } = await checkIsAdmin();

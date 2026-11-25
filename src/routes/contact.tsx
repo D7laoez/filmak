@@ -1,5 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Mail, MessageSquare, ShieldAlert, Send, CheckCircle2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Mail,
+  MessageSquare,
+  ShieldAlert,
+  Send,
+  CheckCircle2,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
@@ -10,7 +18,8 @@ export const Route = createFileRoute("/contact")({
       { title: "تواصل معنا — فلمك | Contact Filmak" },
       {
         name: "description",
-        content: "تواصل مع فريق منصة فلمك للاستفسارات التحريرية، الاقتراحات، الشراكات، أو الإبلاغ عن مشكلة في المحتوى.",
+        content:
+          "تواصل مع فريق منصة فلمك للاستفسارات التحريرية، الاقتراحات، الشراكات، أو الإبلاغ عن مشكلة في المحتوى.",
       },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/contact" }],
@@ -87,7 +96,10 @@ function ContactPage() {
             <p className="text-xs text-muted-foreground leading-relaxed">
               {ar ? "للاستفسارات العامة والشراكات:" : "For general questions & partnerships:"}
             </p>
-            <a href="mailto:contact@filmak.site" className="text-sm font-semibold text-primary hover:underline block font-mono">
+            <a
+              href="mailto:contact@filmak.site"
+              className="text-sm font-semibold text-primary hover:underline block font-mono"
+            >
               contact@filmak.site
             </a>
           </div>
@@ -96,7 +108,9 @@ function ContactPage() {
             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
               <ShieldAlert className="w-5 h-5" />
             </div>
-            <h2 className="font-bold text-base">{ar ? "حقوق الملكية والنشر" : "DMCA & Copyright"}</h2>
+            <h2 className="font-bold text-base">
+              {ar ? "حقوق الملكية والنشر" : "DMCA & Copyright"}
+            </h2>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {ar
                 ? "للإبلاغ عن أي استفسار متعلق بحقوق الملكية الفكرية، تفضل بزيارة صفحة DMCA."
@@ -114,7 +128,9 @@ function ContactPage() {
             {submitted ? (
               <div className="text-center py-10 space-y-3">
                 <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
-                <h3 className="text-xl font-bold">{ar ? "شكراً لتواصلك معنا!" : "Thank You for Reaching Out!"}</h3>
+                <h3 className="text-xl font-bold">
+                  {ar ? "شكراً لتواصلك معنا!" : "Thank You for Reaching Out!"}
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   {ar
                     ? "فتحنا تطبيق البريد لإرسال رسالتك. اضغط «إرسال» داخل تطبيق البريد لإتمام الإرسال."
@@ -132,7 +148,9 @@ function ContactPage() {
                 <h2 className="text-xl font-bold">{ar ? "أرسل رسالة مباشرة" : "Send a Message"}</h2>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">{ar ? "الاسم الكامل" : "Your Name"}</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    {ar ? "الاسم الكامل" : "Your Name"}
+                  </label>
                   <input
                     required
                     value={name}
@@ -143,7 +161,9 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">{ar ? "البريد الإلكتروني" : "Email Address"}</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    {ar ? "البريد الإلكتروني" : "Email Address"}
+                  </label>
                   <input
                     type="email"
                     required
@@ -155,27 +175,39 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">{ar ? "موضوع الرسالة" : "Subject"}</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    {ar ? "موضوع الرسالة" : "Subject"}
+                  </label>
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="general">{ar ? "استفسار عام" : "General Inquiry"}</option>
-                    <option value="editorial">{ar ? "اقتراح أو تصحيح تحريري" : "Editorial Suggestion / Correction"}</option>
-                    <option value="technical">{ar ? "مشكلة تقنية في الموقع" : "Technical Issue"}</option>
-                    <option value="dmca">{ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}</option>
+                    <option value="editorial">
+                      {ar ? "اقتراح أو تصحيح تحريري" : "Editorial Suggestion / Correction"}
+                    </option>
+                    <option value="technical">
+                      {ar ? "مشكلة تقنية في الموقع" : "Technical Issue"}
+                    </option>
+                    <option value="dmca">
+                      {ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}
+                    </option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">{ar ? "نص الرسالة" : "Message"}</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    {ar ? "نص الرسالة" : "Message"}
+                  </label>
                   <textarea
                     required
                     rows={4}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."}
+                    placeholder={
+                      ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."
+                    }
                     className="w-full bg-secondary/50 border border-border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                 </div>

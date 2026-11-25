@@ -8,7 +8,8 @@ export const Route = createFileRoute("/terms")({
       { title: "شروط الاستخدام — فلمك | Terms of Service" },
       {
         name: "description",
-        content: "شروط وأحكام استخدام منصة فلمك لاكتشاف وتصفح الأفلام والمسلسلات والمقالات التحريرية.",
+        content:
+          "شروط وأحكام استخدام منصة فلمك لاكتشاف وتصفح الأفلام والمسلسلات والمقالات التحريرية.",
       },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/terms" }],
@@ -96,7 +97,10 @@ function TermsPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-6">
         {terms.map(([title, text]) => (
-          <section key={title} className="rounded-2xl border border-border bg-card p-6 md:p-7 space-y-2">
+          <section
+            key={title}
+            className="rounded-2xl border border-border bg-card p-6 md:p-7 space-y-2"
+          >
             <h2 className="text-lg font-bold text-foreground">{title}</h2>
             <p className="text-sm md:text-base leading-relaxed text-muted-foreground">{text}</p>
           </section>

@@ -1,0 +1,65 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import {
+  SITE_URL,
+  absoluteUrl,
+  cleanDescription,
+  movieTitle,
+  tvTitle,
+  safeJsonLd,
+} from "../src/lib/seo.ts";
+
+test("absoluteUrl normalizes leading slashes", () => {
+  assert.equal(absoluteUrl("/movies/1"), `${SITE_URL}/movies/1`);
+  assert.equal(absoluteUrl("movies/1"), `${SITE_URL}/movies/1`);
+});
+
+test("cleanDescription collapses whitespace, truncates, and provides fallback", () => {
+  assert.ok(cleanDescription("").length > 0);
+  assert.ok(cleanDescription(null).length > 0);
+  assert.equal(cleanDescription("  hello   world  "), "hello world");
+  const long = "a".repeat(200);
+  const cleaned = cleanDescription(long, 50);
+  assert.equal(cleaned.length, 50);
+  assert.ok(cleaned.endsWith("…"));
+});
+
+test("movieTitle and tvTitle format with and without year", () => {
+  assert.equal(movieTitle("Inception", 2010), "Inception (2010) | فلمك Filmak");
+  assert.equal(movieTitle("Inception"), "Inception | فلمك Filmak");
+  assert.equal(tvTitle("Dark", "2017"), "Dark (2017) | مسلسل | فلمك Filmak");
+  assert.equal(tvTitle("Dark"), "Dark | مسلسل | فلمك Filmak");
+});
+
+test("safeJsonLd escapes HTML-sensitive characters to prevent XSS", () => {
+  const serialized = safeJsonLd({
+    title: "</script><script>alert('xss')</script>&\u2028\u2029",
+  });
+  assert.equal(serialized.includes("<"), false);
+  assert.equal(serialized.includes(">"), false);
+  assert.equal(serialized.includes("&"), false);
+  assert.ok(serialized.includes("\\u003c/script\\u003e"));
+  assert.ok(serialized.includes("\\u0026"));
+});
+
+test("site_visits migration defines table, RLS, and admin_site_analytics RPC", () => {
+  const sql = readFileSync(
+    resolve("supabase/migrations/20261125000000_site_visits_and_analytics.sql"),
+    "utf8",
+  );
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS public\.site_visits/i);
+  assert.match(sql, /ENABLE ROW LEVEL SECURITY/i);
+  assert.match(sql, /CREATE OR REPLACE FUNCTION public\.admin_site_analytics/i);
+});
+
+test("public/_headers includes security headers and public/robots.txt points to sitemap", () => {
+  const headers = readFileSync(resolve("public/_headers"), "utf8");
+  assert.match(headers, /X-Content-Type-Options:\s*nosniff/);
+  assert.match(headers, /X-Frame-Options:\s*DENY/);
+  assert.match(headers, /Referrer-Policy:\s*strict-origin-when-cross-origin/);
+
+  const robots = readFileSync(resolve("public/robots.txt"), "utf8");
+  assert.match(robots, /Sitemap:\s*https:\/\/filmak\.site\/sitemap\.xml/);
+});

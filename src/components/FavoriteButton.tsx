@@ -30,9 +30,7 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
     enabled: !!user,
   });
 
-  const match = items.data?.find(
-    (f) => f.media_id === movie.id && f.media_type === mediaType,
-  );
+  const match = items.data?.find((f) => f.media_id === movie.id && f.media_type === mediaType);
   const status = match?.status ?? null;
   const isFav = status === "favorite";
 
@@ -105,9 +103,7 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
         {toggle.isPending ? (
           <Loader2 className="w-4 h-4 animate-spin text-white" />
         ) : (
-          <Heart
-            className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : "text-white"}`}
-          />
+          <Heart className={`w-4 h-4 ${isFav ? "fill-primary text-primary" : "text-white"}`} />
         )}
       </button>
     );
@@ -124,7 +120,11 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
             : "bg-secondary border border-border hover:bg-secondary/70"
         }`}
       >
-        {setStatus.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Heart className={`w-4 h-4 ${isFav ? "fill-primary" : ""}`} />}
+        {setStatus.isPending ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Heart className={`w-4 h-4 ${isFav ? "fill-primary" : ""}`} />
+        )}
         {isFav ? t("in_fav") : t("add_fav")}
       </button>
       <button
@@ -139,7 +139,9 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
         }`}
       >
         <Bookmark className={`w-4 h-4 ${status === "watchlist" ? "fill-accent" : ""}`} />
-        <span className="hidden sm:inline">{status === "watchlist" ? t("in_watchlist") : t("add_watchlist")}</span>
+        <span className="hidden sm:inline">
+          {status === "watchlist" ? t("in_watchlist") : t("add_watchlist")}
+        </span>
       </button>
       <button
         onClick={(e) => pick(e, "watched")}
@@ -153,7 +155,9 @@ export function FavoriteButton({ movie, variant = "full", mediaType = "movie" }:
         }`}
       >
         <CheckCircle2 className="w-4 h-4" />
-        <span className="hidden sm:inline">{status === "watched" ? t("watched") : t("mark_watched")}</span>
+        <span className="hidden sm:inline">
+          {status === "watched" ? t("watched") : t("mark_watched")}
+        </span>
       </button>
     </div>
   );

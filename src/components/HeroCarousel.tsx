@@ -63,7 +63,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
           <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-3 drop-shadow-2xl">
             {m.title}
           </h2>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4 tabular-nums">
             <span className="inline-flex items-center gap-1 text-primary font-semibold">
               <Star className="w-4 h-4 fill-primary" />
               {m.rating}
@@ -80,8 +80,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
             <Link
               to="/movie/$id"
               params={{ id: String(m.id) }}
-                      reloadDocument
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition shadow-lg shadow-primary/30"
+              className="inline-flex items-center gap-2 min-h-[44px] bg-primary text-primary-foreground rounded-full px-5 py-2.5 text-sm font-semibold hover:opacity-90 transition shadow-lg shadow-primary/30"
             >
               <Play className="w-4 h-4 fill-current" />
               {t("watch_trailer")}
@@ -89,8 +88,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
             <Link
               to="/movie/$id"
               params={{ id: String(m.id) }}
-                      reloadDocument
-              className="inline-flex items-center gap-2 bg-secondary/70 backdrop-blur border border-border rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-secondary transition"
+              className="inline-flex items-center gap-2 min-h-[44px] bg-secondary/70 backdrop-blur border border-border rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-secondary transition"
             >
               <Info className="w-4 h-4" />
               {t("discover")}
@@ -99,16 +97,23 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
         </div>
 
         {items.length > 1 && (
-          <div className="flex items-center gap-1.5 mt-8">
-            {items.map((_, i) => (
+          <div className="flex items-center gap-1 mt-6" role="tablist" aria-label="Featured slides">
+            {items.map((item, i) => (
               <button
-                key={i}
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={i === idx}
                 onClick={() => setIdx(i)}
-                aria-label={`Slide ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === idx ? "w-8 bg-primary" : "w-4 bg-foreground/25 hover:bg-foreground/50"
-                }`}
-              />
+                aria-label={`Slide ${i + 1}: ${item.title}`}
+                className="py-3 px-0.5 flex items-center cursor-pointer"
+              >
+                <span
+                  className={`block h-1.5 rounded-full transition-all duration-300 ${
+                    i === idx ? "w-8 bg-primary" : "w-4 bg-foreground/30 hover:bg-foreground/60"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         )}

@@ -44,9 +44,7 @@ function ResetPasswordPage() {
           setReady(true);
           return;
         }
-        const hash = window.location.hash.startsWith("#")
-          ? window.location.hash.slice(1)
-          : "";
+        const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
         if (hash) {
           const params = new URLSearchParams(hash);
           const access_token = params.get("access_token");
@@ -84,9 +82,7 @@ function ResetPasswordPage() {
       });
       if (error) throw error;
       setNotice(
-        dir === "rtl"
-          ? "أرسلنا رابطاً جديداً إلى بريدك"
-          : "We sent a new reset link to your email",
+        dir === "rtl" ? "أرسلنا رابطاً جديداً إلى بريدك" : "We sent a new reset link to your email",
       );
     } catch (e) {
       setError((e as Error).message);
@@ -100,7 +96,9 @@ function ResetPasswordPage() {
     setError(null);
     setNotice(null);
     if (password.length < 6) {
-      setError(dir === "rtl" ? "كلمة المرور 6 أحرف على الأقل" : "Password must be at least 6 characters");
+      setError(
+        dir === "rtl" ? "كلمة المرور 6 أحرف على الأقل" : "Password must be at least 6 characters",
+      );
       return;
     }
     if (password !== confirm) {
@@ -123,7 +121,10 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div dir={dir} className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
+    <div
+      dir={dir}
+      className="min-h-screen flex items-center justify-center bg-background text-foreground px-4"
+    >
       <div className="w-full max-w-md">
         <Link to="/" className="flex flex-col items-center justify-center gap-3 mb-8">
           <img src="/icon-192.png" alt={t("brand")} className="w-14 h-14 md:w-16 md:h-16" />
@@ -144,7 +145,9 @@ function ResetPasswordPage() {
                   : "Link expired or invalid? Enter your email to receive a new one."}
               </p>
               <div className="relative">
-                <Mail className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <Mail
+                  className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+                />
                 <input
                   type="email"
                   required
@@ -166,7 +169,9 @@ function ResetPasswordPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="relative">
-                <Lock className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <Lock
+                  className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+                />
                 <input
                   type="password"
                   required
@@ -178,7 +183,9 @@ function ResetPasswordPage() {
                 />
               </div>
               <div className="relative">
-                <Lock className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+                <Lock
+                  className={`absolute ${dir === "rtl" ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+                />
                 <input
                   type="password"
                   required
@@ -202,7 +209,9 @@ function ResetPasswordPage() {
           {ready && (
             <form onSubmit={handleResend} className="mt-4 pt-4 border-t border-border space-y-2">
               <p className="text-xs text-muted-foreground text-center">
-                {dir === "rtl" ? "لم يعمل الرابط؟ أرسل واحداً جديداً" : "Link not working? Send a new one"}
+                {dir === "rtl"
+                  ? "لم يعمل الرابط؟ أرسل واحداً جديداً"
+                  : "Link not working? Send a new one"}
               </p>
               <div className="flex gap-2">
                 <input
@@ -217,7 +226,13 @@ function ResetPasswordPage() {
                   disabled={resending}
                   className="inline-flex items-center justify-center gap-2 bg-secondary text-foreground rounded-xl px-3 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50 transition"
                 >
-                  {resending ? <Loader2 className="w-4 h-4 animate-spin" /> : (dir === "rtl" ? "إعادة إرسال" : "Resend")}
+                  {resending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : dir === "rtl" ? (
+                    "إعادة إرسال"
+                  ) : (
+                    "Resend"
+                  )}
                 </button>
               </div>
             </form>

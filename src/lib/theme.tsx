@@ -15,7 +15,9 @@ function detectInitial(): Theme {
   try {
     const saved = window.localStorage.getItem("theme");
     if (saved === "light" || saved === "dark") return saved;
-  } catch {}
+  } catch {
+    // localStorage unavailable
+  }
   return window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
 }
 
@@ -35,12 +37,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const setTheme = useCallback((t: Theme) => {
-    try { window.localStorage.setItem("theme", t); } catch {}
+    try {
+      window.localStorage.setItem("theme", t);
+    } catch {
+      // localStorage unavailable
+    }
     setThemeState(t);
   }, []);
 
   return (
-    <ThemeCtx.Provider value={{ theme, setTheme, toggle: () => setTheme(theme === "dark" ? "light" : "dark") }}>
+    <ThemeCtx.Provider
+      value={{ theme, setTheme, toggle: () => setTheme(theme === "dark" ? "light" : "dark") }}
+    >
       {children}
     </ThemeCtx.Provider>
   );

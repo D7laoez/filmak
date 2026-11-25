@@ -1,5 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Award, CheckCircle2, ShieldCheck, Scale, FileText, Brain, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Award,
+  CheckCircle2,
+  ShieldCheck,
+  Scale,
+  FileText,
+  Brain,
+  Users,
+} from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/editorial-policy")({
@@ -136,12 +146,17 @@ function EditorialPolicyPage() {
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-12">
         {/* Core Pillars */}
         <section className="space-y-6">
-          <h2 className="text-2xl font-bold">{ar ? "المبادئ التحريرية الأساسية" : "Core Editorial Principles"}</h2>
+          <h2 className="text-2xl font-bold">
+            {ar ? "المبادئ التحريرية الأساسية" : "Core Editorial Principles"}
+          </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {pillars.map((p) => {
               const Icon = p.icon;
               return (
-                <div key={p.title} className="rounded-2xl border border-border bg-card p-6 space-y-3">
+                <div
+                  key={p.title}
+                  className="rounded-2xl border border-border bg-card p-6 space-y-3"
+                >
                   <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
                     <Icon className="w-5 h-5" />
                   </div>
@@ -156,7 +171,9 @@ function EditorialPolicyPage() {
         {/* Rating Breakdown */}
         <section className="rounded-3xl border border-border bg-card p-6 md:p-8 space-y-6">
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">{ar ? "كيف نحدد تقييم فلمك (FILMAK Score)؟" : "How We Calculate the FILMAK Score"}</h2>
+            <h2 className="text-2xl font-bold">
+              {ar ? "كيف نحدد تقييم فلمك (FILMAK Score)؟" : "How We Calculate the FILMAK Score"}
+            </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {ar
                 ? "تقييم فلمك ليس رقماً عشوائياً، بل هو محصلة دراسة متوازنة لأربعة محاور رئيسية في كل عمل سينمائي:"
@@ -166,7 +183,10 @@ function EditorialPolicyPage() {
 
           <div className="grid sm:grid-cols-2 gap-4">
             {scoreCriteria.map((c) => (
-              <div key={c.name} className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-1.5">
+              <div
+                key={c.name}
+                className="rounded-xl border border-border/60 bg-secondary/30 p-4 space-y-1.5"
+              >
                 <div className="flex items-center gap-2 font-bold text-sm text-primary">
                   <CheckCircle2 className="w-4 h-4" />
                   {c.name}
@@ -179,7 +199,9 @@ function EditorialPolicyPage() {
 
         {/* External Data Transparency */}
         <section className="space-y-4 rounded-2xl border border-border/60 bg-secondary/20 p-6">
-          <h2 className="text-lg font-bold">{ar ? "الشفافية في استخدام بيانات TMDB" : "TMDB Metadata Transparency"}</h2>
+          <h2 className="text-lg font-bold">
+            {ar ? "الشفافية في استخدام بيانات TMDB" : "TMDB Metadata Transparency"}
+          </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {ar
               ? "نستخدم واجهة برمجة تطبيقات The Movie Database (TMDB) للحصول على البيانات الوصفية الواقعية (مثل تاريخ الإصدار، أسماء طاقم التمثيل، وتصنيفات الأنواع). يتم تمييز هذه البيانات بوضوح تام، ولا ننسبها ككتابة أصلية لمنصة فلمك. إن فلمك غير معتمد أو مصدق عليه رسمياً من قِبل TMDB."

@@ -33,17 +33,20 @@ import { safeJsonLd } from "@/lib/seo";
 export const Route = createFileRoute("/articles/$slug")({
   loader: async ({ params }) => {
     try {
-      const article = await getEditorialArticleBySlug({ data: { slug: params.slug } }).catch(() => null);
+      const article = await getEditorialArticleBySlug({ data: { slug: params.slug } }).catch(
+        () => null,
+      );
       if (!article) return { article: null, relatedMovies: [], otherArticles: [] };
 
       // Fetch related movie details
-      const moviePromises = (article.related_movie_ids || []).slice(0, 5).map((id) =>
-        getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null),
-      );
+      const moviePromises = (article.related_movie_ids || [])
+        .slice(0, 5)
+        .map((id) => getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null));
       const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
 
       // Fetch other recent articles
-      const otherArticles = (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
+      const otherArticles =
+        (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
 
       return {
         article,
@@ -162,9 +165,13 @@ function ArticleReaderPage() {
       <main dir={dir} className="min-h-screen grid place-items-center bg-background px-4">
         <div className="text-center max-w-md">
           <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">{ar ? "المقال غير موجود" : "Article Not Found"}</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {ar ? "المقال غير موجود" : "Article Not Found"}
+          </h1>
           <p className="text-sm text-muted-foreground mb-6">
-            {ar ? "ربما تم نقل المقال أو تغيير رابطه." : "This article may have been moved or renamed."}
+            {ar
+              ? "ربما تم نقل المقال أو تغيير رابطه."
+              : "This article may have been moved or renamed."}
           </p>
           <Link
             to="/articles"
@@ -191,7 +198,10 @@ function ArticleReaderPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,theme(colors.primary.DEFAULT/0.12),transparent_60%)] pointer-events-none" />
         <div className="max-w-4xl mx-auto px-4 py-8 md:py-14 relative">
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-6 flex-wrap" aria-label="Breadcrumbs">
+          <nav
+            className="flex items-center gap-2 text-xs text-muted-foreground mb-6 flex-wrap"
+            aria-label="Breadcrumbs"
+          >
             <Link to="/" className="hover:text-primary transition">
               {ar ? "الرئيسية" : "Home"}
             </Link>
@@ -281,14 +291,20 @@ function ArticleReaderPage() {
           {content.split("\n\n").map((para, i) => {
             if (para.startsWith("## ")) {
               return (
-                <h2 key={i} className="text-2xl md:text-3xl font-black text-foreground pt-6 pb-2 border-b border-border/40">
+                <h2
+                  key={i}
+                  className="text-2xl md:text-3xl font-black text-foreground pt-6 pb-2 border-b border-border/40"
+                >
                   {para.replace("## ", "")}
                 </h2>
               );
             }
             if (para.startsWith("### ")) {
               return (
-                <h3 key={i} className="text-xl md:text-2xl font-bold text-foreground pt-4 text-primary">
+                <h3
+                  key={i}
+                  className="text-xl md:text-2xl font-bold text-foreground pt-4 text-primary"
+                >
                   {para.replace("### ", "")}
                 </h3>
               );
@@ -297,7 +313,7 @@ function ArticleReaderPage() {
               return <hr key={i} className="border-border/60 my-6" />;
             }
             if (para.startsWith("* ") || para.startsWith("- ")) {
-              const items = para.split("\n").map((line) => line.replace(/^[\*\-]\s+/, ""));
+              const items = para.split("\n").map((line) => line.replace(/^[*-]\s+/, ""));
               return (
                 <ul key={i} className="space-y-2 ps-6 list-disc text-muted-foreground my-4">
                   {items.map((it, idx) => (
@@ -305,7 +321,13 @@ function ArticleReaderPage() {
                       <span
                         dangerouslySetInnerHTML={{
                           __html: it
-                            .replace(/\*\*(.*?)\*\*/g, "<strong class='text-foreground font-semibold'>$1</strong>")
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(
+                              /\*\*(.*?)\*\*/g,
+                              "<strong class='text-foreground font-semibold'>$1</strong>",
+                            )
                             .replace(/\*(.*?)\*/g, "<em>$1</em>"),
                         }}
                       />
@@ -320,7 +342,13 @@ function ArticleReaderPage() {
                 className="leading-8 text-foreground/90"
                 dangerouslySetInnerHTML={{
                   __html: para
-                    .replace(/\*\*(.*?)\*\*/g, "<strong class='text-foreground font-bold'>$1</strong>")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(
+                      /\*\*(.*?)\*\*/g,
+                      "<strong class='text-foreground font-bold'>$1</strong>",
+                    )
                     .replace(/\*(.*?)\*/g, "<em>$1</em>"),
                 }}
               />
@@ -333,36 +361,46 @@ function ArticleReaderPage() {
           <section className="rounded-3xl border border-border bg-card p-6 md:p-8 space-y-6 shadow-sm">
             <div className="flex items-center gap-2">
               <Film className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-bold">{ar ? "الأعمال المذكورة في هذا الدليل" : "Featured Movies in This Guide"}</h2>
+              <h2 className="text-xl font-bold">
+                {ar ? "الأعمال المذكورة في هذا الدليل" : "Featured Movies in This Guide"}
+              </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {relatedMovies.map((m: any) => (
-                <Link
-                  key={m.id}
-                  to="/movie/$id"
-                  params={{ id: String(m.id) }}
-                      reloadDocument
-                  className="group flex gap-3 bg-secondary/40 border border-border rounded-xl p-3 hover:border-primary/50 transition"
-                >
-                  {m.poster ? (
-                    <img src={m.poster} alt={m.title} className="w-14 h-20 rounded-md object-cover shrink-0" loading="lazy" />
-                  ) : (
-                    <div className="w-14 h-20 rounded-md bg-muted shrink-0 grid place-items-center">
-                      <Film className="w-6 h-6 text-muted-foreground" />
+              {relatedMovies
+                .filter((m): m is NonNullable<typeof m> => Boolean(m))
+                .map((m) => (
+                  <Link
+                    key={m.id}
+                    to="/movie/$id"
+                    params={{ id: String(m.id) }}
+                    className="group flex gap-3 bg-secondary/40 border border-border rounded-xl p-3 hover:border-primary/50 transition"
+                  >
+                    {m.poster ? (
+                      <img
+                        src={m.poster}
+                        alt={m.title}
+                        className="w-14 h-20 rounded-md object-cover shrink-0"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-14 h-20 rounded-md bg-muted shrink-0 grid place-items-center">
+                        <Film className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className="font-semibold text-sm truncate group-hover:text-primary transition">
+                          {m.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{m.year}</p>
+                      </div>
+                      <div className="inline-flex items-center gap-1 text-xs text-primary font-medium">
+                        <Star className="w-3 h-3 fill-primary" />
+                        {m.rating} / 10
+                      </div>
                     </div>
-                  )}
-                  <div className="min-w-0 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="font-semibold text-sm truncate group-hover:text-primary transition">{m.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">{m.year}</p>
-                    </div>
-                    <div className="inline-flex items-center gap-1 text-xs text-primary font-medium">
-                      <Star className="w-3 h-3 fill-primary" />
-                      {m.rating} / 10
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
             </div>
           </section>
         )}

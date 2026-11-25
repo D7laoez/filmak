@@ -49,29 +49,31 @@ export const Route = createFileRoute("/person/$id")({
       links: [{ rel: "canonical", href: url }],
     };
   },
-  errorComponent: ({ error, reset }) => {
-    const router = useRouter();
-    const t = useT();
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6 text-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">{t("error_title")}</h1>
-          <p className="text-sm text-muted-foreground mb-4">{error.message}</p>
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            {t("retry")}
-          </button>
-        </div>
-      </div>
-    );
-  },
+  errorComponent: PersonErrorComponent,
   notFoundComponent: () => <div className="p-8">404</div>,
 });
+
+function PersonErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+  const router = useRouter();
+  const t = useT();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6 text-center">
+      <div>
+        <h1 className="text-2xl font-bold mb-2">{t("error_title")}</h1>
+        <p className="text-sm text-muted-foreground mb-4">{error.message}</p>
+        <button
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
+          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+        >
+          {t("retry")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function PersonPage() {
   return (
@@ -152,19 +154,25 @@ function PersonInner() {
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
               {data.birthday && (
                 <div>
-                  <dt className="text-muted-foreground">{locale === "ar" ? "تاريخ الميلاد" : "Born"}</dt>
+                  <dt className="text-muted-foreground">
+                    {locale === "ar" ? "تاريخ الميلاد" : "Born"}
+                  </dt>
                   <dd className="font-medium">{fmtDate(data.birthday)}</dd>
                 </div>
               )}
               {data.deathday && (
                 <div>
-                  <dt className="text-muted-foreground">{locale === "ar" ? "تاريخ الوفاة" : "Died"}</dt>
+                  <dt className="text-muted-foreground">
+                    {locale === "ar" ? "تاريخ الوفاة" : "Died"}
+                  </dt>
                   <dd className="font-medium">{fmtDate(data.deathday)}</dd>
                 </div>
               )}
               {data.placeOfBirth && (
                 <div className="sm:col-span-2">
-                  <dt className="text-muted-foreground">{locale === "ar" ? "مكان الميلاد" : "Place of birth"}</dt>
+                  <dt className="text-muted-foreground">
+                    {locale === "ar" ? "مكان الميلاد" : "Place of birth"}
+                  </dt>
                   <dd className="font-medium">{data.placeOfBirth}</dd>
                 </div>
               )}
@@ -197,7 +205,9 @@ function PersonInner() {
           <button
             onClick={() => setTab("cast")}
             className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-              tab === "cast" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+              tab === "cast"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {locale === "ar" ? "كممثل" : "As Actor"}
@@ -207,7 +217,9 @@ function PersonInner() {
             <button
               onClick={() => setTab("crew")}
               className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-                tab === "crew" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                tab === "crew"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {locale === "ar" ? "كطاقم عمل" : "As Crew"}
@@ -225,8 +237,7 @@ function PersonInner() {
           />
         )}
 
-        <div className="my-8">
-        </div>
+        <div className="my-8"></div>
 
         {/* TV */}
         {tvs.length > 0 && (

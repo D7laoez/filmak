@@ -38,7 +38,10 @@ function CatchAllPage() {
       try {
         if (code) await supabase.auth.exchangeCodeForSession(code);
         if (accessToken && refreshToken) {
-          await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
         }
       } catch {
         // Leave broken/expired OAuth callback URLs instead of showing a 404.
@@ -54,7 +57,10 @@ function CatchAllPage() {
 
   if (isCompletingAuth) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground" dir="rtl">
+      <div
+        className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground"
+        dir="rtl"
+      >
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin text-primary" />
           جارٍ إكمال تسجيل الدخول...

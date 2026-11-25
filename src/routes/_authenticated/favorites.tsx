@@ -17,7 +17,10 @@ export const Route = createFileRoute("/_authenticated/favorites")({
   head: () => ({
     meta: [
       { title: "مفضلتي وقوائمي — فلمك" },
-      { name: "description", content: "استعرض قائمتك المفضلة، قائمة المشاهدة لاحقاً، والأفلام التي شاهدتها في فلمك." },
+      {
+        name: "description",
+        content: "استعرض قائمتك المفضلة، قائمة المشاهدة لاحقاً، والأفلام التي شاهدتها في فلمك.",
+      },
     ],
   }),
   component: FavoritesPage,
@@ -33,18 +36,38 @@ function FavoritesPage() {
   });
 
   const tabs: { key: ListStatus; label: string; icon: React.ReactNode; color: string }[] = [
-    { key: "favorite", label: t("tab_favorites"), icon: <Heart className="w-4 h-4" />, color: "text-primary border-primary" },
-    { key: "watchlist", label: t("tab_watchlist"), icon: <Bookmark className="w-4 h-4" />, color: "text-accent border-accent" },
-    { key: "watched", label: t("tab_watched"), icon: <CheckCircle2 className="w-4 h-4" />, color: "text-emerald-500 border-emerald-500" },
+    {
+      key: "favorite",
+      label: t("tab_favorites"),
+      icon: <Heart className="w-4 h-4" />,
+      color: "text-primary border-primary",
+    },
+    {
+      key: "watchlist",
+      label: t("tab_watchlist"),
+      icon: <Bookmark className="w-4 h-4" />,
+      color: "text-accent border-accent",
+    },
+    {
+      key: "watched",
+      label: t("tab_watched"),
+      icon: <CheckCircle2 className="w-4 h-4" />,
+      color: "text-emerald-500 border-emerald-500",
+    },
   ];
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/40 backdrop-blur sticky top-0 z-40 bg-background/80">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2"><Logo size={32} /></Link>
+          <Link to="/" className="flex items-center gap-2">
+            <Logo size={32} />
+          </Link>
           <div className="flex items-center gap-2">
-            <Link to="/stats" className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition">
+            <Link
+              to="/stats"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-secondary/60 border border-border hover:bg-secondary transition"
+            >
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">{t("my_stats")}</span>
             </Link>
@@ -61,7 +84,9 @@ function FavoritesPage() {
               key={x.key}
               onClick={() => navigate({ to: "/favorites", search: { tab: x.key } })}
               className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition whitespace-nowrap ${
-                tab === x.key ? x.color : "border-transparent text-muted-foreground hover:text-foreground"
+                tab === x.key
+                  ? x.color
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               {x.icon}
@@ -71,7 +96,9 @@ function FavoritesPage() {
         </div>
 
         {isLoading ? (
-          <div className="py-12 flex items-center justify-center"><Spinner size={64} label={t("loading")} /></div>
+          <div className="py-12 flex items-center justify-center">
+            <Spinner size={64} label={t("loading")} />
+          </div>
         ) : !data || data.length === 0 ? (
           <div className="text-center py-16">
             <img
@@ -82,7 +109,10 @@ function FavoritesPage() {
               className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 opacity-80"
             />
             <p className="text-muted-foreground mb-4">{t("favorites_empty")}</p>
-            <Link to="/" className="inline-block bg-primary text-primary-foreground rounded-xl px-5 py-2.5 text-sm font-medium">
+            <Link
+              to="/"
+              className="inline-block bg-primary text-primary-foreground rounded-xl px-5 py-2.5 text-sm font-medium"
+            >
               {t("discover")}
             </Link>
           </div>
@@ -97,10 +127,19 @@ function FavoritesPage() {
               >
                 <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-muted">
                   {m.poster ? (
-                    <img src={m.poster} alt={m.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition" />
+                    <img
+                      src={m.poster}
+                      alt={m.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      {m.media_type === "tv" ? <TvIcon className="w-8 h-8 text-muted-foreground" /> : <Film className="w-8 h-8 text-muted-foreground" />}
+                      {m.media_type === "tv" ? (
+                        <TvIcon className="w-8 h-8 text-muted-foreground" />
+                      ) : (
+                        <Film className="w-8 h-8 text-muted-foreground" />
+                      )}
                     </div>
                   )}
                   {m.tmdb_rating != null && (
@@ -113,7 +152,9 @@ function FavoritesPage() {
                     {m.media_type === "tv" ? t("tv_series") : t("movie")}
                   </div>
                 </div>
-                <p className="mt-2 text-sm font-medium truncate group-hover:text-primary transition">{m.title}</p>
+                <p className="mt-2 text-sm font-medium truncate group-hover:text-primary transition">
+                  {m.title}
+                </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <span>{m.year}</span>
                   {m.rating != null && (

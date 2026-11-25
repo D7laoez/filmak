@@ -50,9 +50,7 @@ export function TopBar() {
     setMobileMenu(false);
   }, [pathname]);
 
-  if (pathname === "/auth") return null;
-
-  const showSuggestions = searchFocused && debouncedQ.length >= 2;
+  const showSuggestions = pathname !== "/auth" && searchFocused && debouncedQ.length >= 2;
   const movieSuggestions = useQuery({
     queryKey: ["topbar-search-movies", debouncedQ, locale],
     queryFn: () => searchMovies({ data: { q: debouncedQ, lang: locale } }),
@@ -67,6 +65,8 @@ export function TopBar() {
     staleTime: 60_000,
     gcTime: 5 * 60_000,
   });
+
+  if (pathname === "/auth") return null;
 
   const submitSearch = (value: string) => {
     const v = value.trim();

@@ -28,7 +28,9 @@ export const listMyItems = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<ListItem[]> => {
     let q = context.supabase
       .from("user_lists")
-      .select("id, media_type, media_id, status, rating, note, title, poster, year, tmdb_rating, created_at")
+      .select(
+        "id, media_type, media_id, status, rating, note, title, poster, year, tmdb_rating, created_at",
+      )
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     if (data.status) q = q.eq("status", data.status);

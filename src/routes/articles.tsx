@@ -96,7 +96,9 @@ function ArticlesIndexPage() {
   });
 
   const featuredArticle = allArticles.find((a) => a.featured) ?? allArticles[0];
-  const gridArticles = filteredArticles.filter((a) => a.id !== featuredArticle?.id || searchQuery.trim().length > 0);
+  const gridArticles = filteredArticles.filter(
+    (a) => a.id !== featuredArticle?.id || searchQuery.trim().length > 0,
+  );
 
   return (
     <main dir={dir} className="min-h-screen bg-background text-foreground pb-24">
@@ -125,7 +127,9 @@ function ArticlesIndexPage() {
             </div>
             <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
               {ar ? "أدلة وتحليلات نقدية" : "In-Depth Cinema Guides"}{" "}
-              <span className="text-primary">{ar ? "تثري ذوقك السينمائي" : "& Expert Curation"}</span>
+              <span className="text-primary">
+                {ar ? "تثري ذوقك السينمائي" : "& Expert Curation"}
+              </span>
             </h1>
             <p className="mt-4 text-muted-foreground text-base md:text-lg leading-relaxed">
               {ar
@@ -233,7 +237,9 @@ function ArticlesIndexPage() {
                   {ar ? "لم نجد مقالات تطابق بحثك" : "No articles matched your query"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {ar ? "جرّب تصنيفاً آخر أو كلمات بحث مختلفة." : "Try selecting another category or searching different terms."}
+                  {ar
+                    ? "جرّب تصنيفاً آخر أو كلمات بحث مختلفة."
+                    : "Try selecting another category or searching different terms."}
                 </p>
               </div>
             ) : (

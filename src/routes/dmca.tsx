@@ -8,7 +8,8 @@ export const Route = createFileRoute("/dmca")({
       { title: "حقوق الملكية الفكرية وسياسة DMCA — فلمك | Copyright & DMCA" },
       {
         name: "description",
-        content: "بيان حقوق الملكية الفكرية وسياسة قانون الألفية الرقمية (DMCA) المتبع في منصة فلمك.",
+        content:
+          "بيان حقوق الملكية الفكرية وسياسة قانون الألفية الرقمية (DMCA) المتبع في منصة فلمك.",
       },
     ],
     links: [{ rel: "canonical", href: "https://filmak.site/dmca" }],
@@ -50,7 +51,9 @@ function DmcaPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
         <section className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-4">
-          <h2 className="text-xl font-bold">{ar ? "طبيعة محتوى منصة فلمك" : "Nature of Hosted Content"}</h2>
+          <h2 className="text-xl font-bold">
+            {ar ? "طبيعة محتوى منصة فلمك" : "Nature of Hosted Content"}
+          </h2>
           <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
             {ar
               ? "فلمك (filmak.site) هي منصة دليل رقمي وتحليلات نقدية تهدف إلى مساعدة عشاق السينما على استكشاف الأعمال وتتبع مفضلاتهم. المنصة لا تستضيف، ولا توفر روابط بث مباشر، ولا ترفع أي ملفات وسائط محمية بحقوق الطبع والنشر على خوادمها الخاصة."
@@ -64,23 +67,43 @@ function DmcaPage() {
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-4">
-          <h2 className="text-xl font-bold">{ar ? "إجراءات إرسال إشعار انتهاك (DMCA Notice)" : "Filing a DMCA Notice"}</h2>
+          <h2 className="text-xl font-bold">
+            {ar ? "إجراءات إرسال إشعار انتهاك (DMCA Notice)" : "Filing a DMCA Notice"}
+          </h2>
           <p className="text-sm md:text-base leading-relaxed text-muted-foreground">
             {ar
               ? "إذا كنت مالكاً لحق من حقوق الملكية الفكرية أو ممثلاً معتمداً له، وتعتقد أن هناك محتوى نصياً أو صورة معروضة تنتهك حقوقك، يرجى تزويدنا بالمعلومات التالية:"
               : "If you believe any content on FILMAK infringes your copyright, please submit an official notice containing:"}
           </p>
           <ul className="list-disc ps-6 space-y-2 text-sm text-muted-foreground">
-            <li>{ar ? "تحديد العمل المحمي بحقوق الطبع والنشر بدقة." : "Identification of the copyrighted work claimed to be infringed."}</li>
-            <li>{ar ? "الرابط الدقيق (URL) للصفحة المعنية على موقع فلمك." : "The exact URL of the material on FILMAK."}</li>
-            <li>{ar ? "معلومات الاتصال الخاصة بك (الاسم، البريد الإلكتروني، والصفة القانونية)." : "Your contact information (name, email, legal status)."}</li>
-            <li>{ar ? "إقرار رسمي بصحة البيانات الواردة في الإشعار." : "A statement confirming the accuracy of the notice under penalty of perjury."}</li>
+            <li>
+              {ar
+                ? "تحديد العمل المحمي بحقوق الطبع والنشر بدقة."
+                : "Identification of the copyrighted work claimed to be infringed."}
+            </li>
+            <li>
+              {ar
+                ? "الرابط الدقيق (URL) للصفحة المعنية على موقع فلمك."
+                : "The exact URL of the material on FILMAK."}
+            </li>
+            <li>
+              {ar
+                ? "معلومات الاتصال الخاصة بك (الاسم، البريد الإلكتروني، والصفة القانونية)."
+                : "Your contact information (name, email, legal status)."}
+            </li>
+            <li>
+              {ar
+                ? "إقرار رسمي بصحة البيانات الواردة في الإشعار."
+                : "A statement confirming the accuracy of the notice under penalty of perjury."}
+            </li>
           </ul>
         </section>
 
         <section className="rounded-2xl border border-primary/20 bg-primary/5 p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-bold text-base">{ar ? "جهة استلام إشعارات الحقوق" : "Designated DMCA Agent"}</h3>
+            <h3 className="font-bold text-base">
+              {ar ? "جهة استلام إشعارات الحقوق" : "Designated DMCA Agent"}
+            </h3>
             <p className="text-xs text-muted-foreground mt-1 font-mono">contact@filmak.site</p>
           </div>
           <Link

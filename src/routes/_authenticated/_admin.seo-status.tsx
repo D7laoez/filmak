@@ -2,7 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowRight, RefreshCw, Search, ExternalLink, CheckCircle2, AlertCircle, HelpCircle, Send, Clock } from "lucide-react";
+import {
+  ArrowRight,
+  RefreshCw,
+  Search,
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle,
+  HelpCircle,
+  Send,
+  Clock,
+} from "lucide-react";
 import {
   getSeoStatus,
   inspectSeoUrl,
@@ -18,10 +28,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/_authenticated/_admin/seo-status")({
   head: () => ({
-    meta: [
-      { title: "حالة SEO — فلمك" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "حالة SEO — فلمك" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: SeoStatusPage,
 });
@@ -64,8 +71,7 @@ function SeoStatusPage() {
   });
 
   const forbidden =
-    status.error instanceof Error &&
-    /Forbidden|admin role/i.test(status.error.message);
+    status.error instanceof Error && /Forbidden|admin role/i.test(status.error.message);
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground">
@@ -157,11 +163,29 @@ function SeoStatusPage() {
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="روابط مُرسَلة" value={status.data.submitted} accent="text-primary" />
             <StatCard label="مُفهرَسة" value={status.data.indexed} accent="text-emerald-500" />
-            <StatCard label="أخطاء" value={status.data.errors} accent={status.data.errors > 0 ? "text-destructive" : "text-emerald-500"} />
-            <StatCard label="تحذيرات" value={status.data.warnings} accent={status.data.warnings > 0 ? "text-amber-500" : "text-emerald-500"} />
+            <StatCard
+              label="أخطاء"
+              value={status.data.errors}
+              accent={status.data.errors > 0 ? "text-destructive" : "text-emerald-500"}
+            />
+            <StatCard
+              label="تحذيرات"
+              value={status.data.warnings}
+              accent={status.data.warnings > 0 ? "text-amber-500" : "text-emerald-500"}
+            />
             <div className="col-span-full text-xs text-muted-foreground border border-border/60 rounded-xl px-4 py-3 space-y-1">
-              <div>آخر إرسال: {status.data.lastSubmitted ? new Date(status.data.lastSubmitted).toLocaleString() : "—"}</div>
-              <div>آخر تحميل من Google: {status.data.lastDownloaded ? new Date(status.data.lastDownloaded).toLocaleString() : "—"}</div>
+              <div>
+                آخر إرسال:{" "}
+                {status.data.lastSubmitted
+                  ? new Date(status.data.lastSubmitted).toLocaleString()
+                  : "—"}
+              </div>
+              <div>
+                آخر تحميل من Google:{" "}
+                {status.data.lastDownloaded
+                  ? new Date(status.data.lastDownloaded).toLocaleString()
+                  : "—"}
+              </div>
             </div>
           </section>
         )}
@@ -221,7 +245,9 @@ function SeoStatusPage() {
             </div>
           )}
           {history.data && history.data.length === 0 && (
-            <p className="text-sm text-muted-foreground">لا توجد عمليات مسجّلة بعد. اضغط "إعادة إرسال Sitemap" لبدء أول عملية.</p>
+            <p className="text-sm text-muted-foreground">
+              لا توجد عمليات مسجّلة بعد. اضغط "إعادة إرسال Sitemap" لبدء أول عملية.
+            </p>
           )}
           {history.data && history.data.length > 0 && (
             <div className="overflow-x-auto">
@@ -277,7 +303,15 @@ function HistoryRow({ row }: { row: SubmissionRow }) {
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: number | string; accent: string }) {
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number | string;
+  accent: string;
+}) {
   return (
     <div className="border border-border/60 rounded-2xl p-4 bg-secondary/20">
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
@@ -329,7 +363,10 @@ function InspectionCard({ data }: { data: InspectionResult }) {
         <Row label="حالة الفهرسة" value={data.indexingState} />
         <Row label="حالة الجلب" value={data.pageFetchState} />
         <Row label="robots.txt" value={data.robotsTxtState} />
-        <Row label="آخر زحف" value={data.lastCrawlTime ? new Date(data.lastCrawlTime).toLocaleString() : "—"} />
+        <Row
+          label="آخر زحف"
+          value={data.lastCrawlTime ? new Date(data.lastCrawlTime).toLocaleString() : "—"}
+        />
       </dl>
     </div>
   );

@@ -120,14 +120,13 @@ export function getEditorialContentWordCount(article: Article | null | undefined
 }
 
 export function hasEditorialDepth(article: Article | null | undefined): boolean {
-  if (!hasSubstantialArticle(article)) return false;
+  if (!article || !hasSubstantialArticle(article)) return false;
 
   // Evaluate the richer available language body. Thin pages remain noindex and
   // ineligible for ads; language choice alone must not suppress strong content.
   const bodies = [article.content_ar.trim(), article.content_en.trim()];
   const content = bodies.sort(
-    (a, b) =>
-      b.split(/\s+/).filter(Boolean).length - a.split(/\s+/).filter(Boolean).length,
+    (a, b) => b.split(/\s+/).filter(Boolean).length - a.split(/\s+/).filter(Boolean).length,
   )[0];
   const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim().length >= 80);
   const wordCount = content.split(/\s+/).filter(Boolean).length;
@@ -139,13 +138,12 @@ export function hasEditorialDepthForLocale(
   article: Article | null | undefined,
   locale: string,
 ): boolean {
-  if (!hasSubstantialArticle(article)) return false;
+  if (!article || !hasSubstantialArticle(article)) return false;
   const content = (locale === "ar" ? article.content_ar : article.content_en).trim();
   const wordCount = content.split(/\s+/).filter(Boolean).length;
   const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim().length >= 80);
   return wordCount >= 700 && paragraphs.length >= 5;
 }
-
 
 export type EditorialCollection = {
   id: string;
@@ -251,13 +249,10 @@ const SEED_EDITORIAL_REVIEWS: Record<number, EditorialReview> = {
       "موسيقى هانز زيمر الخالدة وتدرج الإيقاع التصاعدي",
       "نهاية أيقونية تفتح باب النقاش والتفكير",
     ],
-    weaknesses: [
-      "كمية القواعد والشروحات النظرية في الثلث الأول قد تحتاج لتركيز إضافي",
-    ],
+    weaknesses: ["كمية القواعد والشروحات النظرية في الثلث الأول قد تحتاج لتركيز إضافي"],
     who_should_watch:
       "محبو الألغاز الفكرية، عشاق أفلام الأكشن الذكية، ومن يقدرون التصميم السردي المعقد.",
-    who_may_not_enjoy:
-      "من يبحث عن فيلم خفيف للمشاهدة بدون تركيز أثناء الانشغال بأنشطة أخرى.",
+    who_may_not_enjoy: "من يبحث عن فيلم خفيف للمشاهدة بدون تركيز أثناء الانشغال بأنشطة أخرى.",
     why_watch:
       "يقدم Inception تجربة فريدة تجمع بين متعة الإثارة والتشويق مع اختبار عقلي ممتع حول طبيعة الواقع والذاكرة.",
     best_for: "مشاهدة ليلية مع أصدقاء محبين للنقاش والتحليل",
@@ -297,13 +292,10 @@ const SEED_EDITORIAL_REVIEWS: Record<number, EditorialReview> = {
       "طاقم تمثيل كوري متناغم بأداء استثنائي وطبيعي",
       "توازن نادر بين الرسالة الاجتماعية القوية والترفيه الخالص",
     ],
-    weaknesses: [
-      "التحول المفاجئ في النصف الأخير قد يكون صادماً للبعض",
-    ],
+    weaknesses: ["التحول المفاجئ في النصف الأخير قد يكون صادماً للبعض"],
     who_should_watch:
       "كل عاشق للسينما العالمية، محبو الكوميديا السوداء، والباحثون عن قصص غير تقليدية تحمل قيمة فنية عالية.",
-    who_may_not_enjoy:
-      "من يفضلون النهايات الهادئة والقصص التي تفصل بوضوح بين الخير والشر المطلق.",
+    who_may_not_enjoy: "من يفضلون النهايات الهادئة والقصص التي تفصل بوضوح بين الخير والشر المطلق.",
     why_watch:
       "لأنه أحد أهم الأفلام في تاريخ السينما المعاصرة، وأول فيلم غير ناطق بالإنجليزية يفوز بأوسكار أفضل فيلم عن جدارة واستحقاق.",
     best_for: "أمسية سينمائية استثنائية لمن يريد عملاً يثير الإعجاب والتفكير",
@@ -342,9 +334,7 @@ const SEED_EDITORIAL_REVIEWS: Record<number, EditorialReview> = {
       "تسلسلات أكشن واقعية ومطاردات عملية مذهلة",
       "تطور شخصية هارفي دينت وسقوطه التراجيدي",
     ],
-    weaknesses: [
-      "طول الفيلم وبعض خطوط التحقيق الجانبية قد تبدو مكثفة جداً",
-    ],
+    weaknesses: ["طول الفيلم وبعض خطوط التحقيق الجانبية قد تبدو مكثفة جداً"],
     who_should_watch:
       "عشاق أفلام الجريمة والإثارة، محبو نولان وهيث ليدجر، ومن يريد تجربة سينمائية ذات وزن ثقيل.",
     who_may_not_enjoy:
@@ -386,13 +376,10 @@ const SEED_EDITORIAL_REVIEWS: Record<number, EditorialReview> = {
       "مونتاج صوتي وبصري عبقري يبني التوتر بشكل تصاعدي مذهل",
       "معالجة تاريخية وأخلاقية رصينة بدون تبسيط أو تحيز",
     ],
-    weaknesses: [
-      "كثرة الشخصيات العلمية والسياسية في الجزء الأول قد تتطلب انتباهاً مكثفاً",
-    ],
+    weaknesses: ["كثرة الشخصيات العلمية والسياسية في الجزء الأول قد تتطلب انتباهاً مكثفاً"],
     who_should_watch:
       "محبو التاريخ المعاصر، عشاق الدراما السياسية والأخلاقية، وكل من يقدر التمثيل الرفيع والإخراج الدقيق.",
-    who_may_not_enjoy:
-      "من يتوقع فيلم حروب وأكشن عسكري تقليدي بالدبابات والجنود.",
+    who_may_not_enjoy: "من يتوقع فيلم حروب وأكشن عسكري تقليدي بالدبابات والجنود.",
     why_watch:
       "لأنه إنجاز سينمائي حاز على إجماع نقدي وجوائز الأوسكار الكبرى ويوثق لحظة مفصلية في تاريخ البشرية.",
     best_for: "مشاهدة مركزة لمن يقدر حوارات الذكاء وصراعات السلطة",
@@ -424,11 +411,15 @@ const SEED_ARTICLES: Article[] = [
     id: "art-1",
     slug: "best-psychological-thrillers",
     title_ar: "أقوى أفلام الإثارة النفسية التي ستبقى في عقلك لأيام: دليل المشاهدة والتحليل",
-    title_en: "The Best Psychological Thrillers That Will Haunt Your Mind: Essential Guide & Analysis",
+    title_en:
+      "The Best Psychological Thrillers That Will Haunt Your Mind: Essential Guide & Analysis",
     subtitle_ar: "رحلة سينمائية في دهاليز العقل البشري، الشك، والواقع المتشظي",
-    subtitle_en: "A cinematic journey through fractured minds, paranoiac tension, and unreliable realities",
-    excerpt_ar: "لا شيء يعادل متعة مشاهدة فيلم إثارة نفسي يجعلك تشك في كل لقطة، ويعيد ترتيب أوراق الحكاية في اللحظات الأخيرة. جمعنا لك هنا أبرز التحف التي حددت معالم هذا النوع السينمائي مع شرح ما يجعل كل عمل منها تجربة لا تُنسى.",
-    excerpt_en: "Nothing compares to the thrill of a psychological thriller that makes you question every frame. Here is our curated deep dive into the genre's defining masterworks and why each demands your full attention.",
+    subtitle_en:
+      "A cinematic journey through fractured minds, paranoiac tension, and unreliable realities",
+    excerpt_ar:
+      "لا شيء يعادل متعة مشاهدة فيلم إثارة نفسي يجعلك تشك في كل لقطة، ويعيد ترتيب أوراق الحكاية في اللحظات الأخيرة. جمعنا لك هنا أبرز التحف التي حددت معالم هذا النوع السينمائي مع شرح ما يجعل كل عمل منها تجربة لا تُنسى.",
+    excerpt_en:
+      "Nothing compares to the thrill of a psychological thriller that makes you question every frame. Here is our curated deep dive into the genre's defining masterworks and why each demands your full attention.",
     category: "guides",
     category_label_ar: "دليل الإثارة والغموض",
     category_label_en: "Thriller Guide",
@@ -518,10 +509,13 @@ Martin Scorsese guides Leonardo DiCaprio through the gothic corridors of Ashecli
     slug: "movies-like-interstellar",
     title_ar: "أفلام تشبه Interstellar: روائع الخيال العلمي والفضاء والتأمل الإنساني",
     title_en: "Movies Like Interstellar: Mind-Bending Space Epics & Humanist Sci-Fi",
-    subtitle_ar: "إذا أبهرتك رحلة كوبر عبر الثقب الدودي، فهذه الأفلام الخمسة يجب أن تكون وجهتك التالية",
+    subtitle_ar:
+      "إذا أبهرتك رحلة كوبر عبر الثقب الدودي، فهذه الأفلام الخمسة يجب أن تكون وجهتك التالية",
     subtitle_en: "If Cooper's voyage touched your soul, explore these cosmic masterpieces next",
-    excerpt_ar: "جمع Interstellar بين عظمة فيزياء الكون ورهافة المشاعر الأبوية. في هذا المقال نأخذك في جولة مع أبرز الأفلام التي تقدم نفس المزيج الساحر من الاستكشاف الفضائي، المفاهيم العلمية الرصينة، والأسئلة الوجودية.",
-    excerpt_en: "Interstellar uniquely blended gravitational physics with the emotional gravity of parenthood. Here are the finest space epics that capture that same transcendent wonder and existential depth.",
+    excerpt_ar:
+      "جمع Interstellar بين عظمة فيزياء الكون ورهافة المشاعر الأبوية. في هذا المقال نأخذك في جولة مع أبرز الأفلام التي تقدم نفس المزيج الساحر من الاستكشاف الفضائي، المفاهيم العلمية الرصينة، والأسئلة الوجودية.",
+    excerpt_en:
+      "Interstellar uniquely blended gravitational physics with the emotional gravity of parenthood. Here are the finest space epics that capture that same transcendent wonder and existential depth.",
     category: "comparisons",
     category_label_ar: "ترشيحات ومقارنات",
     category_label_en: "Recommendations",
@@ -604,8 +598,10 @@ Ridley Scott and Matt Damon deliver an uplifting survival masterclass grounded i
     title_en: "Hidden Cinematic Gems: Underrated Movies That Deserved Massive Acclaim",
     subtitle_ar: "أعمال استثنائية لم تنل حقها من الشهرة والتسويق وتستحق أن تكتشفها الآن",
     subtitle_en: "Brilliant films overshadowed by box-office noise and marketing budgets",
-    excerpt_ar: "تضيع الكثير من الروائع السينمائية في زحمة الإصدارات الضخمة وحملات التسويق الهائلة. في هذه القائمة، نسلّط الضوء على أعمال مبتكرة في القصة والتمثيل مرت بهدوء دون أن تأخذ حقها، ونشرح لماذا يجب أن تضعها في قائمتك الليلة.",
-    excerpt_en: "Many of cinema's finest treasures slip past general audiences without mega-budget marketing. Here are five hidden masterpieces that deliver unforgettable storytelling.",
+    excerpt_ar:
+      "تضيع الكثير من الروائع السينمائية في زحمة الإصدارات الضخمة وحملات التسويق الهائلة. في هذه القائمة، نسلّط الضوء على أعمال مبتكرة في القصة والتمثيل مرت بهدوء دون أن تأخذ حقها، ونشرح لماذا يجب أن تضعها في قائمتك الليلة.",
+    excerpt_en:
+      "Many of cinema's finest treasures slip past general audiences without mega-budget marketing. Here are five hidden masterpieces that deliver unforgettable storytelling.",
     category: "spotlight",
     category_label_ar: "مختارات خاصة",
     category_label_en: "Spotlight",
@@ -666,8 +662,10 @@ Murakami's prose translated into a simmering study of class alienation and quiet
     title_en: "Movies with Mind-Blowing Plot Twists That Actually Make Sense",
     subtitle_ar: "تحف سينمائية تدفعك لإعادة المشاهدة فوراً لرؤية الخيوط المخفية",
     subtitle_en: "Cinematic twists that recontextualize every previous scene flawlessly",
-    excerpt_ar: "الخاتمة الصادمة الحقيقية ليست مجرد مفاجأة اعتباطية لتغيير مسار الأحداث، بل هي كشف ذكي يعيد ترتيب كل لقطة شاهدتها من منظور جديد كلياً. نستعرض هنا أبرز الأفلام التي أتقنت هذه الصناعة الفنية النادرة.",
-    excerpt_en: "A true plot twist isn't a cheap gimmick—it's a masterclass in narrative misdirection where all clues were hidden in plain sight. Here are the finest examples in film history.",
+    excerpt_ar:
+      "الخاتمة الصادمة الحقيقية ليست مجرد مفاجأة اعتباطية لتغيير مسار الأحداث، بل هي كشف ذكي يعيد ترتيب كل لقطة شاهدتها من منظور جديد كلياً. نستعرض هنا أبرز الأفلام التي أتقنت هذه الصناعة الفنية النادرة.",
+    excerpt_en:
+      "A true plot twist isn't a cheap gimmick—it's a masterclass in narrative misdirection where all clues were hidden in plain sight. Here are the finest examples in film history.",
     category: "guides",
     category_label_ar: "دليل السينما الذكية",
     category_label_en: "Cinema Analysis",
@@ -702,8 +700,10 @@ Explore our top selections where the final five minutes reward your keenest obse
     title_en: "Korean Cinema Beyond Parasite: Thrillers, Dramas & Visual Masterpieces",
     subtitle_ar: "دليل شامل لأبرز الأعمال الكورية الجنوبية التي غيرت خريطة السينما العالمية",
     subtitle_en: "A comprehensive journey through South Korea's golden age of filmmaking",
-    excerpt_ar: "إذا كان مدخلك للسينما الكورية هو فيلم Parasite، فأنت على موعد مع كنز هائل من الأعمال التي تمتاز بجرأة الطرح، وحبكات الانتقام المتقنة، والعمق العاطفي الفريد.",
-    excerpt_en: "If Parasite was your gateway into South Korean cinema, prepare to discover an extraordinary repository of fearless storytelling, revenge thrillers, and heartfelt dramas.",
+    excerpt_ar:
+      "إذا كان مدخلك للسينما الكورية هو فيلم Parasite، فأنت على موعد مع كنز هائل من الأعمال التي تمتاز بجرأة الطرح، وحبكات الانتقام المتقنة، والعمق العاطفي الفريد.",
+    excerpt_en:
+      "If Parasite was your gateway into South Korean cinema, prepare to discover an extraordinary repository of fearless storytelling, revenge thrillers, and heartfelt dramas.",
     category: "genre-deep-dive",
     category_label_ar: "سينما عالمية",
     category_label_en: "World Cinema",
@@ -738,8 +738,10 @@ Essential viewing includes *The Handmaiden*, *Memories of Murder*, and *Train to
     title_en: "The Ultimate Rainy Night Movie Guide: Cozy, Melancholic & Atmospheric Cinema",
     subtitle_ar: "اختيارات سينمائية مريحة تناسب صوت المطر وفنجان القهوة الدافئ",
     subtitle_en: "Atmospheric and comforting cinematic companions for quiet rainy evenings",
-    excerpt_ar: "ليالي الشتاء والمطر تحتاج إلى نوع خاص من السينما: أفلام لا تلهث وراء الأكشن الصاخب، بل تغمرك في تفاصيل بصرية دافئة، وموسيقى هادئة، وشخصيات تلامس القلب.",
-    excerpt_en: "Rainy nights call for a distinct cinematic frequency: gentle pacing, lush cinematography, and intimate human warmth.",
+    excerpt_ar:
+      "ليالي الشتاء والمطر تحتاج إلى نوع خاص من السينما: أفلام لا تلهث وراء الأكشن الصاخب، بل تغمرك في تفاصيل بصرية دافئة، وموسيقى هادئة، وشخصيات تلامس القلب.",
+    excerpt_en:
+      "Rainy nights call for a distinct cinematic frequency: gentle pacing, lush cinematography, and intimate human warmth.",
     category: "collections",
     category_label_ar: "أجواء ومزاج",
     category_label_en: "Atmosphere & Mood",
@@ -835,18 +837,14 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       {
         q_ar: "ما الفرق بين الخيال العلمي الصارم والخيال العلمي الخفيف؟",
         q_en: "What is the difference between Hard Sci-Fi and Soft Sci-Fi?",
-        a_ar:
-          "الخيال العلمي الصارم (مثل Interstellar و 2001) يلتزم بقوانين الفيزياء والعلوم المعروفة قدر الإمكان، بينما يركز الخيال العلمي الخفيف على الأبعاد الاجتماعية والنفسية والمغامرة.",
-        a_en:
-          "Hard Sci-Fi strictly respects known laws of physics and science, whereas Soft Sci-Fi focuses on social, psychological, or exploratory drama.",
+        a_ar: "الخيال العلمي الصارم (مثل Interstellar و 2001) يلتزم بقوانين الفيزياء والعلوم المعروفة قدر الإمكان، بينما يركز الخيال العلمي الخفيف على الأبعاد الاجتماعية والنفسية والمغامرة.",
+        a_en: "Hard Sci-Fi strictly respects known laws of physics and science, whereas Soft Sci-Fi focuses on social, psychological, or exploratory drama.",
       },
       {
         q_ar: "من أين أبدأ إذا كنت جديداً على أفلام الخيال العلمي؟",
         q_en: "Where should beginners start with science fiction cinema?",
-        a_ar:
-          "ابدأ بأعمال تجمع بين القصة الإنسانية والإبهار البصري المتقن مثل Inception و Arrival و The Martian.",
-        a_en:
-          "Start with emotionally accessible, visually stunning modern benchmarks like Inception, Arrival, and The Martian.",
+        a_ar: "ابدأ بأعمال تجمع بين القصة الإنسانية والإبهار البصري المتقن مثل Inception و Arrival و The Martian.",
+        a_en: "Start with emotionally accessible, visually stunning modern benchmarks like Inception, Arrival, and The Martian.",
       },
     ],
   },
@@ -911,10 +909,8 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       {
         q_ar: "ما الذي يميز الأكشن الواقعي عن الأكشن الرقمي؟",
         q_en: "What differentiates practical action from CGI-heavy action?",
-        a_ar:
-          "الأكشن الواقعي يعتمد على المجازفين الحقيقيين والمؤثرات الميكانيكية الحية، مما يعطي المشاهد إحساساً حقيقياً بالخطر والوزن على عكس المؤثرات الرقمية المفرطة.",
-        a_en:
-          "Practical action employs real stunt performers and physical pyrotechnics, delivering tangible weight and genuine stakes.",
+        a_ar: "الأكشن الواقعي يعتمد على المجازفين الحقيقيين والمؤثرات الميكانيكية الحية، مما يعطي المشاهد إحساساً حقيقياً بالخطر والوزن على عكس المؤثرات الرقمية المفرطة.",
+        a_en: "Practical action employs real stunt performers and physical pyrotechnics, delivering tangible weight and genuine stakes.",
       },
     ],
   },
@@ -926,8 +922,7 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       "الرعب السينمائي هو المرآة التي تعكس مخاوفنا الدفينة والمجهول وما وراء الطبيعة. يتجاوز الرعب المعاصر الفزعات السطحية ليقدم دراسات نفسية عميقة حول الصدمات الموروثة، والرهاب الاجتماعي، والعزلة.",
     intro_en:
       "Horror cinema confronts our primal anxieties and the dread of the unknown, exploring grief, trauma, and psychological disintegration far beyond superficial jump scares.",
-    what_to_expect_ar:
-      "أجواء مظلمة، توتر نفسي تصاعدي، غموض غيبي، ونهايات غير تقليدية.",
+    what_to_expect_ar: "أجواء مظلمة، توتر نفسي تصاعدي، غموض غيبي، ونهايات غير تقليدية.",
     what_to_expect_en:
       "Atmospheric dread, slow-building tension, supernatural forces, and unsettling thematic depth.",
     signature_tropes_ar: [
@@ -979,10 +974,8 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       {
         q_ar: "ما هو الرعب المرتفع (Elevated Horror)؟",
         q_en: "What is elevated horror?",
-        a_ar:
-          "هو مصطلح نقدي يُطلق على أفلام الرعب التي تركز على الدراما النفسية والرمزية الفنية وموضوعات مثل الحزن والفقدان بدلاً من الاعتماد على الدماء والفزعات الرخيصة.",
-        a_en:
-          "It refers to horror films prioritizing psychological atmosphere, artistic metaphor, and thematic resonance over cheap shocks.",
+        a_ar: "هو مصطلح نقدي يُطلق على أفلام الرعب التي تركز على الدراما النفسية والرمزية الفنية وموضوعات مثل الحزن والفقدان بدلاً من الاعتماد على الدماء والفزعات الرخيصة.",
+        a_en: "It refers to horror films prioritizing psychological atmosphere, artistic metaphor, and thematic resonance over cheap shocks.",
       },
     ],
   },
@@ -994,8 +987,7 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       "الدراما هي قلب السينما النابض وأكثر الأنواع قدرة على ملامسة الواقع الإنساني. تتناول صراعات النفس، والعلاقات المعقدة، والعدالة الاجتماعية، والخيارات المصيرية التي تحدد مسار الحياة.",
     intro_en:
       "Drama remains cinema's emotional bedrock, portraying nuanced human relationships, moral crossroads, social struggle, and intimate character transformations.",
-    what_to_expect_ar:
-      "شخصيات مبنية بعناية، حوارات قوية، أداء تمثيلي عميق، ولحظات وجدانية مؤثرة.",
+    what_to_expect_ar: "شخصيات مبنية بعناية، حوارات قوية، أداء تمثيلي عميق، ولحظات وجدانية مؤثرة.",
     what_to_expect_en:
       "Character-driven arcs, powerful dialogue, award-winning acting performances, and emotional resonance.",
     signature_tropes_ar: [
@@ -1047,10 +1039,8 @@ const GENRE_EDITORIAL_DATA: Record<number, GenreEditorialInfo> = {
       {
         q_ar: "كيف تختار فيلماً درامياً يناسب مزاجك؟",
         q_en: "How do you pick the right drama for your mood?",
-        a_ar:
-          "حدد ما إذا كنت تبحث عن قصة ملهمة تبعث على التفاؤل (مثل Shawshank) أو دراما واقعية مكثفة تستكشف صراعات معقدة (مثل Whiplash).",
-        a_en:
-          "Identify whether you want an uplifting human triumphs story or an intense, high-tension character study.",
+        a_ar: "حدد ما إذا كنت تبحث عن قصة ملهمة تبعث على التفاؤل (مثل Shawshank) أو دراما واقعية مكثفة تستكشف صراعات معقدة (مثل Whiplash).",
+        a_en: "Identify whether you want an uplifting human triumphs story or an intense, high-tension character study.",
       },
     ],
   },
@@ -1114,15 +1104,14 @@ export const getEditorialReview = createServerFn({ method: "GET" })
 
 // 2. Get list of editorial articles
 export const getEditorialArticles = createServerFn({ method: "GET" })
-  .validator(
-    (d: unknown) =>
-      z
-        .object({
-          category: z.string().optional(),
-          featuredOnly: z.boolean().optional(),
-          limit: z.number().int().min(1).max(50).optional(),
-        })
-        .parse(d ?? {}),
+  .validator((d: unknown) =>
+    z
+      .object({
+        category: z.string().optional(),
+        featuredOnly: z.boolean().optional(),
+        limit: z.number().int().min(1).max(50).optional(),
+      })
+      .parse(d ?? {}),
   )
   .handler(async ({ data }): Promise<Article[]> => {
     try {
@@ -1271,8 +1260,7 @@ export const getEditorialPickOfTheWeek = createServerFn({ method: "GET" }).handl
         "ملحمة كريستوفر نولان التي لا تشيخ، تجمع بين الإعجاز العلمي والموسيقى المهيبة لأورغن هانز زيمر، لتقدم تجربة سينمائية نادرة تُلامس أعماق القلب.",
       why_picked_en:
         "Christopher Nolan's ageless space odyssey seamlessly combines rigorous astrophysics with Hans Zimmer's soaring church-organ score to create an unforgettable emotional triumph.",
-      who_should_watch_ar:
-        "عشاق الخيال العلمي الفلسفي، والباحثون عن قصص التضحية والأمل الكوني.",
+      who_should_watch_ar: "عشاق الخيال العلمي الفلسفي، والباحثون عن قصص التضحية والأمل الكوني.",
       who_should_watch_en:
         "Fans of cerebral science fiction and emotionally resonant family dramas.",
       backdrop: "https://image.tmdb.org/t/p/w1280/xJHokMbljvjADYdit5fK5VQsXEG.jpg",
@@ -1302,19 +1290,25 @@ export const COLLECTIONS_DATA: Record<
     en: "Best Movies of 2026",
     genre: "",
     year: 2026,
-    descAr: "أبرز الإصدارات السينمائية الجديدة لعام 2026 المنتقاة بعناية لمساعدتك على متابعة أهم أعمال العام.",
+    descAr:
+      "أبرز الإصدارات السينمائية الجديدة لعام 2026 المنتقاة بعناية لمساعدتك على متابعة أهم أعمال العام.",
     descEn: "A carefully curated selection of the most notable new cinematic releases from 2026.",
-    editorialIntroAr: "شهد عام 2026 تنوعاً مبهراً في الإنتاجات السينمائية بين الخيال العلمي الملحمي، والدراما المستقلة المكثفة، والتجارب الإخراجية المبتكرة. اخترنا لك هنا الأعمال التي تستحق المشاهدة والتقييم.",
-    editorialIntroEn: "2026 delivered an impressive array of cinematic achievements across science fiction, intimate independent drama, and visionary directing. Here are the defining releases of the year.",
+    editorialIntroAr:
+      "شهد عام 2026 تنوعاً مبهراً في الإنتاجات السينمائية بين الخيال العلمي الملحمي، والدراما المستقلة المكثفة، والتجارب الإخراجية المبتكرة. اخترنا لك هنا الأعمال التي تستحق المشاهدة والتقييم.",
+    editorialIntroEn:
+      "2026 delivered an impressive array of cinematic achievements across science fiction, intimate independent drama, and visionary directing. Here are the defining releases of the year.",
   },
   "horror-movies": {
     ar: "أفضل أفلام الرعب والغموض",
     en: "Best Horror Movies",
     genre: "27",
     descAr: "أفلام رعب قوية لمحبي التوتر والأجواء المظلمة والرعب النفسي العميق.",
-    descEn: "Horror masterworks for fans of psychological dread, atmosphere, and unrelenting suspense.",
-    editorialIntroAr: "يتجاوز الرعب السينمائي الفزعات السطحية ليأخذنا في رحلة داخل أعمق المخاوف الإنسانية. هذه المجموعة تضم أعمالاً رائدة في بناء الأجواء الخانقة والتوتر النفسي الصاعد.",
-    editorialIntroEn: "True horror transcends cheap jump scares into psychological dread and atmospheric terror. This collection highlights the finest films exploring the darker corners of human fear.",
+    descEn:
+      "Horror masterworks for fans of psychological dread, atmosphere, and unrelenting suspense.",
+    editorialIntroAr:
+      "يتجاوز الرعب السينمائي الفزعات السطحية ليأخذنا في رحلة داخل أعمق المخاوف الإنسانية. هذه المجموعة تضم أعمالاً رائدة في بناء الأجواء الخانقة والتوتر النفسي الصاعد.",
+    editorialIntroEn:
+      "True horror transcends cheap jump scares into psychological dread and atmospheric terror. This collection highlights the finest films exploring the darker corners of human fear.",
   },
   "romantic-movies": {
     ar: "أفضل الأفلام الرومانسية",
@@ -1322,8 +1316,10 @@ export const COLLECTIONS_DATA: Record<
     genre: "10749",
     descAr: "اختيارات رومانسية عذبة تجمع بين دفء المشاعر والقصص الإنسانية الصادقة.",
     descEn: "Romantic cinema ranging from timeless classics to poignant modern relationships.",
-    editorialIntroAr: "السينما الرومانسية حين تُصنع بصدق تلامس أوتار القلوب وتخلد لحظات الشوق واللقاء والتضحية. استمتع بأعمال تبتعد عن الابتذال وتقدم دراما عاطفية راقية.",
-    editorialIntroEn: "Intimate, heartfelt, and resonant stories of human connection, longing, and romance crafted with genuine emotional honesty.",
+    editorialIntroAr:
+      "السينما الرومانسية حين تُصنع بصدق تلامس أوتار القلوب وتخلد لحظات الشوق واللقاء والتضحية. استمتع بأعمال تبتعد عن الابتذال وتقدم دراما عاطفية راقية.",
+    editorialIntroEn:
+      "Intimate, heartfelt, and resonant stories of human connection, longing, and romance crafted with genuine emotional honesty.",
   },
   "action-movies": {
     ar: "أفضل أفلام الأكشن والإثارة",
@@ -1331,8 +1327,10 @@ export const COLLECTIONS_DATA: Record<
     genre: "28",
     descAr: "أكشن ومطاردات ومعارك مصممة بحرفية عالية لمن يريد جرعة حماس وأدرينالين.",
     descEn: "High-octane choreography, breathtaking stunts, and non-stop momentum.",
-    editorialIntroAr: "الأكشن ليس مجرد انفجارات؛ بل هو فن كوريغرافيا القتال وضبط إيقاع المطاردات وتصميم المجازفات الحية التي تحبس الأنفاس من اللقطة الأولى حتى الختام.",
-    editorialIntroEn: "Action cinema at its peak: masterclass choreography, practical stunt mastery, and kinetic storytelling that keeps adrenaline pumping.",
+    editorialIntroAr:
+      "الأكشن ليس مجرد انفجارات؛ بل هو فن كوريغرافيا القتال وضبط إيقاع المطاردات وتصميم المجازفات الحية التي تحبس الأنفاس من اللقطة الأولى حتى الختام.",
+    editorialIntroEn:
+      "Action cinema at its peak: masterclass choreography, practical stunt mastery, and kinetic storytelling that keeps adrenaline pumping.",
   },
   "comedy-movies": {
     ar: "أفضل الأفلام الكوميدية",
@@ -1340,8 +1338,10 @@ export const COLLECTIONS_DATA: Record<
     genre: "35",
     descAr: "أفلام كوميدية ممتعة وذكية لسهرة خفيفة بدون تعقيد.",
     descEn: "Hilarious, uplifting, and smart comedies for an entertaining movie night.",
-    editorialIntroAr: "الضحك فن رفيع، وهذه القائمة تجمع بين الكوميديا الذكية، والمواقف الطريفة، والحوارات الساخرة لتمنحك أمسية مريحة ترسم الابتسامة.",
-    editorialIntroEn: "Laughter and brilliant situational wit: curated comedies that combine smart writing with genuine lighthearted entertainment.",
+    editorialIntroAr:
+      "الضحك فن رفيع، وهذه القائمة تجمع بين الكوميديا الذكية، والمواقف الطريفة، والحوارات الساخرة لتمنحك أمسية مريحة ترسم الابتسامة.",
+    editorialIntroEn:
+      "Laughter and brilliant situational wit: curated comedies that combine smart writing with genuine lighthearted entertainment.",
   },
   "sci-fi-movies": {
     ar: "أفضل أفلام الخيال العلمي",
@@ -1349,8 +1349,10 @@ export const COLLECTIONS_DATA: Record<
     genre: "878",
     descAr: "عوالم مستقبلية، أسرار الفضاء، وأفكار فلسفية تتجاوز المألوف.",
     descEn: "Futuristic visions, cosmic mysteries, and mind-bending philosophical concepts.",
-    editorialIntroAr: "مختبر الأفكار الكبرى؛ حيث يلتقي التفكير العلمي مع الأسئلة الوجودية حول الزمن، ومصير البشرية، وحدود الكون.",
-    editorialIntroEn: "The ultimate frontier of speculative thought: where scientific concepts converge with existential inquiries about human destiny.",
+    editorialIntroAr:
+      "مختبر الأفكار الكبرى؛ حيث يلتقي التفكير العلمي مع الأسئلة الوجودية حول الزمن، ومصير البشرية، وحدود الكون.",
+    editorialIntroEn:
+      "The ultimate frontier of speculative thought: where scientific concepts converge with existential inquiries about human destiny.",
   },
   "korean-movies": {
     ar: "أفضل الأفلام الكورية",
@@ -1359,8 +1361,10 @@ export const COLLECTIONS_DATA: Record<
     descAr: "اختيارات من السينما الكورية الجنوبية تجمع بين الإثارة والدراما والغموض.",
     descEn: "South Korean cinematic gems across gripping thrillers, domestic drama, and mystery.",
     language: "ko",
-    editorialIntroAr: "السينما الكورية الجنوبية تشتهر بالحبكات غير المتوقعة والشخصيات المعقدة والجرأة الفنية النادرة. إليك أفضل ما أنتجته هذه السينما الرائدة.",
-    editorialIntroEn: "South Korean cinema is renowned for fearless genre blending, intense psychological stakes, and unparalleled narrative surprises.",
+    editorialIntroAr:
+      "السينما الكورية الجنوبية تشتهر بالحبكات غير المتوقعة والشخصيات المعقدة والجرأة الفنية النادرة. إليك أفضل ما أنتجته هذه السينما الرائدة.",
+    editorialIntroEn:
+      "South Korean cinema is renowned for fearless genre blending, intense psychological stakes, and unparalleled narrative surprises.",
   },
   "turkish-movies": {
     ar: "أفضل الأفلام التركية",
@@ -1369,8 +1373,10 @@ export const COLLECTIONS_DATA: Record<
     descAr: "أعمال درامية وسينمائية تركية مميزة بالشخصيات القوية والقصص المؤثرة.",
     descEn: "Turkish cinema picks renowned for emotional resonance and evocative cinematography.",
     language: "tr",
-    editorialIntroAr: "تتميز السينما التركية بعمقها الإنساني والدراما العاطفية الدافئة والتصوير البصري المستلهم من طبيعة وثقافة المنطقة.",
-    editorialIntroEn: "Turkish cinema offers poetic visual beauty, intimate character studies, and profound emotional narratives.",
+    editorialIntroAr:
+      "تتميز السينما التركية بعمقها الإنساني والدراما العاطفية الدافئة والتصوير البصري المستلهم من طبيعة وثقافة المنطقة.",
+    editorialIntroEn:
+      "Turkish cinema offers poetic visual beauty, intimate character studies, and profound emotional narratives.",
   },
   "arabic-movies": {
     ar: "أفضل الأفلام العربية",
@@ -1379,8 +1385,10 @@ export const COLLECTIONS_DATA: Record<
     descAr: "أفلام عربية مختارة من مختلف المدارس السينمائية في المنطقة.",
     descEn: "Selected Arabic-language cinema representing diverse regional voices.",
     language: "ar",
-    editorialIntroAr: "مختارات من أبرز إنتاجات السينما العربية التي تناولت الهوية والمجتمع وقصص الإنسان العربي برؤى إخراجية معاصرة ومتميزة.",
-    editorialIntroEn: "A curated survey of modern Arabic cinema exploring identity, heritage, and compelling local stories.",
+    editorialIntroAr:
+      "مختارات من أبرز إنتاجات السينما العربية التي تناولت الهوية والمجتمع وقصص الإنسان العربي برؤى إخراجية معاصرة ومتميزة.",
+    editorialIntroEn:
+      "A curated survey of modern Arabic cinema exploring identity, heritage, and compelling local stories.",
   },
   "movies-like-inception": {
     ar: "أفلام مثل Inception",
@@ -1388,8 +1396,10 @@ export const COLLECTIONS_DATA: Record<
     genre: "878",
     descAr: "أفلام ذكية لمحبي الألغاز والواقع المتداخل والأفكار الذهنية الكبيرة.",
     descEn: "Smart thrillers for fans of layered realities, memory puzzles, and big concepts.",
-    editorialIntroAr: "إذا كنت تعشق القصص التي تتلاعب بمفهوم الواقع وتجعلك تفكر في كل مشهد كأنه قطعة في لغز هندسي، فهذه هي القائمة المثالية لك.",
-    editorialIntroEn: "If you thrive on non-linear narratives and reality-bending puzzles that reward active viewing, explore these mind-bending masterworks.",
+    editorialIntroAr:
+      "إذا كنت تعشق القصص التي تتلاعب بمفهوم الواقع وتجعلك تفكر في كل مشهد كأنه قطعة في لغز هندسي، فهذه هي القائمة المثالية لك.",
+    editorialIntroEn:
+      "If you thrive on non-linear narratives and reality-bending puzzles that reward active viewing, explore these mind-bending masterworks.",
   },
 };
 
@@ -1410,15 +1420,24 @@ export const getCollectionMovies = createServerFn({ method: "GET" })
 
     try {
       const { tmdbGet } = await import("./tmdb.server");
-      const res = await tmdbGet<{ results: any[] }>("/discover/movie", p, "en");
+      type TmdbDiscoverMovie = {
+        id: number;
+        title?: string;
+        original_title?: string;
+        poster_path?: string | null;
+        release_date?: string;
+        vote_average?: number;
+        overview?: string;
+      };
+      const res = await tmdbGet<{ results: TmdbDiscoverMovie[] }>("/discover/movie", p, "en");
       return {
         collection: c,
         items: (res.results ?? [])
-          .filter((x: any) => x.poster_path)
+          .filter((x): x is TmdbDiscoverMovie & { poster_path: string } => Boolean(x.poster_path))
           .slice(0, 18)
-          .map((x: any) => ({
+          .map((x) => ({
             id: x.id,
-            title: x.title || x.original_title,
+            title: x.title || x.original_title || "",
             poster: `https://image.tmdb.org/t/p/w500${x.poster_path}`,
             year: (x.release_date || "").slice(0, 4),
             rating: Math.round((x.vote_average || 0) * 10) / 10,
@@ -1429,4 +1448,3 @@ export const getCollectionMovies = createServerFn({ method: "GET" })
       return { collection: c, items: [] };
     }
   });
-

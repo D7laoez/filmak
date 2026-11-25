@@ -88,7 +88,8 @@ function GenrePage() {
 
   const genres = useQuery({
     queryKey: [isTv ? "tv-genres" : "genres", locale],
-    queryFn: () => (isTv ? getTvGenres({ data: { lang: locale } }) : getGenres({ data: { lang: locale } })),
+    queryFn: () =>
+      isTv ? getTvGenres({ data: { lang: locale } }) : getGenres({ data: { lang: locale } }),
   });
 
   const genreEditorial = useQuery({
@@ -97,7 +98,10 @@ function GenrePage() {
   });
 
   const editorial = genreEditorial.data;
-  const genreName = genres.data?.find((g) => g.id === genreId)?.name ?? (ar ? editorial?.name_ar : editorial?.name_en) ?? "";
+  const genreName =
+    genres.data?.find((g) => g.id === genreId)?.name ??
+    (ar ? editorial?.name_ar : editorial?.name_en) ??
+    "";
   const selectedNames = selectedIds
     .map((gid) => genres.data?.find((g) => g.id === gid)?.name)
     .filter(Boolean)
@@ -105,7 +109,16 @@ function GenrePage() {
 
   // Fetch all pages up to `pages`
   const pagesResult = useQuery({
-    queryKey: [isTv ? "tv-by-genre" : "by-genre", selectedIds.join(","), search.sort, pages, search.minRating, search.year, search.ol, locale],
+    queryKey: [
+      isTv ? "tv-by-genre" : "by-genre",
+      selectedIds.join(","),
+      search.sort,
+      pages,
+      search.minRating,
+      search.year,
+      search.ol,
+      locale,
+    ],
     queryFn: async () => {
       const collected: (MovieCard | TvCard)[] = [];
       let totalPages = 1;
@@ -158,20 +171,21 @@ function GenrePage() {
       ] as const);
 
   // JSON-LD FAQs schema
-  const faqSchema = editorial?.faqs && editorial.faqs.length > 0
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: editorial.faqs.map((f) => ({
-          "@type": "Question",
-          name: ar ? f.q_ar : f.q_en,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: ar ? f.a_ar : f.a_en,
-          },
-        })),
-      }
-    : null;
+  const faqSchema =
+    editorial?.faqs && editorial.faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: editorial.faqs.map((f) => ({
+            "@type": "Question",
+            name: ar ? f.q_ar : f.q_en,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: ar ? f.a_ar : f.a_en,
+            },
+          })),
+        }
+      : null;
 
   return (
     <div dir={dir} className="min-h-screen bg-background text-foreground pb-24">
@@ -193,7 +207,11 @@ function GenrePage() {
             {t("back")}
           </Link>
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            {isTv ? <TvIcon className="w-5 h-5 text-primary shrink-0" /> : <Tags className="w-5 h-5 text-primary shrink-0" />}
+            {isTv ? (
+              <TvIcon className="w-5 h-5 text-primary shrink-0" />
+            ) : (
+              <Tags className="w-5 h-5 text-primary shrink-0" />
+            )}
             <h1 className="text-xl font-bold truncate">
               {isTv ? t("tv_series") : t("tab_movies")} · {selectedNames || genreName}
             </h1>
@@ -210,7 +228,9 @@ function GenrePage() {
             <button
               onClick={() => setShowFilters((v) => !v)}
               className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition ${
-                showFilters ? "bg-primary text-primary-foreground border-primary" : "bg-secondary/60 border-border hover:bg-secondary"
+                showFilters
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-secondary/60 border-border hover:bg-secondary"
               }`}
             >
               <Filter className="w-3.5 h-3.5" />
@@ -295,12 +315,16 @@ function GenrePage() {
               <span className="text-muted-foreground">{t("year")}</span>
               <select
                 value={search.year ?? ""}
-                onChange={(e) => updateSearch({ year: e.target.value ? Number(e.target.value) : null })}
+                onChange={(e) =>
+                  updateSearch({ year: e.target.value ? Number(e.target.value) : null })
+                }
                 className="bg-card border border-border rounded-lg px-3 py-2 text-sm"
               >
                 <option value="">{t("any")}</option>
                 {Array.from({ length: 50 }, (_, i) => CURRENT_YEAR - i).map((y) => (
-                  <option key={y} value={y}>{y}</option>
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </label>
@@ -313,7 +337,9 @@ function GenrePage() {
               >
                 <option value={0}>{t("any")}</option>
                 {[5, 6, 7, 7.5, 8, 8.5, 9].map((r) => (
-                  <option key={r} value={r}>{r}+</option>
+                  <option key={r} value={r}>
+                    {r}+
+                  </option>
                 ))}
               </select>
             </label>
@@ -326,7 +352,9 @@ function GenrePage() {
               >
                 <option value="">{t("any")}</option>
                 {LANGS.map((l) => (
-                  <option key={l} value={l}>{t(`lang_${l}` as never)}</option>
+                  <option key={l} value={l}>
+                    {t(`lang_${l}` as never)}
+                  </option>
                 ))}
               </select>
             </label>
@@ -370,11 +398,16 @@ function GenrePage() {
                   {ar ? "أبرز السمات والأنماط المميزة" : "Signature Tropes & Motifs"}
                 </h3>
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  {(ar ? editorial.signature_tropes_ar : editorial.signature_tropes_en).map((t, idx) => (
-                    <span key={idx} className="text-xs px-2.5 py-1 rounded-full bg-secondary/70 border border-border text-foreground font-medium">
-                      ✓ {t}
-                    </span>
-                  ))}
+                  {(ar ? editorial.signature_tropes_ar : editorial.signature_tropes_en).map(
+                    (t, idx) => (
+                      <span
+                        key={idx}
+                        className="text-xs px-2.5 py-1 rounded-full bg-secondary/70 border border-border text-foreground font-medium"
+                      >
+                        ✓ {t}
+                      </span>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
@@ -397,7 +430,9 @@ function GenrePage() {
                     >
                       <div className="font-bold text-sm text-foreground group-hover:text-primary transition flex items-center justify-between">
                         <span className="truncate">{ar ? pick.title_ar : pick.title_en}</span>
-                        <span className="text-xs text-muted-foreground font-normal">{pick.year}</span>
+                        <span className="text-xs text-muted-foreground font-normal">
+                          {pick.year}
+                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                         {ar ? pick.note_ar : pick.note_en}
@@ -460,7 +495,13 @@ function GenrePage() {
 
         {!pagesResult.isLoading && (pagesResult.data?.results.length ?? 0) === 0 && (
           <div className="py-16 flex flex-col items-center justify-center text-center">
-            <img src="/icon-192.png" srcSet="/icon-192.png 1x, /icon-512.png 2x" alt={t("brand")} aria-hidden className="w-16 h-16 md:w-20 md:h-20 opacity-70 mb-3" />
+            <img
+              src="/icon-192.png"
+              srcSet="/icon-192.png 1x, /icon-512.png 2x"
+              alt={t("brand")}
+              aria-hidden
+              className="w-16 h-16 md:w-20 md:h-20 opacity-70 mb-3"
+            />
             <p className="text-base font-medium">{t("no_results")}</p>
             <p className="text-sm text-muted-foreground mt-1">{t("no_results_sub")}</p>
           </div>
@@ -477,25 +518,40 @@ function GenrePage() {
                   key={`${m.id}-${m.year}`}
                   to={isTv ? "/tv/$id" : "/movie/$id"}
                   params={{ id: String(m.id) }}
-                      reloadDocument
+                  reloadDocument
                   className="group block"
                 >
                   <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">
                     {m.poster ? (
-                      <img src={m.poster} alt={m.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                      <img
+                        src={m.poster}
+                        alt={m.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center"><Film className="w-8 h-8 text-muted-foreground" /></div>
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Film className="w-8 h-8 text-muted-foreground" />
+                      </div>
                     )}
                     <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Star className="w-3 h-3 fill-primary text-primary" />
                       {m.rating}
                     </div>
                     <FavoriteButton
-                      movie={{ id: m.id, title: m.title, poster: m.poster, year: m.year, rating: m.rating }}
+                      movie={{
+                        id: m.id,
+                        title: m.title,
+                        poster: m.poster,
+                        year: m.year,
+                        rating: m.rating,
+                      }}
                       variant="icon"
                     />
                   </div>
-                  <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">{m.title}</p>
+                  <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
+                    {m.title}
+                  </p>
                   <p className="text-xs text-muted-foreground">{m.year}</p>
                 </Link>
               ))}
@@ -526,11 +582,16 @@ function GenrePage() {
           <section className="rounded-3xl border border-border bg-card p-6 md:p-8 space-y-4">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <HelpCircle className="w-5 h-5 text-primary" />
-              {ar ? `أسئلة شائعة حول أفلام ${genreName}` : `Frequently Asked Questions about ${genreName}`}
+              {ar
+                ? `أسئلة شائعة حول أفلام ${genreName}`
+                : `Frequently Asked Questions about ${genreName}`}
             </h3>
             <div className="space-y-3 pt-2">
               {editorial.faqs.map((faq, idx) => (
-                <details key={idx} className="group rounded-xl border border-border/60 bg-secondary/20 p-4">
+                <details
+                  key={idx}
+                  className="group rounded-xl border border-border/60 bg-secondary/20 p-4"
+                >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-sm">
                     <span>{ar ? faq.q_ar : faq.q_en}</span>
                     <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" />

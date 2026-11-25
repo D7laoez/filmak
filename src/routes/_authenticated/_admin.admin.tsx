@@ -108,7 +108,9 @@ function AdminPage() {
     const all = users.data ?? [];
     const q = search.trim().toLowerCase();
     return q
-      ? all.filter((u) => (u.email ?? "").toLowerCase().includes(q) || u.id.toLowerCase().includes(q))
+      ? all.filter(
+          (u) => (u.email ?? "").toLowerCase().includes(q) || u.id.toLowerCase().includes(q),
+        )
       : all;
   }, [users.data, search]);
 
@@ -139,7 +141,9 @@ function AdminPage() {
             <Logo size={32} />
             <div>
               <div className="font-semibold">لوحة إدارة فلمك التحريرية</div>
-              <div className="text-xs text-muted-foreground">Owner analytics & CMS control center</div>
+              <div className="text-xs text-muted-foreground">
+                Owner analytics & CMS control center
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -195,7 +199,9 @@ function AdminPage() {
         {forbidden ? (
           <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-6">
             <b>الوصول مقيّد</b>
-            <p className="mt-1 text-sm text-muted-foreground">هذه اللوحة للمالك فقط (ali.m2002121@gmail.com).</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              هذه اللوحة للمالك فقط (ali.m2002121@gmail.com).
+            </p>
           </div>
         ) : activeTab === "analytics" ? (
           <>
@@ -215,19 +221,30 @@ function AdminPage() {
               </Panel>
               <Panel title="الدول">
                 <RankList
-                  rows={analytics.data?.countries?.map((x) => ({ label: x.country, value: x.visits })) ?? []}
+                  rows={
+                    analytics.data?.countries?.map((x) => ({
+                      label: x.country,
+                      value: x.visits,
+                    })) ?? []
+                  }
                 />
               </Panel>
               <Panel title="الأجهزة">
                 <RankList
-                  rows={analytics.data?.devices?.map((x) => ({ label: x.device, value: x.visits })) ?? []}
+                  rows={
+                    analytics.data?.devices?.map((x) => ({ label: x.device, value: x.visits })) ??
+                    []
+                  }
                 />
               </Panel>
             </section>
             <section className="grid gap-4 lg:grid-cols-2">
               <Panel title="أكثر الصفحات زيارة">
                 <RankList
-                  rows={analytics.data?.top_paths?.map((x) => ({ label: x.path, value: x.visits })) ?? []}
+                  rows={
+                    analytics.data?.top_paths?.map((x) => ({ label: x.path, value: x.visits })) ??
+                    []
+                  }
                   mono
                 />
               </Panel>
@@ -239,7 +256,9 @@ function AdminPage() {
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold">الحسابات المسجلة ({filtered.length})</h2>
-                  <p className="text-xs text-muted-foreground">الإيميل، آخر دخول، المفضلة، القوائم والدور</p>
+                  <p className="text-xs text-muted-foreground">
+                    الإيميل، آخر دخول، المفضلة، القوائم والدور
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center rounded-full border border-border bg-secondary/40 px-3">
@@ -302,7 +321,9 @@ function AdminPage() {
                             <div className="flex justify-end gap-1">
                               <button
                                 disabled={toggleMut.isPending}
-                                onClick={() => toggleMut.mutate({ userId: u.id, makeAdmin: !u.is_admin })}
+                                onClick={() =>
+                                  toggleMut.mutate({ userId: u.id, makeAdmin: !u.is_admin })
+                                }
                                 className="rounded-full p-2 hover:bg-secondary disabled:opacity-40"
                                 title="تغيير الدور"
                               >
@@ -310,7 +331,9 @@ function AdminPage() {
                               </button>
                               <button
                                 disabled={deleteMut.isPending}
-                                onClick={() => confirm(`حذف ${u.email ?? u.id}؟`) && deleteMut.mutate(u.id)}
+                                onClick={() =>
+                                  confirm(`حذف ${u.email ?? u.id}؟`) && deleteMut.mutate(u.id)
+                                }
                                 className="rounded-full p-2 text-destructive hover:bg-destructive/10 disabled:opacity-40"
                                 title="حذف"
                               >
@@ -384,13 +407,18 @@ function EditorialReviewsCms() {
   });
 
   const upsertMut = useMutation({
-    mutationFn: (data: any) => upsertReviewFn({ data }),
+    mutationFn: (
+      data: Omit<typeof formData, "strengths" | "weaknesses"> & {
+        strengths: string[];
+        weaknesses: string[];
+      },
+    ) => upsertReviewFn({ data }),
     onSuccess: () => {
       toast.success("تم حفظ المراجعة بنجاح");
       setFormOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-editorial-reviews"] });
     },
-    onError: (err: any) => toast.error(err.message || "حدث خطأ"),
+    onError: (err: Error) => toast.error(err.message || "حدث خطأ"),
   });
 
   const deleteMut = useMutation({
@@ -401,7 +429,7 @@ function EditorialReviewsCms() {
     },
   });
 
-  const handleEdit = (rev: any) => {
+  const handleEdit = (rev: NonNullable<typeof reviewsQuery.data>[number]) => {
     setFormData({
       movie_id: rev.movie_id,
       verdict: rev.verdict || "",
@@ -429,8 +457,14 @@ function EditorialReviewsCms() {
     upsertMut.mutate({
       ...formData,
       movie_id: Number(formData.movie_id),
-      strengths: formData.strengths.split("\n").map((s) => s.trim()).filter(Boolean),
-      weaknesses: formData.weaknesses.split("\n").map((w) => w.trim()).filter(Boolean),
+      strengths: formData.strengths
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      weaknesses: formData.weaknesses
+        .split("\n")
+        .map((w) => w.trim())
+        .filter(Boolean),
     });
   };
 
@@ -439,7 +473,9 @@ function EditorialReviewsCms() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">مراجعات حكم فلمك (FILMAK Verdicts)</h2>
-          <p className="text-xs text-muted-foreground">إضافة وتعديل التقييمات التحريرية ونقاط القوة والضعف للأفلام</p>
+          <p className="text-xs text-muted-foreground">
+            إضافة وتعديل التقييمات التحريرية ونقاط القوة والضعف للأفلام
+          </p>
         </div>
         <button
           onClick={() => setFormOpen((v) => !v)}
@@ -451,7 +487,10 @@ function EditorialReviewsCms() {
       </div>
 
       {formOpen && (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-2xl border border-border bg-card p-6 space-y-4"
+        >
           <h3 className="font-bold text-base">نموذج مراجعة الفيلم</h3>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
             <label className="space-y-1">
@@ -496,7 +535,9 @@ function EditorialReviewsCms() {
                 min="1"
                 max="10"
                 value={formData.visuals_score}
-                onChange={(e) => setFormData({ ...formData, visuals_score: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, visuals_score: Number(e.target.value) })
+                }
                 className="w-full bg-secondary/60 border border-border rounded-lg p-2"
               />
             </label>
@@ -508,7 +549,9 @@ function EditorialReviewsCms() {
                 min="1"
                 max="10"
                 value={formData.entertainment_score}
-                onChange={(e) => setFormData({ ...formData, entertainment_score: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, entertainment_score: Number(e.target.value) })
+                }
                 className="w-full bg-secondary/60 border border-border rounded-lg p-2"
               />
             </label>
@@ -520,7 +563,9 @@ function EditorialReviewsCms() {
                 min="1"
                 max="10"
                 value={formData.editorial_score}
-                onChange={(e) => setFormData({ ...formData, editorial_score: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, editorial_score: Number(e.target.value) })
+                }
                 className="w-full bg-secondary/60 border border-border rounded-lg p-2 font-bold text-primary"
               />
             </label>
@@ -626,7 +671,9 @@ function EditorialReviewsCms() {
                       ★ {rev.editorial_score}/10
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1 max-w-2xl">{rev.verdict}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1 max-w-2xl">
+                    {rev.verdict}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
@@ -688,13 +735,13 @@ function ArticlesCms() {
   });
 
   const upsertMut = useMutation({
-    mutationFn: (data: any) => upsertArticleFn({ data }),
+    mutationFn: (data: typeof formData) => upsertArticleFn({ data }),
     onSuccess: () => {
       toast.success("تم حفظ المقال بنجاح");
       setFormOpen(false);
       qc.invalidateQueries({ queryKey: ["admin-articles"] });
     },
-    onError: (err: any) => toast.error(err.message || "حدث خطأ"),
+    onError: (err: Error) => toast.error(err.message || "حدث خطأ"),
   });
 
   const deleteMut = useMutation({
@@ -705,7 +752,7 @@ function ArticlesCms() {
     },
   });
 
-  const handleEdit = (art: any) => {
+  const handleEdit = (art: NonNullable<typeof articlesQuery.data>[number]) => {
     setFormData({
       id: art.id,
       slug: art.slug,
@@ -714,8 +761,8 @@ function ArticlesCms() {
       subtitle_ar: art.subtitle_ar || "",
       subtitle_en: art.subtitle_en || "",
       category: art.category,
-      category_label_ar: art.category_label_ar,
-      category_label_en: art.category_label_en,
+      category_label_ar: art.category === "guides" ? "أدلة المشاهدة" : art.category,
+      category_label_en: art.category === "guides" ? "Viewing Guides" : art.category,
       excerpt_ar: art.excerpt_ar,
       excerpt_en: art.excerpt_en,
       content_ar: art.content_ar,
@@ -725,7 +772,7 @@ function ArticlesCms() {
       author_role: art.author_role,
       reading_time_minutes: art.reading_time_minutes,
       featured: art.featured,
-      published: art.published,
+      published: art.status === "published",
     });
     setFormOpen(true);
   };
@@ -740,7 +787,9 @@ function ArticlesCms() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">المقالات والأدلة السينمائية (Articles CMS)</h2>
-          <p className="text-xs text-muted-foreground">إنشاء وتعديل المقالات التحريرية والأدلة الشاملة لمجلة فلمك</p>
+          <p className="text-xs text-muted-foreground">
+            إنشاء وتعديل المقالات التحريرية والأدلة الشاملة لمجلة فلمك
+          </p>
         </div>
         <button
           onClick={() => {
@@ -775,8 +824,13 @@ function ArticlesCms() {
       </div>
 
       {formOpen && (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 space-y-4">
-          <h3 className="font-bold text-base">{formData.id ? "تعديل المقال" : "إنشاء مقال جديد"}</h3>
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-2xl border border-border bg-card p-6 space-y-4"
+        >
+          <h3 className="font-bold text-base">
+            {formData.id ? "تعديل المقال" : "إنشاء مقال جديد"}
+          </h3>
 
           <div className="grid sm:grid-cols-2 gap-4 text-xs">
             <label className="space-y-1">
@@ -914,7 +968,9 @@ function ArticlesCms() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5 font-mono">/articles/{art.slug}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                    /articles/{art.slug}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
@@ -1078,7 +1134,9 @@ function UserDrawer({
           <div className="space-y-5">
             <div className="rounded-2xl border border-border p-4">
               <div className="font-medium">{data.user.email}</div>
-              <div className="mt-1 break-all font-mono text-xs text-muted-foreground">{data.user.id}</div>
+              <div className="mt-1 break-all font-mono text-xs text-muted-foreground">
+                {data.user.id}
+              </div>
               <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
                 <div>
                   التسجيل

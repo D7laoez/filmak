@@ -1,5 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type {
+  TmdbCastMember,
+  TmdbCrewMember,
+  TmdbImageItem,
+  TmdbMovieDetails,
+  TmdbMovieResult,
+  TmdbVideoItem,
+  TmdbWatchRegion,
+} from "./tmdb.types";
 
 export type MovieCard = {
   id: number;
@@ -11,10 +20,10 @@ export type MovieCard = {
   overview: string;
 };
 
-function toCard(m: any): MovieCard {
+function toCard(m: TmdbMovieResult): MovieCard {
   return {
     id: m.id,
-    title: m.title || m.original_title,
+    title: m.title || m.original_title || "",
     poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
     backdrop: m.backdrop_path ? `https://image.tmdb.org/t/p/w1280${m.backdrop_path}` : null,
     year: (m.release_date || "").slice(0, 4),
@@ -30,56 +39,78 @@ export const getTrending = createServerFn({ method: "GET" })
   .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const r = await tmdbGet<{ results: any[] }>("/trending/movie/week", {}, data.lang);
-    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    const r = await tmdbGet<{ results: TmdbMovieResult[] }>("/trending/movie/week", {}, data.lang);
+    return (r.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 18)
+      .map(toCard);
   });
 
 export const getTopRated = createServerFn({ method: "GET" })
   .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const r = await tmdbGet<{ results: any[] }>("/movie/top_rated", {}, data.lang);
-    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    const r = await tmdbGet<{ results: TmdbMovieResult[] }>("/movie/top_rated", {}, data.lang);
+    return (r.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 18)
+      .map(toCard);
   });
 
 export const getPopular = createServerFn({ method: "GET" })
   .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const r = await tmdbGet<{ results: any[] }>("/movie/popular", {}, data.lang);
-    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    const r = await tmdbGet<{ results: TmdbMovieResult[] }>("/movie/popular", {}, data.lang);
+    return (r.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 18)
+      .map(toCard);
   });
 
 export const getNowPlaying = createServerFn({ method: "GET" })
   .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const r = await tmdbGet<{ results: any[] }>(
+    const r = await tmdbGet<{ results: TmdbMovieResult[] }>(
       "/movie/now_playing",
       { region: data.lang === "en" ? "US" : "IQ" },
       data.lang,
     );
-    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 18)
+      .map(toCard);
   });
 
 export const getUpcoming = createServerFn({ method: "GET" })
   .validator(langOnly)
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const r = await tmdbGet<{ results: any[] }>(
+    const r = await tmdbGet<{ results: TmdbMovieResult[] }>(
       "/movie/upcoming",
       { region: data.lang === "en" ? "US" : "IQ" },
       data.lang,
     );
-    return (r.results || []).filter((m) => m.poster_path).slice(0, 18).map(toCard);
+    return (r.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 18)
+      .map(toCard);
   });
 
 export const searchMovies = createServerFn({ method: "GET" })
   .validator((d: unknown) => z.object({ q: z.string().min(1).max(200), lang: langSchema }).parse(d))
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
-    const res = await tmdbGet<{ results: any[] }>("/search/movie", { query: data.q }, data.lang);
-    return (res.results || []).filter((m) => m.poster_path).slice(0, 24).map(toCard);
+    const res = await tmdbGet<{ results: TmdbMovieResult[] }>(
+      "/search/movie",
+      { query: data.q },
+      data.lang,
+    );
+    return (res.results || [])
+      .filter((m) => m.poster_path)
+      .slice(0, 24)
+      .map(toCard);
   });
 
 export const getGenres = createServerFn({ method: "GET" })
@@ -122,7 +153,7 @@ export const getMoviesByGenre = createServerFn({ method: "GET" })
     if (data.minRating > 0) params["vote_average.gte"] = String(data.minRating);
     if (data.year) params["primary_release_year"] = String(data.year);
     if (data.lang_original) params["with_original_language"] = data.lang_original;
-    const r = await tmdbGet<{ results: any[]; total_pages: number }>(
+    const r = await tmdbGet<{ results: TmdbMovieResult[]; total_pages: number }>(
       "/discover/movie",
       params,
       data.lang,
@@ -167,7 +198,7 @@ export const discoverMovies = createServerFn({ method: "GET" })
     if (data.minRating > 0) params["vote_average.gte"] = String(data.minRating);
     if (data.year) params["primary_release_year"] = String(data.year);
     if (data.lang_original) params["with_original_language"] = data.lang_original;
-    const r = await tmdbGet<{ results: any[]; total_pages: number }>(
+    const r = await tmdbGet<{ results: TmdbMovieResult[]; total_pages: number }>(
       "/discover/movie",
       params,
       data.lang,
@@ -179,26 +210,42 @@ export const discoverMovies = createServerFn({ method: "GET" })
   });
 
 export const getMovieDetails = createServerFn({ method: "GET" })
-  .validator((d: unknown) => z.object({ id: z.number().int().positive(), lang: langSchema }).parse(d))
+  .validator((d: unknown) =>
+    z.object({ id: z.number().int().positive(), lang: langSchema }).parse(d),
+  )
   .handler(async ({ data }) => {
     const { tmdbGet } = await import("./tmdb.server");
     const [details, videos, providers, credits, similar, images] = await Promise.all([
-      tmdbGet<any>(`/movie/${data.id}`, {}, data.lang),
-      tmdbGet<any>(`/movie/${data.id}/videos`, { language: "en-US" }, data.lang),
-      tmdbGet<any>(`/movie/${data.id}/watch/providers`, {}, data.lang),
-      tmdbGet<any>(`/movie/${data.id}/credits`, {}, data.lang),
-      tmdbGet<any>(`/movie/${data.id}/similar`, {}, data.lang),
-      tmdbGet<any>(`/movie/${data.id}/images`, { include_image_language: "en,null" }, data.lang).catch(
-        () => ({ backdrops: [], posters: [] }),
+      tmdbGet<TmdbMovieDetails>(`/movie/${data.id}`, {}, data.lang),
+      tmdbGet<{ results?: TmdbVideoItem[] }>(
+        `/movie/${data.id}/videos`,
+        { language: "en-US" },
+        data.lang,
       ),
+      tmdbGet<{ results?: Record<string, TmdbWatchRegion> }>(
+        `/movie/${data.id}/watch/providers`,
+        {},
+        data.lang,
+      ),
+      tmdbGet<{ cast?: TmdbCastMember[]; crew?: TmdbCrewMember[] }>(
+        `/movie/${data.id}/credits`,
+        {},
+        data.lang,
+      ),
+      tmdbGet<{ results?: TmdbMovieResult[] }>(`/movie/${data.id}/similar`, {}, data.lang),
+      tmdbGet<{ backdrops?: TmdbImageItem[]; posters?: TmdbImageItem[] }>(
+        `/movie/${data.id}/images`,
+        { include_image_language: "en,null" },
+        data.lang,
+      ).catch(() => ({ backdrops: [] as TmdbImageItem[], posters: [] as TmdbImageItem[] })),
     ]);
 
     const trailer = (videos.results || []).find(
-      (v: any) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"),
+      (v) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser"),
     );
     const allVideos = (videos.results || [])
-      .filter((v: any) => v.site === "YouTube" && v.key)
-      .sort((a: any, b: any) => {
+      .filter((v) => v.site === "YouTube" && Boolean(v.key))
+      .sort((a, b) => {
         const order: Record<string, number> = {
           Trailer: 0,
           Teaser: 1,
@@ -209,12 +256,12 @@ export const getMovieDetails = createServerFn({ method: "GET" })
         return (order[a.type] ?? 9) - (order[b.type] ?? 9);
       })
       .slice(0, 12)
-      .map((v: any) => ({ key: v.key as string, name: v.name as string, type: v.type as string }));
+      .map((v) => ({ key: v.key, name: v.name, type: v.type }));
 
     const providersByCountry = providers.results || {};
     const preferred = ["IQ", "SA", "AE", "EG", "US"];
     let watchCountry: string | null = null;
-    let watch: any = null;
+    let watch: TmdbWatchRegion | null = null;
     for (const c of preferred) {
       if (providersByCountry[c]) {
         watchCountry = c;
@@ -236,21 +283,24 @@ export const getMovieDetails = createServerFn({ method: "GET" })
       profile_path: string | null;
     }>;
     const findCrew = (jobs: string[]) =>
-      crewList.filter((c) => jobs.includes(c.job)).slice(0, 3).map((c) => c.name);
+      crewList
+        .filter((c) => jobs.includes(c.job))
+        .slice(0, 3)
+        .map((c) => c.name);
 
     return {
       id: details.id,
-      title: details.title || details.original_title,
+      title: details.title || details.original_title || "",
       originalTitle: details.original_title ?? null,
-      tagline: details.tagline,
-      overview: details.overview,
+      tagline: details.tagline ?? null,
+      overview: details.overview ?? "",
       poster: details.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : null,
       backdrop: details.backdrop_path
         ? `https://image.tmdb.org/t/p/original${details.backdrop_path}`
         : null,
       year: (details.release_date || "").slice(0, 4),
       releaseDate: details.release_date ?? null,
-      runtime: details.runtime,
+      runtime: details.runtime ?? null,
       rating: Math.round((details.vote_average || 0) * 10) / 10,
       voteCount: details.vote_count ?? 0,
       popularity: Math.round((details.popularity ?? 0) * 10) / 10,
@@ -259,29 +309,29 @@ export const getMovieDetails = createServerFn({ method: "GET" })
       revenue: details.revenue ?? 0,
       imdbId: details.imdb_id ?? null,
       originalLanguage: details.original_language ?? null,
-      spokenLanguages: (details.spoken_languages || []).map((l: any) => l.english_name || l.name),
-      productionCountries: (details.production_countries || []).map((c: any) => c.name),
-      productionCompanies: (details.production_companies || []).map((c: any) => ({
-        name: c.name as string,
+      spokenLanguages: (details.spoken_languages || []).map((l) => l.english_name || l.name || ""),
+      productionCountries: (details.production_countries || []).map((c) => c.name),
+      productionCompanies: (details.production_companies || []).map((c) => ({
+        name: c.name,
         logo: c.logo_path ? `https://image.tmdb.org/t/p/w200${c.logo_path}` : null,
       })),
-      genres: (details.genres || []).map((g: any) => g.name),
+      genres: (details.genres || []).map((g) => g.name),
       trailerKey: trailer?.key ?? null,
       videos: allVideos,
       images: {
-        backdrops: (images.backdrops || []).slice(0, 12).map((b: any) => ({
+        backdrops: (images.backdrops || []).slice(0, 12).map((b) => ({
           url: `https://image.tmdb.org/t/p/original${b.file_path}`,
           thumb: `https://image.tmdb.org/t/p/w780${b.file_path}`,
         })),
-        posters: (images.posters || []).slice(0, 12).map((p: any) => ({
+        posters: (images.posters || []).slice(0, 12).map((p) => ({
           url: `https://image.tmdb.org/t/p/original${p.file_path}`,
           thumb: `https://image.tmdb.org/t/p/w342${p.file_path}`,
         })),
       },
-      cast: (credits.cast || []).slice(0, 16).map((c: any) => ({
+      cast: (credits.cast || []).slice(0, 16).map((c) => ({
         id: c.id,
         name: c.name,
-        character: c.character,
+        character: c.character ?? "",
         profile: c.profile_path ? `https://image.tmdb.org/t/p/w200${c.profile_path}` : null,
       })),
       crew: {
@@ -294,24 +344,24 @@ export const getMovieDetails = createServerFn({ method: "GET" })
       watchCountry,
       watch: watch
         ? {
-            link: watch.link,
-            flatrate: (watch.flatrate || []).map((p: any) => ({
+            link: watch.link ?? "",
+            flatrate: (watch.flatrate || []).map((p) => ({
               name: p.provider_name,
               logo: `https://image.tmdb.org/t/p/w200${p.logo_path}`,
             })),
-            rent: (watch.rent || []).map((p: any) => ({
+            rent: (watch.rent || []).map((p) => ({
               name: p.provider_name,
               logo: `https://image.tmdb.org/t/p/w200${p.logo_path}`,
             })),
-            buy: (watch.buy || []).map((p: any) => ({
+            buy: (watch.buy || []).map((p) => ({
               name: p.provider_name,
               logo: `https://image.tmdb.org/t/p/w200${p.logo_path}`,
             })),
           }
         : null,
-      similar: (similar.results || []).slice(0, 12).map((m: any) => ({
+      similar: (similar.results || []).slice(0, 12).map((m) => ({
         id: m.id,
-        title: m.title || m.original_title,
+        title: m.title || m.original_title || "",
         poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
         year: (m.release_date || "").slice(0, 4),
         rating: Math.round((m.vote_average || 0) * 10) / 10,
