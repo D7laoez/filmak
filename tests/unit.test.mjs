@@ -63,3 +63,28 @@ test("public/_headers includes security headers and public/robots.txt points to 
   const robots = readFileSync(resolve("public/robots.txt"), "utf8");
   assert.match(robots, /Sitemap:\s*https:\/\/filmak\.site\/sitemap\.xml/);
 });
+
+test("applySecurityAndCacheHeaders sets security headers and route-appropriate Cache-Control", async () => {
+  const { applySecurityAndCacheHeaders } = await import("../src/lib/http-headers.ts");
+
+  const publicRes = applySecurityAndCacheHeaders(
+    new Response("<html></html>", {
+      status: 200,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    }),
+    "/",
+  );
+  assert.equal(publicRes.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(publicRes.headers.get("X-Frame-Options"), "DENY");
+  assert.equal(publicRes.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin");
+  assert.match(publicRes.headers.get("Cache-Control") ?? "", /s-maxage=300/);
+
+  const privateRes = applySecurityAndCacheHeaders(
+    new Response("<html></html>", {
+      status: 200,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    }),
+    "/admin",
+  );
+  assert.equal(privateRes.headers.get("Cache-Control"), "no-store");
+});

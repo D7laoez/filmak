@@ -1,0 +1,65 @@
+const PRIVATE_PREFIXES = [
+  "/admin",
+  "/auth",
+  "/callback",
+  "/favorites",
+  "/reset-password",
+  "/stats",
+  "/taste",
+  "/watchlist",
+  "/watched",
+  "/_serverFn",
+  "/api/",
+];
+
+const PUBLIC_LONG_CACHE_PATHS = new Set([
+  "/about",
+  "/contact",
+  "/dmca",
+  "/editorial-policy",
+  "/faq",
+  "/privacy",
+  "/terms",
+]);
+
+function isPrivatePath(pathname: string): boolean {
+  return PRIVATE_PREFIXES.some(
+    (prefix) =>
+      pathname === prefix || pathname.startsWith(`${prefix}/`) || pathname.startsWith(prefix),
+  );
+}
+
+export function applySecurityAndCacheHeaders(response: Response, pathname: string): Response {
+  const headers = new Headers(response.headers);
+
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("X-XSS-Protection", "0");
+
+  if (!headers.has("Cache-Control")) {
+    const contentType = headers.get("content-type") ?? "";
+    if (isPrivatePath(pathname)) {
+      headers.set("Cache-Control", "no-store");
+    } else if (response.status === 200 && contentType.includes("text/html")) {
+      if (PUBLIC_LONG_CACHE_PATHS.has(pathname)) {
+        headers.set(
+          "Cache-Control",
+          "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
+        );
+      } else {
+        headers.set(
+          "Cache-Control",
+          "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+        );
+      }
+    }
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}

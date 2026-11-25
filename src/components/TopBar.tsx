@@ -24,6 +24,7 @@ import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { searchMovies, type MovieCard } from "@/lib/movies.functions";
 import { searchTv, type TvCard } from "@/lib/tv.functions";
+import { QuickSearchModal } from "@/components/QuickSearchModal";
 
 export function TopBar() {
   const { user } = useAuth();
@@ -36,6 +37,7 @@ export function TopBar() {
   const [q, setQ] = useState(search?.q ?? "");
   const [searchFocused, setSearchFocused] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [cmdkOpen, setCmdkOpen] = useState(false);
   const [debouncedQ, setDebouncedQ] = useState(search?.q ?? "");
 
   useEffect(() => {
@@ -219,6 +221,15 @@ export function TopBar() {
           )}
         </div>
         <div className="hidden items-center gap-2 md:flex">
+          <button
+            type="button"
+            onClick={() => setCmdkOpen(true)}
+            aria-label={ar ? "بحث سريع (Ctrl+K)" : "Quick search (Ctrl+K)"}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary transition cursor-pointer"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <kbd className="font-sans text-[11px] font-medium">Ctrl+K</kbd>
+          </button>
           <Link
             to="/articles"
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs hover:bg-secondary transition"
@@ -360,6 +371,7 @@ export function TopBar() {
           </nav>
         </div>
       )}
+      <QuickSearchModal open={cmdkOpen} onOpenChange={setCmdkOpen} />
     </header>
   );
 }

@@ -10,6 +10,7 @@ import { Spinner } from "@/components/Spinner";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { NavToggles } from "@/components/NavToggles";
 import { TrailerModal } from "@/components/TrailerModal";
+import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/tv/$id")({
   component: TvPage,
@@ -34,6 +35,44 @@ export const Route = createFileRoute("/tv/$id")({
     const title = tv ? `${tv.title} — فلمك · تفاصيل المسلسل` : "فلمك";
     const desc = tv?.overview?.slice(0, 200) ?? "";
     const url = origin ? `${origin}/tv/${params.id}` : `/tv/${params.id}`;
+    const tvLd = tv
+      ? {
+          "@context": "https://schema.org",
+          "@type": "TVSeries",
+          name: tv.title,
+          description: tv.overview || undefined,
+          image: abs,
+          numberOfSeasons: tv.seasons || undefined,
+          numberOfEpisodes: tv.episodes || undefined,
+          genre: tv.genres,
+          url,
+          aggregateRating: tv.rating
+            ? {
+                "@type": "AggregateRating",
+                ratingValue: Number(tv.rating).toFixed(1),
+                bestRating: 10,
+                worstRating: 0,
+              }
+            : undefined,
+        }
+      : undefined;
+
+    const breadcrumbLd = tv
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "فلمك",
+              item: origin || "https://filmak.site",
+            },
+            { "@type": "ListItem", position: 2, name: tv.title, item: url },
+          ],
+        }
+      : undefined;
+
     return {
       meta: [
         { title },
@@ -51,6 +90,12 @@ export const Route = createFileRoute("/tv/$id")({
         { name: "twitter:image", content: abs },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [
+        ...(tvLd ? [{ type: "application/ld+json", children: safeJsonLd(tvLd) }] : []),
+        ...(breadcrumbLd
+          ? [{ type: "application/ld+json", children: safeJsonLd(breadcrumbLd) }]
+          : []),
+      ],
     };
   },
   errorComponent: TvErrorComponent,
