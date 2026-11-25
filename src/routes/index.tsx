@@ -422,7 +422,7 @@ function Home() {
             <Sparkles className="w-5 h-5" />
             <span>{t("ask_ai")}</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black">{t("describe_mood")}</h2>
+          <h1 className="text-2xl md:text-3xl font-black">{t("describe_mood")}</h1>
           <form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();

@@ -29,18 +29,38 @@ function isPrivatePath(pathname: string): boolean {
   );
 }
 
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://image.tmdb.org https://*.supabase.co https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://pagead2.googlesyndication.com",
+  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 export function applySecurityAndCacheHeaders(response: Response, pathname: string): Response {
   const headers = new Headers(response.headers);
 
+  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("X-XSS-Protection", "0");
+  headers.set("Content-Security-Policy", CONTENT_SECURITY_POLICY);
+
+  const isPrivate = isPrivatePath(pathname);
+  if (isPrivate) {
+    headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
 
   if (!headers.has("Cache-Control")) {
     const contentType = headers.get("content-type") ?? "";
-    if (isPrivatePath(pathname)) {
+    if (isPrivate) {
       headers.set("Cache-Control", "no-store");
     } else if (response.status === 200 && contentType.includes("text/html")) {
       if (PUBLIC_LONG_CACHE_PATHS.has(pathname)) {

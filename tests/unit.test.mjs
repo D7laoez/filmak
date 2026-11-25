@@ -77,6 +77,9 @@ test("applySecurityAndCacheHeaders sets security headers and route-appropriate C
   assert.equal(publicRes.headers.get("X-Content-Type-Options"), "nosniff");
   assert.equal(publicRes.headers.get("X-Frame-Options"), "DENY");
   assert.equal(publicRes.headers.get("Referrer-Policy"), "strict-origin-when-cross-origin");
+  assert.match(publicRes.headers.get("Strict-Transport-Security") ?? "", /max-age=31536000/);
+  assert.match(publicRes.headers.get("Content-Security-Policy") ?? "", /frame-ancestors 'none'/);
+  assert.equal(publicRes.headers.get("X-Robots-Tag"), null);
   assert.match(publicRes.headers.get("Cache-Control") ?? "", /s-maxage=300/);
 
   const privateRes = applySecurityAndCacheHeaders(
@@ -87,4 +90,10 @@ test("applySecurityAndCacheHeaders sets security headers and route-appropriate C
     "/admin",
   );
   assert.equal(privateRes.headers.get("Cache-Control"), "no-store");
+  assert.equal(privateRes.headers.get("X-Robots-Tag"), "noindex, nofollow");
+});
+
+test("public/sw.js exists for PWA offline support", () => {
+  const sw = readFileSync(resolve("public/sw.js"), "utf8");
+  assert.match(sw, /addEventListener\("fetch"/);
 });

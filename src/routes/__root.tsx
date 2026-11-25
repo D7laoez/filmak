@@ -293,6 +293,11 @@ function RootComponent() {
       const hash = window.location.hash || "";
       if (hash.includes("type=recovery") && window.location.pathname !== "/reset-password")
         window.location.replace("/reset-password" + window.location.search + hash);
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/sw.js").catch(() => {
+          // Ignore SW registration failure in restricted environments
+        });
+      }
     }
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
