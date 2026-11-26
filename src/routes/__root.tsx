@@ -15,7 +15,6 @@ import { Loader2, Film, ShieldCheck, Heart, Sparkles, BookOpen, Mail, Scale } fr
 import appCss from "../styles.css?url";
 import { reportError } from "../lib/error-reporting";
 import { Toaster } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { LocaleProvider, useT, useLocale } from "@/lib/i18n";
 import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
@@ -43,6 +42,7 @@ function NotFoundComponent() {
       if (!code && !accessToken && !refreshToken && !error) return;
       setIsCompletingAuth(true);
       try {
+        const { supabase } = await import("@/integrations/supabase/client");
         const existing = await supabase.auth.getSession();
         if (!existing.data.session) {
           if (code) await supabase.auth.exchangeCodeForSession(code);
@@ -287,18 +287,29 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        if (typeof window !== "undefined" && window.location.pathname !== "/reset-password")
-          window.location.replace(
-            "/reset-password" + window.location.search + window.location.hash,
-          );
-        return;
-      }
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-    });
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+
+    void import("@/integrations/supabase/client")
+      .then(({ supabase }) => {
+        if (cancelled) return;
+        const { data } = supabase.auth.onAuthStateChange((event) => {
+          if (event === "PASSWORD_RECOVERY") {
+            if (typeof window !== "undefined" && window.location.pathname !== "/reset-password")
+              window.location.replace(
+                "/reset-password" + window.location.search + window.location.hash,
+              );
+            return;
+          }
+          if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+          router.invalidate();
+          if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+        });
+        unsubscribe = () => data.subscription.unsubscribe();
+      })
+      .catch(() => {
+        // Auth listeners are non-critical for public page rendering.
+      });
 
     if (typeof window !== "undefined") {
       const hash = window.location.hash || "";
@@ -310,7 +321,11 @@ function RootComponent() {
         });
       }
     }
-    return () => sub.subscription.unsubscribe();
+
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, [router, queryClient]);
 
   return (
