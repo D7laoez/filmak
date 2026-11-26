@@ -17,7 +17,6 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
@@ -87,6 +86,7 @@ export function TopBar() {
   const handleSignOut = async () => {
     await qc.cancelQueries();
     qc.clear();
+    const { supabase } = await import("@/integrations/supabase/client");
     await supabase.auth.signOut();
     toast.success(t("logout_toast"));
   };
