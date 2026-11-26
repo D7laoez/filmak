@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { getRequestHeader } from "@tanstack/react-start/server";
+import { createServerFn } from "@tanstack/react-start";
 import { Loader2, Film, ShieldCheck, Heart, Sparkles, BookOpen, Mail, Scale } from "lucide-react";
 import appCss from "../styles.css?url";
 import { reportError } from "../lib/error-reporting";
@@ -143,13 +143,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const getInitialLocale = createServerFn({ method: "GET" }).handler(async () => {
+  const { getRequestHeader } = await import("@tanstack/react-start/server");
+  const cookie = getRequestHeader("cookie") ?? "";
+  return /(?:^|;\\s*)filmak_locale=(ar|en)(?:;|$)/.exec(cookie)?.[1] === "en" ? "en" : "ar";
+});
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   loader: async () => {
     try {
       const origin = await getRequestOrigin().catch(() => "https://filmak.site");
-      const cookie = getRequestHeader("cookie") ?? "";
-      const locale =
-        /(?:^|;\s*)filmak_locale=(ar|en)(?:;|$)/.exec(cookie)?.[1] === "en" ? "en" : "ar";
+      const locale = await getInitialLocale();
       return { origin: origin || "https://filmak.site", locale };
     } catch {
       return { origin: "https://filmak.site", locale: "ar" as const };
