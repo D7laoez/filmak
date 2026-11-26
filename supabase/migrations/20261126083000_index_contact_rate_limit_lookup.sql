@@ -1,2 +1,0 @@
--- The existing contact_messages_ip_created_idx already covers (ip_hash, created_at DESC).
--- Kept this migration file aligned with the live schema after removing the duplicate index.
