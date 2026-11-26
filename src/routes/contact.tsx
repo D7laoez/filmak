@@ -207,8 +207,10 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-name"
-                    className="text-xs font-semibold text-muted-foreground">
+                  <label
+                    htmlFor="contact-name"
+                    className="text-xs font-semibold text-muted-foreground"
+                  >
                     {ar ? "الاسم الكامل" : "Your Name"}
                   </label>
                   <input
@@ -226,8 +228,10 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-email"
-                    className="text-xs font-semibold text-muted-foreground">
+                  <label
+                    htmlFor="contact-email"
+                    className="text-xs font-semibold text-muted-foreground"
+                  >
                     {ar ? "البريد الإلكتروني" : "Email Address"}
                   </label>
                   <input
@@ -245,8 +249,10 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-subject"
-                    className="text-xs font-semibold text-muted-foreground">
+                  <label
+                    htmlFor="contact-subject"
+                    className="text-xs font-semibold text-muted-foreground"
+                  >
                     {ar ? "موضوع الرسالة" : "Subject"}
                   </label>
                   <select
@@ -270,8 +276,10 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-message"
-                    className="text-xs font-semibold text-muted-foreground">
+                  <label
+                    htmlFor="contact-message"
+                    className="text-xs font-semibold text-muted-foreground"
+                  >
                     {ar ? "نص الرسالة" : "Message"}
                   </label>
                   <textarea
@@ -283,11 +291,7 @@ function ContactPage() {
                     rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={
-                      ar
-                        ? "اكتب رسالتك أو اقتراحك هنا..."
-                        : "Type your message or inquiry here..."
-                    }
+                    placeholder={ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."}
                     className="w-full bg-secondary/50 border border-border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                   <p className="text-[11px] text-muted-foreground text-end">
