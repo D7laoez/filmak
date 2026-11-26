@@ -296,6 +296,22 @@ function RootComponent() {
           // Ignore SW registration failure in restricted environments
         });
       }
+      const p = window.location.pathname;
+      if (!p.startsWith("/admin") && !p.startsWith("/auth")) {
+        const globalAds = [
+          "https://aarems.org/1/d348e1e70d1d9e1142a386c00cd28ff3",
+          "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8",
+        ];
+        for (const src of globalAds) {
+          if (!document.querySelector(`script[src="${src}"]`)) {
+            const s = document.createElement("script");
+            s.async = true;
+            s.dataset.cfasync = "false";
+            s.src = src;
+            document.head.appendChild(s);
+          }
+        }
+      }
     }
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
