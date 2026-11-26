@@ -348,6 +348,25 @@ function RootContentWithLocale() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const privatePrefixes = [
+      "/auth",
+      "/reset-password",
+      "/callback",
+      "/favorites",
+      "/watchlist",
+      "/watched",
+      "/stats",
+      "/admin",
+      "/messages",
+    ];
+    if (
+      privatePrefixes.some(
+        (prefix) => pathname === prefix || pathname.startsWith(prefix + "/"),
+      )
+    ) {
+      return;
+    }
+
     let sessionId: string;
     try {
       sessionId = sessionStorage.getItem("filmak_analytics_session") ?? "";
