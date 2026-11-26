@@ -387,7 +387,7 @@ function ArticleReaderPage() {
                       </div>
                       <div className="inline-flex items-center gap-1 text-xs text-primary font-medium">
                         <Star className="w-3 h-3 fill-primary" />
-                        {m.rating} / 10
+                        {m.rating > 0 ? `${m.rating.toFixed(1)} / 10` : "غير متاح"}
                       </div>
                     </div>
                   </Link>
