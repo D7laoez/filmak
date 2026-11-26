@@ -42,7 +42,6 @@ function NotFoundComponent() {
       if (!code && !accessToken && !refreshToken && !error) return;
       setIsCompletingAuth(true);
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         const existing = await supabase.auth.getSession();
         if (!existing.data.session) {
           if (code) await supabase.auth.exchangeCodeForSession(code);
