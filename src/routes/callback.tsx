@@ -17,24 +17,43 @@ export const Route = createFileRoute("/callback")({
 function CallbackPage() {
   const navigate = useNavigate();
   const { dir } = useLocale();
-  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!cancelled && session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        navigate({ to: "/", replace: true });
+      }
+    });
+
     (async () => {
       try {
         const url = new URL(window.location.href);
         const authError =
           url.searchParams.get("error_description") || url.searchParams.get("error");
         if (authError) throw new Error(authError);
+
+        // First check if supabase-js detectSessionInUrl already created the session
+        const initial = await supabase.auth.getSession();
+        if (initial.data.session) {
+          if (!cancelled) navigate({ to: "/", replace: true });
+          return;
+        }
+
         const code = url.searchParams.get("code");
         const hash = url.hash.startsWith("#") ? url.hash.slice(1) : "";
         const params = new URLSearchParams(hash);
         const accessToken = params.get("access_token");
         const refreshToken = params.get("refresh_token");
+
         if (code) {
           const result = await supabase.auth.exchangeCodeForSession(code);
-          if (result.error) throw result.error;
+          if (result.error) {
+            // Re-check in case detectSessionInUrl completed concurrently
+            const retry = await supabase.auth.getSession();
+            if (!retry.data.session) throw result.error;
+          }
         } else if (accessToken && refreshToken) {
           const result = await supabase.auth.setSession({
             access_token: accessToken,
@@ -42,43 +61,52 @@ function CallbackPage() {
           });
           if (result.error) throw result.error;
         }
+
         const { data } = await supabase.auth.getSession();
-        if (!data.session) throw new Error("No session created");
+        if (!data.session) {
+          throw new Error(
+            dir === "rtl"
+              ? "لم يتم إنشاء جلسة دخول. تأكد من تفعيل رابط العودة في Supabase."
+              : "No session created. Verify callback URL in Supabase Auth settings.",
+          );
+        }
         if (!cancelled) navigate({ to: "/", replace: true });
-      } catch {
-        if (!cancelled) setError(true);
+      } catch (err) {
+        if (!cancelled) {
+          setErrorMsg((err as Error).message || "Authentication failed");
+        }
       }
     })();
+
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, dir]);
 
-  if (error)
+  if (errorMsg)
     return (
       <div
         dir={dir}
         className="min-h-screen flex items-center justify-center bg-background text-foreground px-4"
       >
-        <div className="max-w-sm text-center">
-          <AlertCircle className="mx-auto mb-4 w-8 h-8 text-destructive" />
+        <div className="max-w-sm text-center space-y-3">
+          <AlertCircle className="mx-auto w-8 h-8 text-destructive" />
           <h1 className="font-bold text-xl">
             {dir === "rtl" ? "تعذر إكمال تسجيل الدخول" : "Couldn't complete sign in"}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {dir === "rtl"
-              ? "ارجع إلى صفحة تسجيل الدخول وحاول مرة أخرى."
-              : "Return to sign in and try again."}
-          </p>
+          <p className="text-sm text-muted-foreground">{errorMsg}</p>
           <button
+            type="button"
             onClick={() => navigate({ to: "/auth", replace: true })}
-            className="mt-6 rounded-xl bg-primary text-primary-foreground px-5 py-3 text-sm font-semibold"
+            className="mt-4 rounded-full bg-primary text-primary-foreground px-6 py-2.5 text-sm font-bold cursor-pointer"
           >
             {dir === "rtl" ? "العودة لتسجيل الدخول" : "Back to sign in"}
           </button>
         </div>
       </div>
     );
+
   return (
     <div
       dir={dir}

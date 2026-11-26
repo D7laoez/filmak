@@ -42,12 +42,15 @@ function NotFoundComponent() {
       if (!code && !accessToken && !refreshToken && !error) return;
       setIsCompletingAuth(true);
       try {
-        if (code) await supabase.auth.exchangeCodeForSession(code);
-        if (accessToken && refreshToken)
-          await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
+        const existing = await supabase.auth.getSession();
+        if (!existing.data.session) {
+          if (code) await supabase.auth.exchangeCodeForSession(code);
+          else if (accessToken && refreshToken)
+            await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+        }
       } catch {
         // Ignore invalid/expired auth callback params and redirect home
       } finally {
