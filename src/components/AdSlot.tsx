@@ -1,101 +1,75 @@
-import { useEffect, useRef, useState } from "react";
-
-declare global {
-  interface Window {
-    adsbygoogle?: unknown[];
-  }
-}
+import { useEffect, useRef } from "react";
 
 const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env;
-const ADSENSE_CLIENT = env.VITE_ADSENSE_CLIENT_ID || "ca-pub-2237012686036777";
-const EDITORIAL_AD_SLOT = env.VITE_ADSENSE_ARTICLE_SLOT_ID || "";
-const PLACEHOLDER_SLOT = "1234567890";
+const ADSTERRA_NATIVE_KEY = env.VITE_ADSTERRA_NATIVE_KEY || "";
+const ADSTERRA_SCRIPT_URL = env.VITE_ADSTERRA_SCRIPT_URL || "";
+const MONETAG_SCRIPT_URL = env.VITE_MONETAG_SCRIPT_URL || "";
 
 type AdSlotProps = {
+  placement?: string;
   slot?: string;
   format?: string;
   layout?: string;
   responsive?: boolean;
   className?: string;
   style?: React.CSSProperties;
-  /** Allow a substantially enriched first-party movie page to use an ad. */
   editorialEligible?: boolean;
 };
 
 /**
- * AdSense is intentionally restricted to first-party editorial pages.
- * Movie/person/discovery pages contain third-party catalogue data and must not
- * receive Google ads unless they are substantially enriched with original content.
+ * Multi-network profitable ad slot supporting Adsterra (Native / Display Banners)
+ * and Monetag (Popunder / In-Page Push / Vignette), designed for movie discovery sites.
  */
-export function AdSlot({
-  slot,
-  format = "auto",
-  layout,
-  responsive = true,
-  className,
-  style,
-  editorialEligible = false,
-}: AdSlotProps) {
-  const ref = useRef<HTMLModElement>(null);
-  const pushed = useRef(false);
-  const [eligible, setEligible] = useState(false);
+export function AdSlot({ placement = "banner", className, style }: AdSlotProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Ad eligibility is an explicit route decision. Catalogue, search, person,
-    // TV and discovery pages never load AdSense unless a route opts in.
-    setEligible(editorialEligible);
-  }, [editorialEligible]);
-
-  // Ignore the old placeholder slot so it can never accidentally be served.
-  const resolvedSlot = slot && slot !== PLACEHOLDER_SLOT ? slot : EDITORIAL_AD_SLOT;
-
-  useEffect(() => {
-    if (!eligible || !ADSENSE_CLIENT || !resolvedSlot || pushed.current) return;
-
-    const pushAd = () => {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        pushed.current = true;
-      } catch (e) {
-        console.debug("AdSense push failed", e);
+    // Load global Monetag script once if configured
+    if (MONETAG_SCRIPT_URL) {
+      const existingMonetag = document.querySelector<HTMLScriptElement>(
+        'script[data-filmak-monetag="true"]',
+      );
+      if (!existingMonetag) {
+        const s = document.createElement("script");
+        s.async = true;
+        s.dataset.cfasync = "false";
+        s.dataset.filmakMonetag = "true";
+        s.src = MONETAG_SCRIPT_URL;
+        document.head.appendChild(s);
       }
-    };
-
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-filmak-adsense="true"]',
-    );
-
-    if (existing) {
-      if (window.adsbygoogle) pushAd();
-      else existing.addEventListener("load", pushAd, { once: true });
-      return;
     }
 
-    const script = document.createElement("script");
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
-    script.dataset.filmakAdsense = "true";
-    script.addEventListener("load", pushAd, { once: true });
-    document.head.appendChild(script);
-  }, [eligible, resolvedSlot]);
+    // Load Adsterra Native/Banner script into this slot if configured
+    if (ADSTERRA_NATIVE_KEY && ADSTERRA_SCRIPT_URL && containerRef.current) {
+      const existing = containerRef.current.querySelector<HTMLScriptElement>(
+        'script[data-filmak-adsterra="true"]',
+      );
+      if (!existing) {
+        const s = document.createElement("script");
+        s.async = true;
+        s.dataset.cfasync = "false";
+        s.dataset.filmakAdsterra = "true";
+        s.src = ADSTERRA_SCRIPT_URL;
+        containerRef.current.appendChild(s);
+      }
+    }
+  }, [placement]);
 
-  if (!eligible || !ADSENSE_CLIENT || !resolvedSlot) return null;
+  if (!ADSTERRA_NATIVE_KEY || !ADSTERRA_SCRIPT_URL) {
+    return null;
+  }
 
   return (
-    <div className={className} aria-label="Advertisement">
-      <ins
-        ref={ref}
-        className="adsbygoogle"
-        style={{ display: "block", ...style }}
-        data-ad-client={ADSENSE_CLIENT}
-        data-ad-slot={resolvedSlot}
-        data-ad-format={format}
-        data-ad-layout={layout}
-        data-full-width-responsive={responsive ? "true" : "false"}
-      />
+    <div
+      ref={containerRef}
+      className={className}
+      style={style}
+      aria-label="Sponsored advertisement"
+      data-ad-placement={placement}
+    >
+      <div id={`container-${ADSTERRA_NATIVE_KEY}`} className="min-h-[90px] w-full" />
     </div>
   );
 }

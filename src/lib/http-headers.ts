@@ -31,12 +31,12 @@ function isPrivatePath(pathname: string): boolean {
 
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.topcreativeformat.com https://*.monetag.com https://*.alwingulla.com https://*.dolohen.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://image.tmdb.org https://*.supabase.co https://www.google-analytics.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://pagead2.googlesyndication.com",
-  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+  "img-src 'self' data: blob: https://image.tmdb.org https://*.supabase.co https://www.google-analytics.com https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.monetag.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://*.effectivegatecpm.com https://*.monetag.com",
+  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.monetag.com",
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",

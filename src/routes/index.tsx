@@ -20,10 +20,8 @@ import {
   Tags,
   Compass,
   CheckCircle2,
-  BookOpen,
   ArrowRight,
   ArrowLeft,
-  Clock,
   LibraryBig,
 } from "lucide-react";
 import { X } from "lucide-react";
@@ -50,7 +48,7 @@ import {
   type TvCard,
 } from "@/lib/tv.functions";
 import { recommendMovies } from "@/lib/recommend.functions";
-import { getEditorialPickOfTheWeek, getEditorialArticles } from "@/lib/editorial.functions";
+import { AdSlot } from "@/components/AdSlot";
 
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useQueryClient } from "@tanstack/react-query";
@@ -170,16 +168,6 @@ function Home() {
     queryFn: () => getUpcoming({ data: { lang: locale } }),
   });
 
-  const pickOfTheWeek = useQuery({
-    queryKey: ["editorial-pick-of-week"],
-    queryFn: () => getEditorialPickOfTheWeek(),
-  });
-
-  const articlesQuery = useQuery({
-    queryKey: ["editorial-articles-home"],
-    queryFn: () => getEditorialArticles({ data: { limit: 3 } }),
-  });
-
   const [searchQ, setSearchQ] = useState(urlQ ?? "");
   const [activeSearch, setActiveSearch] = useState(urlQ ?? "");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -286,136 +274,10 @@ function Home() {
       {/* Hero Carousel */}
       <HeroCarousel movies={trending.data ?? []} />
 
-      {/* ========================================================================= */}
-      {/* 1. FILMAK PICK OF THE WEEK (FEATURED EDITORIAL SPOTLIGHT) */}
-      {/* ========================================================================= */}
-      {pickOfTheWeek.data && (
-        <section className="max-w-7xl mx-auto px-4 pt-10">
-          <div className="relative overflow-hidden rounded-3xl border border-primary/35 bg-gradient-to-br from-card via-card to-primary/5 shadow-xl p-6 md:p-8">
-            <div className="absolute top-0 right-0 -mt-12 -mr-12 w-72 h-72 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
-            <div className="grid md:grid-cols-12 gap-6 items-center">
-              <div className="md:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-primary/15 px-3.5 py-1 text-xs text-primary font-bold">
-                  <Award className="w-4 h-4" />
-                  {ar ? pickOfTheWeek.data.badge_ar : pickOfTheWeek.data.badge_en}
-                </div>
-                <h2 className="text-2xl md:text-4xl font-black tracking-tight">
-                  {pickOfTheWeek.data.title}
-                </h2>
-                <blockquote className="text-sm md:text-base leading-relaxed text-foreground/90 italic bg-secondary/40 rounded-2xl p-4 border-r-4 rtl:border-r-4 ltr:border-l-4 border-primary">
-                  "{ar ? pickOfTheWeek.data.why_picked_ar : pickOfTheWeek.data.why_picked_en}"
-                </blockquote>
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <Link
-                    to="/movie/$id"
-                    params={{ id: String(pickOfTheWeek.data.movieId) }}
-                    className="inline-flex items-center gap-2 min-h-[44px] rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 transition shadow-lg shadow-primary/25"
-                  >
-                    <Film className="w-4 h-4" />
-                    {ar ? "قراءة حكم فلمك الكامل" : "Read Full Verdict"}
-                  </Link>
-                  <span className="text-xs text-muted-foreground font-medium">
-                    {ar ? "اختيار هيئة تحرير فلمك" : "Curated by Filmak Editorial Board"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="md:col-span-4 aspect-video md:aspect-[4/3] rounded-2xl overflow-hidden bg-muted shadow-lg">
-                {pickOfTheWeek.data.backdrop ? (
-                  <img
-                    src={pickOfTheWeek.data.backdrop}
-                    alt={pickOfTheWeek.data.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full grid place-items-center bg-secondary">
-                    <Film className="w-12 h-12 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <AdSlot placement="home-banner" className="max-w-7xl mx-auto px-4 pt-8" />
 
       {/* ========================================================================= */}
-      {/* 2. LATEST EDITORIAL GUIDES & ARTICLES */}
-      {/* ========================================================================= */}
-      {articlesQuery.data && articlesQuery.data.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 pt-12 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-primary" />
-                {ar ? "أحدث الأدلة والمقالات السينمائية" : "Latest Cinema Guides & Articles"}
-              </h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                {ar
-                  ? "تحليلات معمقة وقوائم منتقاة من هيئة تحرير فلمك."
-                  : "Original critical deep dives and viewing roadmaps."}
-              </p>
-            </div>
-            <Link
-              to="/articles"
-              className="text-xs text-primary font-semibold hover:underline inline-flex items-center gap-1"
-            >
-              {ar ? "كل المقالات" : "All Articles"}
-              <Arrow className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {articlesQuery.data.map((art) => (
-              <Link
-                key={art.id}
-                to="/articles/$slug"
-                params={{ slug: art.slug }}
-                className="group rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:border-primary/40 hover:shadow-xl transition flex flex-col justify-between"
-              >
-                <div className="aspect-video bg-muted overflow-hidden relative">
-                  {art.featured_image ? (
-                    <img
-                      src={art.featured_image}
-                      alt={ar ? art.title_ar : art.title_en}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full grid place-items-center bg-secondary">
-                      <BookOpen className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="absolute top-2.5 right-2.5 bg-black/75 backdrop-blur text-[10px] text-white px-2.5 py-0.5 rounded-full font-semibold">
-                    {ar ? art.category_label_ar : art.category_label_en}
-                  </div>
-                </div>
-
-                <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-sm leading-snug group-hover:text-primary transition line-clamp-2">
-                      {ar ? art.title_ar : art.title_en}
-                    </h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
-                      {ar ? art.excerpt_ar : art.excerpt_en}
-                    </p>
-                  </div>
-                  <div className="border-t border-border/40 pt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <span>✍️ {art.author_name}</span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {art.reading_time_minutes} {ar ? "د" : "min"}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 3. AI NATURAL LANGUAGE RECOMMENDATIONS */}
+      {/* AI NATURAL LANGUAGE RECOMMENDATIONS */}
       {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 pt-12">
         <div className="relative overflow-hidden bg-gradient-to-br from-card via-card to-primary/5 border border-primary/25 rounded-3xl p-6 md:p-8 space-y-5 shadow-xl">
