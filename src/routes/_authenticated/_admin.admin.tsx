@@ -27,6 +27,7 @@ import {
   Save,
   CheckCircle2,
   FileText,
+  Inbox,
 } from "lucide-react";
 import {
   getAdminStats,
@@ -147,6 +148,13 @@ function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin/messages"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"
+            >
+              <Inbox className="h-4 w-4" />
+              رسائل التواصل
+            </Link>
             <button
               onClick={refresh}
               className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"
