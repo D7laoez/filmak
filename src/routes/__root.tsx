@@ -3,6 +3,7 @@ import {
   Outlet,
   Link,
   useNavigate,
+  useLocation,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
@@ -326,7 +327,47 @@ function RootComponent() {
 
 function RootContentWithLocale() {
   const { t, locale, dir } = useLocale();
+  const { pathname } = useLocation();
   const ar = locale === "ar";
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let sessionId: string;
+    try {
+      sessionId = sessionStorage.getItem("filmak_analytics_session") ?? "";
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        sessionStorage.setItem("filmak_analytics_session", sessionId);
+      }
+    } catch {
+      sessionId = crypto.randomUUID();
+    }
+
+    let referrer: string | undefined;
+    try {
+      if (document.referrer) {
+        const parsedReferrer = new URL(document.referrer);
+        referrer = parsedReferrer.origin + parsedReferrer.pathname;
+      }
+    } catch {
+      referrer = undefined;
+    }
+
+    void import("@/lib/site-analytics.functions")
+      .then(({ recordSiteVisit }) =>
+        recordSiteVisit({
+          data: {
+            path: pathname,
+            sessionId,
+            referrer,
+          },
+        }),
+      )
+      .catch(() => {
+        // Analytics must never interfere with page navigation.
+      });
+  }, [pathname]);
 
   return (
     <>
