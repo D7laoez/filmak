@@ -83,21 +83,21 @@ export const recordSiteVisit = createServerFn({ method: "POST" })
         ? data.sessionId.slice(0, 128)
         : crypto.randomUUID();
     const userId = await getUserId(request);
-    const { error } = await supabaseAdmin.from("site_visits").insert({
-      session_id: sessionId,
-      user_id: userId,
-      path,
-      referrer: typeof data?.referrer === "string" ? data.referrer.slice(0, 1000) : null,
-      ip_address: ip,
-      country,
-      city,
-      user_agent: ua.slice(0, 1000),
-      device_type: DEVICE(ua),
-      browser: BROWSER(ua),
-      os: OS(ua),
+    const { data: accepted, error } = await supabaseAdmin.rpc("record_site_visit", {
+      p_session_id: sessionId,
+      p_user_id: userId,
+      p_path: path,
+      p_referrer: typeof data?.referrer === "string" ? data.referrer.slice(0, 1000) : null,
+      p_ip_address: ip,
+      p_country: country,
+      p_city: city,
+      p_user_agent: ua.slice(0, 1000),
+      p_device_type: DEVICE(ua),
+      p_browser: BROWSER(ua),
+      p_os: OS(ua),
     });
-    if (error) console.warn("[site-analytics] visit insert failed:", error.message);
-    return { ok: !error };
+    if (error) console.warn("[site-analytics] visit recording failed:", error.message);
+    return { ok: !error && accepted === true, skipped: accepted === false };
   });
 
 export type SiteAnalytics = {
