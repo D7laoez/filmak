@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": allowedOrigin,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Vary": "Origin",
+  Vary: "Origin",
 };
 
 function json(body: Record<string, unknown>, status = 200) {
@@ -24,7 +24,8 @@ async function hmacSha256(value: string, secret: string) {
     ["sign"],
   );
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 Deno.serve(async (req: Request) => {
@@ -62,7 +63,8 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Message must be between 20 and 5000 characters" }, 400);
     }
 
-    const ip = req.headers.get("cf-connecting-ip") ??
+    const ip =
+      req.headers.get("cf-connecting-ip") ??
       req.headers.get("x-real-ip") ??
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
@@ -78,16 +80,13 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const { data: accepted, error: submitError } = await supabase.rpc(
-      "submit_contact_message",
-      {
-        p_name: name,
-        p_email: email,
-        p_subject: subject,
-        p_message: message,
-        p_ip_hash: ipHash,
-      },
-    );
+    const { data: accepted, error: submitError } = await supabase.rpc("submit_contact_message", {
+      p_name: name,
+      p_email: email,
+      p_subject: subject,
+      p_message: message,
+      p_ip_hash: ipHash,
+    });
 
     if (submitError) {
       console.error("Contact message submission failed:", submitError.message);
