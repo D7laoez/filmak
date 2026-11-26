@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Mail,
-  MessageSquare,
   ShieldAlert,
   Send,
   CheckCircle2,
@@ -32,30 +31,84 @@ function ContactPage() {
   const ar = locale === "ar";
   const Arrow = dir === "rtl" ? ArrowRight : ArrowLeft;
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("general");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name || !email || !message) {
-      toast.error(ar ? "يرجى ملء جميع الحقول المطلوبة." : "Please fill in all required fields.");
+    if (isSubmitting) return;
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const company = String(formData.get("company") || "");
+    if (!name.trim() || !email.trim() || message.trim().length < 20) {
+      toast.error(
+        ar
+          ? "يرجى إدخال الاسم والبريد ورسالة لا تقل عن 20 حرفاً."
+          : "Enter your name, email, and a message of at least 20 characters.",
+      );
       return;
     }
-    const subjectLabels: Record<string, string> = {
-      general: ar ? "استفسار عام" : "General Inquiry",
-      editorial: ar ? "اقتراح أو تصحيح تحريري" : "Editorial Suggestion / Correction",
-      technical: ar ? "مشكلة تقنية في الموقع" : "Technical Issue",
-      dmca: ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice",
-    };
-    const mailSubject = encodeURIComponent(`[Filmak] ${subjectLabels[subject] || subject}`);
-    const mailBody = encodeURIComponent(
-      `${ar ? "الاسم" : "Name"}: ${name}\n${ar ? "البريد" : "Email"}: ${email}\n\n${message}`,
-    );
-    // This form opens the visitor's email app; it does not submit to a server.
-    window.location.href = `mailto:contact@filmak.site?subject=${mailSubject}&body=${mailBody}`;
-    setSubmitted(true);
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact-submit`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim(),
+            subject,
+            message: message.trim(),
+            company,
+          }),
+        },
+      );
+
+      const result = (await response.json().catch(() => ({}))) as {
+        success?: boolean;
+        error?: string;
+      };
+      if (!response.ok || !result.success) {
+        if (response.status === 429) {
+          throw new Error(
+            ar
+              ? "أرسلت رسائل كثيرة خلال وقت قصير. حاول بعد 15 دقيقة."
+              : "Too many messages. Please try again in 15 minutes.",
+          );
+        }
+        throw new Error(
+          ar
+            ? "تعذر إرسال الرسالة حالياً. حاول مرة أخرى."
+            : "We could not submit your message. Please try again.",
+        );
+      }
+
+      setSubmitted(true);
+      setName("");
+      setEmail("");
+      setSubject("general");
+      setMessage("");
+      form.reset();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : ar
+            ? "حدث خطأ غير متوقع."
+            : "An unexpected error occurred.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -86,7 +139,6 @@ function ContactPage() {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-12 grid md:grid-cols-12 gap-8">
-        {/* Contact Info Cards */}
         <div className="md:col-span-5 space-y-4">
           <div className="rounded-2xl border border-border bg-card p-6 space-y-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
@@ -122,21 +174,21 @@ function ContactPage() {
           </div>
         </div>
 
-        {/* Contact Form */}
         <div className="md:col-span-7">
           <div className="rounded-3xl border border-border bg-card p-6 md:p-8 space-y-6">
             {submitted ? (
-              <div className="text-center py-10 space-y-3">
+              <div className="text-center py-10 space-y-3" role="status" aria-live="polite">
                 <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
                 <h3 className="text-xl font-bold">
-                  {ar ? "شكراً لتواصلك معنا!" : "Thank You for Reaching Out!"}
+                  {ar ? "تم استلام رسالتك بنجاح" : "Your Message Was Received"}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {ar
-                    ? "فتحنا تطبيق البريد لإرسال رسالتك. اضغط «إرسال» داخل تطبيق البريد لإتمام الإرسال."
-                    : "Your email app should open with this message prepared. Press Send in your email app to complete delivery."}
+                    ? "وصلت رسالتك إلى صندوق تواصل فريق فلمك. سنراجعها في أقرب وقت."
+                    : "Your message is safely stored in Filmak's contact inbox. Our team will review it."}
                 </p>
                 <button
+                  type="button"
                   onClick={() => setSubmitted(false)}
                   className="mt-4 text-xs text-primary underline"
                 >
@@ -147,12 +199,22 @@ function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <h2 className="text-xl font-bold">{ar ? "أرسل رسالة مباشرة" : "Send a Message"}</h2>
 
+                <div className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                  <label htmlFor="contact-company">Company</label>
+                  <input id="contact-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-name" className="text-xs font-semibold text-muted-foreground">
                     {ar ? "الاسم الكامل" : "Your Name"}
                   </label>
                   <input
+                    id="contact-name"
+                    name="name"
                     required
+                    minLength={2}
+                    maxLength={100}
+                    autoComplete="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder={ar ? "مثال: أحمد علي" : "e.g. John Doe"}
@@ -161,12 +223,16 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-email" className="text-xs font-semibold text-muted-foreground">
                     {ar ? "البريد الإلكتروني" : "Email Address"}
                   </label>
                   <input
+                    id="contact-email"
+                    name="email"
                     type="email"
                     required
+                    maxLength={254}
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
@@ -175,10 +241,12 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-subject" className="text-xs font-semibold text-muted-foreground">
                     {ar ? "موضوع الرسالة" : "Subject"}
                   </label>
                   <select
+                    id="contact-subject"
+                    name="subject"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="w-full bg-secondary/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"
@@ -190,35 +258,50 @@ function ContactPage() {
                     <option value="technical">
                       {ar ? "مشكلة تقنية في الموقع" : "Technical Issue"}
                     </option>
-                    <option value="dmca">
-                      {ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}
-                    </option>
+                    <option value="dmca">{ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-message" className="text-xs font-semibold text-muted-foreground">
                     {ar ? "نص الرسالة" : "Message"}
                   </label>
                   <textarea
+                    id="contact-message"
+                    name="message"
                     required
-                    rows={4}
+                    minLength={20}
+                    maxLength={5000}
+                    rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={
-                      ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."
-                    }
+                    placeholder={ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."}
                     className="w-full bg-secondary/50 border border-border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
+                  <p className="text-[11px] text-muted-foreground text-end">
+                    {message.length}/5000
+                  </p>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold rounded-xl py-3 text-sm hover:opacity-90 transition shadow-lg shadow-primary/20"
+                  disabled={isSubmitting}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold rounded-xl py-3 text-sm hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed transition shadow-lg shadow-primary/20"
                 >
                   <Send className="w-4 h-4" />
-                  {ar ? "إرسال الرسالة" : "Send Message"}
+                  {isSubmitting
+                    ? ar
+                      ? "جارٍ إرسال الرسالة..."
+                      : "Sending..."
+                    : ar
+                      ? "إرسال الرسالة"
+                      : "Send Message"}
                 </button>
+                <p className="text-[11px] text-muted-foreground text-center">
+                  {ar
+                    ? "تُحفظ الرسائل بشكل آمن ولا تظهر للزوار الآخرين."
+                    : "Messages are stored securely and are not visible to other visitors."}
+                </p>
               </form>
             )}
           </div>
