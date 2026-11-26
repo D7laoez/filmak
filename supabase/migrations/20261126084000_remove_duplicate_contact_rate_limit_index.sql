@@ -1,0 +1,1 @@
+drop index if exists public.contact_messages_ip_hash_created_at_idx;
