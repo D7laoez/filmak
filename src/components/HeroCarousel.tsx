@@ -17,7 +17,23 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
     return () => clearInterval(h);
   }, [items.length, paused]);
 
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return (
+      <section
+        dir={dir}
+        aria-label={ar ? "الأفلام المميزة" : "Featured movies"}
+        aria-busy="true"
+        className="relative h-[70vh] min-h-[460px] max-h-[720px] w-full overflow-hidden border-b border-border/50 bg-gradient-to-br from-card via-background to-primary/10"
+      >
+        <div className="mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-12 md:px-8 md:pb-16">
+          <div className="h-5 w-32 animate-pulse rounded-full bg-muted/70" />
+          <div className="mt-4 h-10 w-3/4 max-w-xl animate-pulse rounded-xl bg-muted/70" />
+          <div className="mt-3 h-4 w-1/2 max-w-md animate-pulse rounded bg-muted/60" />
+          <div className="mt-6 h-11 w-40 animate-pulse rounded-full bg-muted/70" />
+        </div>
+      </section>
+    );
+  }
   const m = items[idx];
 
   const prevSlide = () => setIdx((i) => (i - 1 + items.length) % items.length);
