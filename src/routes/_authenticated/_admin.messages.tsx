@@ -166,7 +166,8 @@ function ContactInboxPage() {
                       {message.email}
                     </a>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {labels[message.subject]}{" · "}
+                      {labels[message.subject]}
+                      <span className="px-1">·</span>
                       {new Date(message.created_at).toLocaleString("ar-IQ")}
                     </p>
                   </div>
