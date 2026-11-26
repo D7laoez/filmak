@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": allowedOrigin,
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Vary": "Origin",
+  Vary: "Origin",
 };
 
 function json(body: Record<string, unknown>, status = 200) {
@@ -54,7 +54,8 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Message must be between 20 and 5000 characters" }, 400);
     }
 
-    const ip = req.headers.get("cf-connecting-ip") ??
+    const ip =
+      req.headers.get("cf-connecting-ip") ??
       req.headers.get("x-real-ip") ??
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
