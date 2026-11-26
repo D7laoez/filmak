@@ -56,15 +56,15 @@ function FreeMoviesPage() {
         <header className="space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{ar ? "مشاهدة مجانية وقانونية 100%" : "100% Free & Public Domain"}</span>
+            <span>{ar ? "تراخيص ملكية عامة معلنة" : "Declared Public-Domain Licenses"}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight">
             {ar ? "سينما كلاسيكية مجانية — تشغيل مباشر" : "Free Classic Cinema — Direct Player"}
           </h1>
           <p className="text-sm text-muted-foreground max-w-2xl">
             {ar
-              ? "أفلام روائية كاملة واقعة في الملكية العامة (Public Domain) عبر Internet Archive، متاحة للتشغيل المباشر داخل الموقع."
-              : "Full-length public domain feature films streamed directly from the Internet Archive."}
+              ? "نعرض فقط العناصر التي تتضمن بيانات Internet Archive ترخيص Public Domain Mark أو CC0. بيانات الترخيص يضيفها رافع الملف ولا تمثل تحققاً قانونياً مستقلاً؛ راجع صفحة المصدر قبل إعادة الاستخدام."
+              : "We list only items whose Internet Archive metadata declares Public Domain Mark or CC0. License metadata is uploader-provided, not independent legal verification; check the source record before reuse."}
           </p>
 
           <form onSubmit={handleSearch} className="flex gap-2 max-w-lg pt-2">
@@ -185,6 +185,7 @@ function FreeMoviesPage() {
                 {movie.year && (
                   <p className="text-[11px] text-muted-foreground tabular-nums">{movie.year}</p>
                 )}
+                <p className="text-[10px] text-muted-foreground">{movie.rightsLabel}</p>
               </button>
             ))}
           </div>
