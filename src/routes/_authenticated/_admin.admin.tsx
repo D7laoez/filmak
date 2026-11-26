@@ -149,7 +149,7 @@ function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              to="/admin/messages"
+              to="/messages"
               className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"
             >
               <Inbox className="h-4 w-4" />
