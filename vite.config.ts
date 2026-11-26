@@ -10,51 +10,34 @@ export default defineConfig({
         rolldownOptions: {
           output: {
             strictExecutionOrder: true,
-            codeSplitting: {
-              groups: [
-                {
-                  name: "react-vendor",
-                  test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/,
-                  priority: 30,
-                },
-                {
-                  name: "tanstack-vendor",
-                  test: /node_modules[\\/]@tanstack[\\/](?!react-start[\\/]dist[\\/]plugin[\\/]default-entry[\\/]client)/,
-                  minSize: 20_000,
-                  priority: 25,
-                },
-                {
-                  name: "supabase-vendor",
-                  test: /node_modules[\\/]@supabase[\\/]/,
-                  minSize: 20_000,
-                  priority: 25,
-                },
-                {
-                  name: "radix-vendor",
-                  test: /node_modules[\\/]@radix-ui[\\/]/,
-                  minSize: 30_000,
-                  priority: 20,
-                },
-                {
-                  name: "ai-vendor",
-                  test: /node_modules[\\/](ai|@ai-sdk)[\\/]/,
-                  minSize: 20_000,
-                  priority: 20,
-                },
-                {
-                  name: "charts-vendor",
-                  test: /node_modules[\\/]recharts[\\/]/,
-                  minSize: 20_000,
-                  priority: 20,
-                },
-                {
-                  name: "vendor-rest",
-                  test: /node_modules[\\/](?!@tanstack[\\/]react-start[\\/]dist[\\/]plugin[\\/]default-entry[\\/]client)/,
-                  minSize: 50_000,
-                  maxSize: 220_000,
-                  priority: 1,
-                },
-              ],
+            manualChunks(id) {
+              const moduleId = id.replaceAll("\\", "/");
+              if (
+                !moduleId.includes("/node_modules/") ||
+                moduleId.includes("/node_modules/@tanstack/react-start/dist/plugin/default-entry/client")
+              ) {
+                return;
+              }
+
+              if (/\/node_modules\/(react|react-dom|scheduler)\//.test(moduleId)) {
+                return "react-vendor";
+              }
+              if (/\/node_modules\/@tanstack\//.test(moduleId)) {
+                return "tanstack-vendor";
+              }
+              if (/\/node_modules\/@supabase\//.test(moduleId)) {
+                return "supabase-vendor";
+              }
+              if (/\/node_modules\/@radix-ui\//.test(moduleId)) {
+                return "radix-vendor";
+              }
+              if (/\/node_modules\/(ai|@ai-sdk)\//.test(moduleId)) {
+                return "ai-vendor";
+              }
+              if (/\/node_modules\/recharts\//.test(moduleId)) {
+                return "charts-vendor";
+              }
+              return "vendor";
             },
           },
         },
