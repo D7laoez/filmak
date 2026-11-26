@@ -499,6 +499,22 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      record_site_visit: {
+        Args: {
+          p_browser: string;
+          p_city: string | null;
+          p_country: string | null;
+          p_device_type: string;
+          p_ip_address: string | null;
+          p_os: string;
+          p_path: string;
+          p_referrer: string | null;
+          p_session_id: string;
+          p_user_agent: string;
+          p_user_id: string | null;
+        };
+        Returns: boolean;
+      };
       admin_site_analytics: {
         Args: {
           days?: number;
