@@ -261,7 +261,7 @@ function DiscoverPage() {
                     )}
                     <div className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 text-[11px] bg-black/70 text-primary rounded-full px-2 py-0.5 backdrop-blur">
                       <Star className="w-3 h-3 fill-primary" />
-                      {m.rating}
+                      {m.rating > 0 ? m.rating.toFixed(1) : "غير متاح"}
                     </div>
                   </div>
                   <div className="mt-2">
