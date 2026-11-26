@@ -24,19 +24,35 @@ export function AdSlot({ placement = "banner", className, style }: AdSlotProps) 
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !containerRef.current) return;
-    const existing = containerRef.current.querySelector<HTMLScriptElement>(
-      'script[data-filmak-native-ad="true"]',
-    );
-    if (existing) return;
+    const target = containerRef.current;
+    if (typeof window === "undefined" || !target) return;
 
-    const s = document.createElement("script");
-    s.async = true;
-    s.setAttribute("fetchpriority", "high");
-    s.dataset.cfasync = "false";
-    s.dataset.filmakNativeAd = "true";
-    s.src = NATIVE_SCRIPT_URL;
-    containerRef.current.appendChild(s);
+    const loadAd = () => {
+      if (target.querySelector<HTMLScriptElement>('script[data-filmak-native-ad="true"]')) return;
+      const script = document.createElement("script");
+      script.async = true;
+      script.dataset.cfasync = "false";
+      script.dataset.filmakNativeAd = "true";
+      script.src = NATIVE_SCRIPT_URL;
+      target.appendChild(script);
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      loadAd();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          loadAd();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
   }, [placement]);
 
   return (
