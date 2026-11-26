@@ -24,8 +24,7 @@ async function hmacSha256(value: string, secret: string) {
     ["sign"],
   );
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 Deno.serve(async (req: Request) => {
