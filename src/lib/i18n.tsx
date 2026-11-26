@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useLayoutEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -507,27 +506,14 @@ type Ctx = {
 
 const LocaleCtx = createContext<Ctx | null>(null);
 
-function detectInitial(): Locale {
-  if (typeof window === "undefined") return "ar";
-  try {
-    const saved = window.localStorage.getItem("locale");
-    if (saved === "ar" || saved === "en") return saved;
-  } catch {
-    // localStorage unavailable (e.g. private mode)
-  }
-  const nav = (navigator.language || "ar").toLowerCase();
-  return nav.startsWith("ar") ? "ar" : "en";
-}
-
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  // SSR default is "ar" to match the original site; after hydration
-  // we detect the real locale to avoid a visible flash on Arabic devices.
-  const [locale, setLocaleState] = useState<Locale>("ar");
-
-  useLayoutEffect(() => {
-    const detected = detectInitial();
-    setLocaleState(detected);
-  }, []);
+export function LocaleProvider({
+  children,
+  initialLocale = "ar",
+}: {
+  children: ReactNode;
+  initialLocale?: Locale;
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -538,6 +524,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((l: Locale) => {
     try {
       window.localStorage.setItem("locale", l);
+      document.cookie = `filmak_locale=${l}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`;
     } catch {
       // localStorage unavailable
     }
