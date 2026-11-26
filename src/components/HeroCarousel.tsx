@@ -97,7 +97,10 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
       )}
 
       <div className="relative z-10 h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
-        <div className="max-w-2xl" key={m.id}>
+        <div
+          className="min-h-[390px] md:min-h-[300px] max-w-2xl flex flex-col justify-end"
+          key={m.id}
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3 border border-primary/30 backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t("trending")}</span>
