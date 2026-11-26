@@ -98,7 +98,7 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
           <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4 tabular-nums">
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary font-bold">
               <Star className="w-3.5 h-3.5 fill-primary" />
-              {m.rating}
+              {m.rating > 0 ? m.rating.toFixed(1) : ar ? "غير متاح" : "N/A"}
             </span>
             {m.year && <span className="font-medium text-foreground/80">{m.year}</span>}
           </div>
