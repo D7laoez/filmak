@@ -13,7 +13,7 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import { getEditorialArticles, hasEditorialDepth, type Article } from "@/lib/editorial.functions";
+import { getEditorialArticles, hasSubstantialArticle, type Article } from "@/lib/editorial.functions";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { safeJsonLd } from "@/lib/seo";
@@ -91,7 +91,7 @@ function ArticlesIndexPage() {
       }),
   });
 
-  const allArticles = (articlesQuery.data ?? []).filter(hasEditorialDepth);
+  const allArticles = (articlesQuery.data ?? []).filter(hasSubstantialArticle);
   const filteredArticles = allArticles.filter((art) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
