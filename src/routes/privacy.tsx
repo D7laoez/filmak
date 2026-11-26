@@ -30,6 +30,10 @@ function PrivacyPage() {
           "المفضلة والقوائم",
           "المفضلة وقائمة المشاهدة وسجل المشاهدة والتقييمات المرتبطة بالحساب تحفظ في قاعدة البيانات لتتمكن من الوصول إليها من أجهزتك. الوصول إليها محمي بحسب حساب المستخدم.",
         ],
+        [
+          "رسائل التواصل",
+          "عند إرسال رسالة عبر نموذج التواصل، نحفظ الاسم والبريد الإلكتروني وموضوع الرسالة ومحتواها في قاعدة بيانات خاصة، ونحتفظ ببصمة مشفّرة لعنوان الاتصال للمساعدة في منع الإساءة وتحديد معدل الإرسال. لا تظهر هذه الرسائل للزوار، ويقتصر الوصول إليها على إدارة الموقع. يمكنك طلب حذف رسالة عبر صفحة التواصل.",
+        ],
         ["التفضيلات المحلية", "اللغة والمظهر وبعض إعدادات الواجهة قد تحفظ محليًا في متصفحك."],
         [
           "الإعلانات والتحليلات وملفات تعريف الارتباط",
@@ -49,6 +53,10 @@ function PrivacyPage() {
         [
           "Favorites and lists",
           "Favorites, watchlist, watched items and ratings associated with your account are stored so you can access them across devices.",
+        ],
+        [
+          "Contact messages",
+          "When you submit the contact form, we store your name, email address, subject and message in a private database. We also retain a hashed connection identifier to help prevent abuse and limit submissions. Messages are not visible to visitors and are accessible only to site administrators. You can request deletion through the contact page.",
         ],
         [
           "Local preferences",
@@ -107,8 +115,8 @@ function PrivacyPage() {
               )}
               {title ===
                 (ar
-                  ? "الإعلانات وملفات تعريف الارتباط"
-                  : "Advertising cookies and personalization") && (
+                  ? "الإعلانات والتحليلات وملفات تعريف الارتباط"
+                  : "Advertising, analytics and cookies") && (
                 <p className="mt-2 text-sm">
                   <a
                     className="text-primary underline"
