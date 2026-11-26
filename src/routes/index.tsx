@@ -448,7 +448,7 @@ function Home() {
                             )}
                             <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                               <Star className="w-3 h-3 fill-primary text-primary" />
-                              {r.rating}
+                              {r.rating > 0 ? r.rating.toFixed(1) : "غير متاح"}
                             </div>
                           </div>
                           <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
@@ -671,7 +671,7 @@ function Row({
                 )}
                 <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-primary text-primary" />
-                  {m.rating}
+                  {m.rating > 0 ? m.rating.toFixed(1) : "غير متاح"}
                 </div>
                 <FavoriteButton movie={m} variant="icon" />
               </div>
