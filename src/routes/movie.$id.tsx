@@ -1044,7 +1044,7 @@ function Content() {
                           )}
                           <div className="absolute top-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                             <Star className="w-3 h-3 fill-primary text-primary" />
-                            {m.rating}
+                            {m.rating > 0 ? m.rating.toFixed(1) : "غير متاح"}
                           </div>
                         </div>
                         <p className="mt-2 text-sm font-semibold truncate group-hover:text-primary transition">
