@@ -1017,7 +1017,6 @@ function Content() {
                       <Link
                         to="/movie/$id"
                         params={{ id: String(m.id) }}
-                        reloadDocument
                         className="group block flex-1"
                       >
                         <div className="relative aspect-[2/3] rounded-2xl overflow-hidden bg-muted shadow-sm">

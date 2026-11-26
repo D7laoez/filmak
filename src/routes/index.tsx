@@ -655,7 +655,6 @@ function Home() {
               key={g.id}
               to="/genre/$id"
               params={{ id: String(g.id) }}
-              reloadDocument
               search={{
                 type: tab,
                 sort: "popularity.desc",

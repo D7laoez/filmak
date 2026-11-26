@@ -248,7 +248,6 @@ function DiscoverPage() {
                   key={m.id}
                   to="/movie/$id"
                   params={{ id: String(m.id) }}
-                  reloadDocument
                   className="group block"
                 >
                   <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-muted">

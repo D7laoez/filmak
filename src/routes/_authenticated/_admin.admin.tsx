@@ -662,7 +662,6 @@ function EditorialReviewsCms() {
                     <Link
                       to="/movie/$id"
                       params={{ id: String(rev.movie_id) }}
-                      reloadDocument
                       className="font-bold text-sm text-primary hover:underline"
                     >
                       Movie ID #{rev.movie_id}

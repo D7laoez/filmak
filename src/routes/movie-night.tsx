@@ -174,7 +174,6 @@ function MovieNightPage() {
                   key={m.id}
                   to="/movie/$id"
                   params={{ id: String(m.id) }}
-                  reloadDocument
                   className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-primary/50 transition"
                 >
                   <img

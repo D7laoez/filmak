@@ -132,7 +132,6 @@ function PickPage() {
                     <Link
                       to="/movie/$id"
                       params={{ id: String(picked.id) }}
-                      reloadDocument
                       className="inline-flex items-center justify-center rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
                     >
                       {locale === "ar" ? "شوف التفاصيل" : "View details"}
