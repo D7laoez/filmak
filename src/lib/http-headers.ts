@@ -31,12 +31,12 @@ function isPrivatePath(pathname: string): boolean {
 
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://aarems.org https://*.aarems.org https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://directyp.org https://*.directyp.org https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.topcreativeformat.com https://*.monetag.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.topcreativeformat.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://aarems.org https://*.aarems.org https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://directyp.org https://*.directyp.org",
-  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://aarems.org https://*.aarems.org https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://directyp.org https://*.directyp.org",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
+  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",

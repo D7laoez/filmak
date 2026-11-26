@@ -3,7 +3,7 @@ import { ShieldAlert, RefreshCw } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 
 const AD_PROBES = [
-  "https://aarems.org/1/d348e1e70d1d9e1142a386c00cd28ff3",
+  "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8",
   "https://bancadeltempoidea.org/21/00079e251d8adc9df75fbf3115dcceb6",
 ];
 
