@@ -53,7 +53,6 @@ import { AdSlot } from "@/components/AdSlot";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
 import { Languages } from "lucide-react";
@@ -251,6 +250,7 @@ function Home() {
   async function handleSignOut() {
     await qc.cancelQueries();
     qc.clear();
+    const { supabase } = await import("@/integrations/supabase/client");
     await supabase.auth.signOut();
     toast.success(t("logout_toast"));
   }
