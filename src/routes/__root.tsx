@@ -19,6 +19,7 @@ import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
+import { AdBlockGate } from "@/components/AdBlockGate";
 
 import { safeJsonLd } from "@/lib/seo";
 
@@ -497,6 +498,7 @@ function RootContentWithLocale() {
         </div>
       </footer>
       <BottomNav />
+      <AdBlockGate />
     </>
   );
 }
