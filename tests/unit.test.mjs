@@ -44,14 +44,34 @@ test("safeJsonLd escapes HTML-sensitive characters to prevent XSS", () => {
   assert.ok(serialized.includes("\\u0026"));
 });
 
-test("site_visits migration defines table, RLS, and admin_site_analytics RPC", () => {
-  const sql = readFileSync(
-    resolve("supabase/migrations/20261125000000_site_visits_and_analytics.sql"),
+test("site_visits migration defines table, RLS, and hardened analytics RPC", () => {
+  const schema = readFileSync(
+    resolve("supabase/migrations/20261126075636_create_contact_inbox.sql"),
     "utf8",
   );
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS public\.site_visits/i);
-  assert.match(sql, /ENABLE ROW LEVEL SECURITY/i);
-  assert.match(sql, /CREATE OR REPLACE FUNCTION public\.admin_site_analytics/i);
+  const hardening = readFileSync(
+    resolve("supabase/migrations/20261126080112_remove_unneeded_security_definer_rpcs.sql"),
+    "utf8",
+  );
+  assert.match(schema, /CREATE TABLE IF NOT EXISTS public\.site_visits/i);
+  assert.match(schema, /ENABLE ROW LEVEL SECURITY/i);
+  assert.match(schema, /CREATE OR REPLACE FUNCTION public\.admin_site_analytics/i);
+  assert.match(hardening, /admin_site_analytics[\s\S]*?security invoker/i);
+});
+
+test("contact and analytics write RPCs are atomic and service-role only", () => {
+  const contact = readFileSync(
+    resolve("supabase/migrations/20261126082451_make_contact_rate_limit_atomic.sql"),
+    "utf8",
+  );
+  const analytics = readFileSync(
+    resolve("supabase/migrations/20261126082926_add_rate_limited_site_visit_rpc.sql"),
+    "utf8",
+  );
+  assert.match(contact, /pg_advisory_xact_lock/i);
+  assert.match(contact, /to service_role/i);
+  assert.match(analytics, /pg_advisory_xact_lock/i);
+  assert.match(analytics, /to service_role/i);
 });
 
 test("public/_headers includes security headers and public/robots.txt points to sitemap", () => {
