@@ -8,6 +8,7 @@ export type PublicDomainMovie = {
   description: string;
   poster: string;
   downloads: number;
+  rightsLabel: string;
 };
 
 type ArchiveDoc = {
@@ -16,7 +17,19 @@ type ArchiveDoc = {
   year?: string | number;
   description?: string | string[];
   downloads?: number;
+  licenseurl?: string;
+  rights?: string | string[];
 };
+
+function hasExplicitPublicDomainLicense(value: unknown): boolean {
+  const license = String(value ?? "")
+    .trim()
+    .toLowerCase();
+  return (
+    license.includes("creativecommons.org/publicdomain/mark/1.0") ||
+    license.includes("creativecommons.org/publicdomain/zero/1.0")
+  );
+}
 
 export const getFreePublicDomainMovies = createServerFn({ method: "GET" })
   .validator((d: unknown) =>
@@ -32,6 +45,7 @@ export const getFreePublicDomainMovies = createServerFn({ method: "GET" })
       "collection:(feature_films)",
       "mediatype:(movies)",
       "format:(MPEG4 OR h.264)",
+      '(licenseurl:"https://creativecommons.org/publicdomain/mark/1.0/" OR licenseurl:"https://creativecommons.org/publicdomain/zero/1.0/")',
     ];
     if (data.q?.trim()) {
       const cleanQ = data.q.trim().replace(/[()":]/g, " ");
@@ -45,6 +59,7 @@ export const getFreePublicDomainMovies = createServerFn({ method: "GET" })
     url.searchParams.append("fl[]", "year");
     url.searchParams.append("fl[]", "description");
     url.searchParams.append("fl[]", "downloads");
+    url.searchParams.append("fl[]", "licenseurl");
     url.searchParams.append("sort[]", "downloads desc");
     url.searchParams.set("rows", "24");
     url.searchParams.set("page", String(data.page));
@@ -56,7 +71,9 @@ export const getFreePublicDomainMovies = createServerFn({ method: "GET" })
     const docs = json.response?.docs ?? [];
 
     return docs
-      .filter((doc) => Boolean(doc.identifier && doc.title))
+      .filter((doc) =>
+        Boolean(doc.identifier && doc.title && hasExplicitPublicDomainLicense(doc.licenseurl)),
+      )
       .map((doc) => {
         const rawDesc = Array.isArray(doc.description)
           ? doc.description.join(" ")
@@ -72,6 +89,7 @@ export const getFreePublicDomainMovies = createServerFn({ method: "GET" })
           description: cleanDesc.slice(0, 220),
           poster: `https://archive.org/services/img/${encodeURIComponent(doc.identifier)}`,
           downloads: Number(doc.downloads || 0),
+          rightsLabel: doc.licenseurl?.includes("/mark/") ? "Public Domain Mark 1.0" : "CC0 1.0",
         };
       });
   });
@@ -97,9 +115,20 @@ export const getFreeMovieStream = createServerFn({ method: "GET" })
     });
     if (!res.ok) return { id: data.id, title: data.id, streamUrl: null, subtitleUrl: null };
     const meta = (await res.json()) as {
-      metadata?: { title?: string };
+      metadata?: { title?: string; licenseurl?: string };
       files?: ArchiveFile[];
     };
+    // Never expose a playable stream unless the uploader metadata declares
+    // an explicit Creative Commons Public Domain Mark or CC0 license.
+    if (!hasExplicitPublicDomainLicense(meta.metadata?.licenseurl)) {
+      return {
+        id: data.id,
+        title: meta.metadata?.title || data.id,
+        streamUrl: null,
+        subtitleUrl: null,
+      };
+    }
+
     const files = meta.files ?? [];
     const mp4 =
       files.find((f) => f.name.endsWith(".mp4") && !f.name.includes("512kb")) ??
