@@ -49,8 +49,10 @@ export const getRouter = () => {
                 controller.close();
                 return;
               }
-              if (chunk.value != null) {
-                controller.enqueue(chunk.value);
+              const value = chunk.value as
+                { mutations?: unknown[]; queries?: unknown[] } | null | undefined;
+              if (value && Array.isArray(value.mutations) && Array.isArray(value.queries)) {
+                controller.enqueue(value);
                 return;
               }
             }
@@ -59,11 +61,22 @@ export const getRouter = () => {
             return reader.cancel(reason);
           },
         });
-        return originalHydrate({ ...state, queryStream: safeStream });
+        return originalHydrate({
+          ...state,
+          dehydratedQueryClient: state?.dehydratedQueryClient ?? {
+            mutations: [],
+            queries: [],
+          },
+          queryStream: safeStream,
+        });
       }
 
       return originalHydrate({
         ...state,
+        dehydratedQueryClient: state?.dehydratedQueryClient ?? {
+          mutations: [],
+          queries: [],
+        },
         queryStream: new ReadableStream<unknown>({
           start(controller) {
             controller.close();
