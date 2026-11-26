@@ -1,2 +1,2 @@
-create index if not exists contact_messages_ip_hash_created_at_idx
-  on public.contact_messages (ip_hash, created_at desc);
+-- The existing contact_messages_ip_created_idx already covers (ip_hash, created_at DESC).
+-- Kept this migration file aligned with the live schema after removing the duplicate index.
