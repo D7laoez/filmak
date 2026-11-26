@@ -13,7 +13,11 @@ import {
   Search,
   Filter,
 } from "lucide-react";
-import { getEditorialArticles, hasSubstantialArticle, type Article } from "@/lib/editorial.functions";
+import {
+  getEditorialArticles,
+  hasSubstantialArticle,
+  type Article,
+} from "@/lib/editorial.functions";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { safeJsonLd } from "@/lib/seo";
