@@ -27,10 +27,6 @@ declare
   v_since timestamptz := now() - make_interval(days => v_days);
   v_result jsonb;
 begin
-  if auth.uid() is null or not public.has_role(auth.uid(), 'admin'::public.app_role) then
-    raise exception 'Forbidden' using errcode = '42501';
-  end if;
-
   select jsonb_build_object(
     'total_visits', (select count(*)::integer from public.site_visits where created_at >= v_since),
     'unique_sessions', (select count(distinct session_id)::integer from public.site_visits where created_at >= v_since),
@@ -99,6 +95,6 @@ end;
 $function$;
 
 revoke all on function public.admin_site_analytics(integer) from public, anon, authenticated;
-grant execute on function public.admin_site_analytics(integer) to authenticated;
+grant execute on function public.admin_site_analytics(integer) to service_role;
 revoke all on function public.has_role(uuid, public.app_role) from public, anon, authenticated;
 grant execute on function public.has_role(uuid, public.app_role) to authenticated;
