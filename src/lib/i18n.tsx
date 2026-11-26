@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useLayoutEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -523,7 +524,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   // we detect the real locale to avoid a visible flash on Arabic devices.
   const [locale, setLocaleState] = useState<Locale>("ar");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const detected = detectInitial();
     setLocaleState(detected);
   }, []);
