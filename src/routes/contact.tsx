@@ -1,12 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Mail,
-  ShieldAlert,
-  Send,
-  CheckCircle2,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Mail, ShieldAlert, Send, CheckCircle2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useLocale } from "@/lib/i18n";
@@ -199,13 +192,23 @@ function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <h2 className="text-xl font-bold">{ar ? "أرسل رسالة مباشرة" : "Send a Message"}</h2>
 
-                <div className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+                <div
+                  className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden"
+                  aria-hidden="true"
+                >
                   <label htmlFor="contact-company">Company</label>
-                  <input id="contact-company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+                  <input
+                    id="contact-company"
+                    name="company"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-name" className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-name"
+                    className="text-xs font-semibold text-muted-foreground">
                     {ar ? "الاسم الكامل" : "Your Name"}
                   </label>
                   <input
@@ -223,7 +226,8 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-email" className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-email"
+                    className="text-xs font-semibold text-muted-foreground">
                     {ar ? "البريد الإلكتروني" : "Email Address"}
                   </label>
                   <input
@@ -241,7 +245,8 @@ function ContactPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-subject" className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-subject"
+                    className="text-xs font-semibold text-muted-foreground">
                     {ar ? "موضوع الرسالة" : "Subject"}
                   </label>
                   <select
@@ -258,12 +263,15 @@ function ContactPage() {
                     <option value="technical">
                       {ar ? "مشكلة تقنية في الموقع" : "Technical Issue"}
                     </option>
-                    <option value="dmca">{ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}</option>
+                    <option value="dmca">
+                      {ar ? "حقوق ملكية ونشر (DMCA)" : "Copyright / DMCA Notice"}
+                    </option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label htmlFor="contact-message" className="text-xs font-semibold text-muted-foreground">
+                  <label htmlFor="contact-message"
+                    className="text-xs font-semibold text-muted-foreground">
                     {ar ? "نص الرسالة" : "Message"}
                   </label>
                   <textarea
@@ -275,7 +283,11 @@ function ContactPage() {
                     rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder={ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."}
+                    placeholder={
+                      ar
+                        ? "اكتب رسالتك أو اقتراحك هنا..."
+                        : "Type your message or inquiry here..."
+                    }
                     className="w-full bg-secondary/50 border border-border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
                   <p className="text-[11px] text-muted-foreground text-end">
