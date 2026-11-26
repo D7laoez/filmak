@@ -117,19 +117,19 @@ CREATE POLICY "Admins have full access to editorial reviews"
   ON public.editorial_reviews
   FOR ALL
   TO authenticated
-  USING (public.has_role('admin', auth.uid()))
-  WITH CHECK (public.has_role('admin', auth.uid()));
+  USING (public.has_role(auth.uid(), 'admin'::public.app_role))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
 
 CREATE POLICY "Admins have full access to articles"
   ON public.articles
   FOR ALL
   TO authenticated
-  USING (public.has_role('admin', auth.uid()))
-  WITH CHECK (public.has_role('admin', auth.uid()));
+  USING (public.has_role(auth.uid(), 'admin'::public.app_role))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
 
 CREATE POLICY "Admins have full access to collections"
   ON public.collections_editorial
   FOR ALL
   TO authenticated
-  USING (public.has_role('admin', auth.uid()))
-  WITH CHECK (public.has_role('admin', auth.uid()));
+  USING (public.has_role(auth.uid(), 'admin'::public.app_role))
+  WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));

@@ -31,7 +31,7 @@ BEGIN
       ON public.site_visits
       FOR SELECT
       TO authenticated
-      USING (public.has_role('admin'::public.app_role, auth.uid()));
+      USING (public.has_role(auth.uid(), 'admin'::public.app_role));
   END IF;
 END
 $$;
