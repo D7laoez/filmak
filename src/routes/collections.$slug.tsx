@@ -161,7 +161,7 @@ function CollectionDetailPage() {
                 />
                 <div className="absolute top-2 right-2 rounded-full bg-black/75 backdrop-blur px-2 py-1 text-[11px] text-white flex items-center gap-1 font-semibold">
                   <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  {m.rating}
+                  {m.rating > 0 ? m.rating.toFixed(1) : "غير متاح"}
                 </div>
               </div>
               <h2 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition leading-tight">
