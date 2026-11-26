@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
@@ -46,15 +45,10 @@ async function getUserId(request: Request) {
   if (!auth?.startsWith("Bearer ")) return null;
   const token = auth.slice(7);
   if (token.split(".").length !== 3) return null;
-  const url = process.env.SUPABASE_URL || "https://vdmvnimrcxyendyocowm.supabase.co";
-  const key =
-    process.env.SUPABASE_PUBLISHABLE_KEY || "sb_publishable_N4CdAVcKG-AUsLjIeIIf8w_AAc8M5UJ";
   try {
-    const client = createClient(url, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const { data } = await client.auth.getClaims(token);
-    return data?.claims?.sub ?? null;
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    if (error) return null;
+    return data.user?.id ?? null;
   } catch {
     return null;
   }
