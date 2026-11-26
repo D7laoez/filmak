@@ -32,8 +32,8 @@ function PrivacyPage() {
         ],
         ["التفضيلات المحلية", "اللغة والمظهر وبعض إعدادات الواجهة قد تحفظ محليًا في متصفحك."],
         [
-          "الإعلانات وملفات تعريف الارتباط",
-          "قد تستخدم Google وشركاؤها ملفات تعريف الارتباط وتقنيات مشابهة لتقديم الإعلانات وقياسها، وقد تستند الإعلانات المخصصة إلى زياراتك السابقة لهذا الموقع أو مواقع أخرى. يمكنك إدارة تخصيص الإعلانات من إعدادات إعلانات Google أو إيقاف بعض الإعلانات المخصصة عبر AboutAds. قد تختلف الإعلانات وإعدادات الموافقة بحسب موقعك والقوانين المطبقة.",
+          "الإعلانات والتحليلات وملفات تعريف الارتباط",
+          "نستخدم Google Analytics لقياس استخدام الموقع، وقد تظهر وحدات إعلانية من شبكة Adsterra في مواضع محددة. قد تستخدم هذه الجهات ملفات تعريف الارتباط أو معرّفات وتقنيات مشابهة لجمع بيانات تقنية وقياس الإعلانات وتكرارها. لا نحمل شريط الإعلانات الاجتماعي على جميع الصفحات. يمكنك إدارة تخصيص إعلانات Google من إعداداتها، كما يمكنك ضبط ملفات تعريف الارتباط من المتصفح. تختلف خيارات الموافقة والإعلانات بحسب بلدك والقوانين المطبقة.",
           "https://support.google.com/adsense/answer/1348695?hl=ar",
         ],
         [
@@ -55,8 +55,8 @@ function PrivacyPage() {
           "Language, theme and some interface preferences may be stored locally in your browser.",
         ],
         [
-          "Advertising cookies and personalization",
-          "Google and its partners may use cookies or similar technologies to serve and measure ads. Personalized ads may be based on your previous visits to this site or other sites. You can manage personalized advertising in Google Ads Settings or opt out of some personalized ads through AboutAds. Ad delivery and consent options may vary by location and applicable law.",
+          "Advertising, analytics and cookies",
+          "We use Google Analytics to measure site usage, and selected placements may display ads from the Adsterra network. These providers may use cookies, identifiers or similar technologies to collect technical data and measure ad delivery and frequency. We do not load a site-wide social-bar ad script. You can manage Google ad personalization in Google Ads Settings and control cookies through your browser. Consent and ad options vary by location and applicable law.",
           "https://support.google.com/adsense/answer/1348695?hl=en",
         ],
         [
