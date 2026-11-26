@@ -11,15 +11,15 @@ const DEVICE = (ua: string) =>
       : "Mobile"
     : "Desktop";
 const BROWSER = (ua: string) =>
-  /Edg\\//i.test(ua)
+  /Edg\//i.test(ua)
     ? "Edge"
-    : /OPR\\//i.test(ua)
+    : /OPR\//i.test(ua)
       ? "Opera"
-      : /Chrome\\//i.test(ua)
+      : /Chrome\//i.test(ua)
         ? "Chrome"
-        : /Firefox\\//i.test(ua)
+        : /Firefox\//i.test(ua)
           ? "Firefox"
-          : /Safari\\//i.test(ua)
+          : /Safari\//i.test(ua)
             ? "Safari"
             : "Other";
 const OS = (ua: string) =>
