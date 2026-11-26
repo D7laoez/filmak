@@ -15,6 +15,7 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /messages
 Disallow: /movie/null
 Disallow: /tv/null
 Disallow: /movie/undefined
@@ -33,6 +34,7 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /messages
 Disallow: /movie/null
 Disallow: /tv/null
 Disallow: /movie/undefined
@@ -51,6 +53,7 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /messages
 Disallow: /movie/null
 Disallow: /tv/null
 Disallow: /movie/undefined
@@ -69,6 +72,7 @@ Disallow: /watched
 Disallow: /stats
 Disallow: /taste
 Disallow: /admin
+Disallow: /messages
 Disallow: /movie/null
 Disallow: /tv/null
 Disallow: /movie/undefined
