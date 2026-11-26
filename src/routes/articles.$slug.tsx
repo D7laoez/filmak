@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, rootRouteId } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useMemo } from "react";
 import {
@@ -32,30 +32,21 @@ import { safeJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/articles/$slug")({
   loader: async ({ params }) => {
-    try {
-      const article = await getEditorialArticleBySlug({ data: { slug: params.slug } }).catch(
-        () => null,
-      );
-      if (!article) return { article: null, relatedMovies: [], otherArticles: [] };
+    const article = await getEditorialArticleBySlug({ data: { slug: params.slug } });
+    if (!article) throw notFound({ routeId: rootRouteId });
 
-      // Fetch related movie details
-      const moviePromises = (article.related_movie_ids || [])
-        .slice(0, 5)
-        .map((id) => getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null));
-      const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
+    // A missing article is a real 404. Only optional related content is best-effort.
+    const moviePromises = (article.related_movie_ids || [])
+      .slice(0, 5)
+      .map((id) => getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null));
+    const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
+    const otherArticles = (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
 
-      // Fetch other recent articles
-      const otherArticles =
-        (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
-
-      return {
-        article,
-        relatedMovies,
-        otherArticles: otherArticles.filter((a) => a.slug !== params.slug).slice(0, 3),
-      };
-    } catch {
-      return { article: null, relatedMovies: [], otherArticles: [] };
-    }
+    return {
+      article,
+      relatedMovies,
+      otherArticles: otherArticles.filter((a) => a.slug !== params.slug).slice(0, 3),
+    };
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
