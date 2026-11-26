@@ -40,7 +40,8 @@ export const Route = createFileRoute("/articles/$slug")({
       .slice(0, 5)
       .map((id) => getMovieDetails({ data: { id, lang: "ar" } }).catch(() => null));
     const relatedMovies = (await Promise.all(moviePromises)).filter(Boolean);
-    const otherArticles = (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
+    const otherArticles =
+      (await getEditorialArticles({ data: { limit: 4 } }).catch(() => [])) || [];
 
     return {
       article,
@@ -387,7 +388,7 @@ function ArticleReaderPage() {
                       </div>
                       <div className="inline-flex items-center gap-1 text-xs text-primary font-medium">
                         <Star className="w-3 h-3 fill-primary" />
-                        {m.rating > 0 ? `${m.rating.toFixed(1)} / 10` : "غير متاح"}
+                        {m.rating > 0 ? m.rating.toFixed(1) : "غير متاح"} / 10
                       </div>
                     </div>
                   </Link>
