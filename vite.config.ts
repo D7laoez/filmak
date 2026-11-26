@@ -14,7 +14,9 @@ export default defineConfig({
               const moduleId = id.replaceAll("\\", "/");
               if (
                 !moduleId.includes("/node_modules/") ||
-                moduleId.includes("/node_modules/@tanstack/react-start/dist/plugin/default-entry/client")
+                moduleId.includes(
+                  "/node_modules/@tanstack/react-start/dist/plugin/default-entry/client",
+                )
               ) {
                 return;
               }
