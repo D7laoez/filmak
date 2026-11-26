@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Sparkles,
@@ -16,7 +16,7 @@ import { useLocale } from "@/lib/i18n";
 import { getPopular, getTopRated, getTrending, type MovieCard } from "@/lib/movies.functions";
 
 export const Route = createFileRoute("/collections")({
-  component: CollectionsPage,
+  component: CollectionsRouteComponent,
   head: () => ({
     meta: [
       { title: "مجموعات ومختارات فلمك التحريرية — Filmak Collections" },
@@ -134,7 +134,7 @@ function MovieRail({
               )}
               <div className="absolute top-2 right-2 rounded-full bg-black/75 backdrop-blur px-2 py-1 text-[11px] text-white flex items-center gap-1 font-semibold">
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                {movie.rating?.toFixed(1) ?? "—"}
+                {movie.rating > 0 ? movie.rating.toFixed(1) : "غير متاح"}
               </div>
             </div>
             <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-5 group-hover:text-primary transition">
@@ -146,6 +146,11 @@ function MovieRail({
       </div>
     </section>
   );
+}
+
+function CollectionsRouteComponent() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  return pathname.replace(/\/$/, "") === "/collections" ? <CollectionsPage /> : <Outlet />;
 }
 
 function CollectionsPage() {
