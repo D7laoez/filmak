@@ -294,6 +294,12 @@ function Home() {
                 {ar ? "تصفح الأفلام" : "Discover"}
               </Link>
               <Link
+                to="/free-movies"
+                className="rounded-full border border-primary/35 bg-primary/10 text-primary font-semibold px-3 py-1 hover:bg-primary/20 transition"
+              >
+                {ar ? "أفلام كلاسيكية مجانية" : "Free Classics"}
+              </Link>
+              <Link
                 to="/movie-night"
                 className="rounded-full border border-border bg-secondary/60 px-3 py-1 hover:border-primary/50 hover:text-primary transition"
               >

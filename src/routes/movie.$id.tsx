@@ -37,6 +37,7 @@ import {
 } from "@/lib/editorial.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
+import { CinemaPlayer } from "@/components/CinemaPlayer";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { useT } from "@/lib/i18n";
@@ -483,6 +484,15 @@ function Content() {
             </div>
           </div>
         </div>
+
+        {/* In-page Cinema Player & Official Watch Hub */}
+        <CinemaPlayer
+          title={data.title}
+          trailerKey={data.trailerKey}
+          videos={data.videos}
+          watch={data.watch}
+          watchCountry={data.watchCountry}
+        />
 
         {/* ========================================================================= */}
         {/* PROMINENT ORIGINAL FILMAK EDITORIAL SECTION: FILMAK VERDICT & SCORES */}

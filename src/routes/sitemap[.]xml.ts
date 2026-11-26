@@ -12,6 +12,7 @@ const BASE = "https://filmak.site";
 const INDEXABLE_ROUTES = [
   "/",
   "/discover",
+  "/free-movies",
   "/articles",
   "/collections",
   "/movie-night",

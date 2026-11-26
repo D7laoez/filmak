@@ -22,6 +22,7 @@ import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as EditorialPolicyRouteImport } from './routes/editorial-policy'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FreeMoviesRouteImport } from './routes/free-movies'
 import { Route as MovieNightRouteImport } from './routes/movie-night'
 import { Route as PickRouteImport } from './routes/pick'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -105,6 +106,11 @@ const EditorialPolicyRoute = EditorialPolicyRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeMoviesRoute = FreeMoviesRouteImport.update({
+  id: '/free-movies',
+  path: '/free-movies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieNightRoute = MovieNightRouteImport.update({
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/faq': typeof FaqRoute
+  '/free-movies': typeof FreeMoviesRoute
   '/movie-night': typeof MovieNightRoute
   '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/faq': typeof FaqRoute
+  '/free-movies': typeof FreeMoviesRoute
   '/movie-night': typeof MovieNightRoute
   '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/dmca': typeof DmcaRoute
   '/editorial-policy': typeof EditorialPolicyRoute
   '/faq': typeof FaqRoute
+  '/free-movies': typeof FreeMoviesRoute
   '/movie-night': typeof MovieNightRoute
   '/pick': typeof PickRoute
   '/privacy': typeof PrivacyRoute
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/editorial-policy'
     | '/faq'
+    | '/free-movies'
     | '/movie-night'
     | '/pick'
     | '/privacy'
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/editorial-policy'
     | '/faq'
+    | '/free-movies'
     | '/movie-night'
     | '/pick'
     | '/privacy'
@@ -392,6 +403,7 @@ export interface FileRouteTypes {
     | '/dmca'
     | '/editorial-policy'
     | '/faq'
+    | '/free-movies'
     | '/movie-night'
     | '/pick'
     | '/privacy'
@@ -428,6 +440,7 @@ export interface RootRouteChildren {
   DmcaRoute: typeof DmcaRoute
   EditorialPolicyRoute: typeof EditorialPolicyRoute
   FaqRoute: typeof FaqRoute
+  FreeMoviesRoute: typeof FreeMoviesRoute
   MovieNightRoute: typeof MovieNightRoute
   PickRoute: typeof PickRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -534,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-movies': {
+      id: '/free-movies'
+      path: '/free-movies'
+      fullPath: '/free-movies'
+      preLoaderRoute: typeof FreeMoviesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie-night': {
@@ -745,6 +765,7 @@ const rootRouteChildren: RootRouteChildren = {
   DmcaRoute: DmcaRoute,
   EditorialPolicyRoute: EditorialPolicyRoute,
   FaqRoute: FaqRoute,
+  FreeMoviesRoute: FreeMoviesRoute,
   MovieNightRoute: MovieNightRoute,
   PickRoute: PickRoute,
   PrivacyRoute: PrivacyRoute,

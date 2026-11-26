@@ -35,6 +35,7 @@ const CONTENT_SECURITY_POLICY = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
+  "media-src 'self' https://archive.org https://*.archive.org https://*.us.archive.org",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
   "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
   "object-src 'none'",

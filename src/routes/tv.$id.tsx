@@ -5,6 +5,7 @@ import { ArrowRight, Star, Calendar, Play, Film, Tv as TvIcon } from "lucide-rea
 import { getTvDetails } from "@/lib/tv.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
+import { CinemaPlayer } from "@/components/CinemaPlayer";
 import { useLocale, useT } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { getRequestOrigin } from "@/lib/origin.functions";
@@ -275,6 +276,15 @@ function Content() {
               <ShareButton title={data.title} text={data.overview?.slice(0, 120)} />
             </div>
           </div>
+        </div>
+
+        <div className="mt-10">
+          <CinemaPlayer
+            title={data.title}
+            trailerKey={data.trailerKey}
+            watch={data.watch}
+            watchCountry={data.watchCountry}
+          />
         </div>
 
         {data.cast.length > 0 && (
