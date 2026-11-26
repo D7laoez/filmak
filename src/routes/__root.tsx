@@ -9,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { Loader2, Film, ShieldCheck, Heart, Sparkles, BookOpen, Mail, Scale } from "lucide-react";
 import appCss from "../styles.css?url";
 import { reportError } from "../lib/error-reporting";
@@ -146,9 +147,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   loader: async () => {
     try {
       const origin = await getRequestOrigin().catch(() => "https://filmak.site");
-      return { origin: origin || "https://filmak.site" };
+      const cookie = getRequestHeader("cookie") ?? "";
+      const locale =
+        /(?:^|;\s*)filmak_locale=(ar|en)(?:;|$)/.exec(cookie)?.[1] === "en" ? "en" : "ar";
+      return { origin: origin || "https://filmak.site", locale };
     } catch {
-      return { origin: "https://filmak.site" };
+      return { origin: "https://filmak.site", locale: "ar" as const };
     }
   },
   head: ({ loaderData }) => {
@@ -260,7 +264,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var l=localStorage.getItem('locale');var t=localStorage.getItem('theme');if(!l){var n=(navigator.language||'ar').toLowerCase();l=n.indexOf('ar')===0?'ar':'en';}if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var h=document.documentElement;h.lang=l;h.dir=l==='ar'?'rtl':'ltr';if(t==='dark')h.classList.add('dark');else h.classList.remove('dark');h.style.colorScheme=t;}catch(e){}})();`,
+            __html: `(function(){try{var m=document.cookie.match(/(?:^|;\\s*)filmak_locale=(ar|en)(?:;|$)/);var l=m?m[1]:'ar';var t=localStorage.getItem('theme');if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}var h=document.documentElement;h.lang=l;h.dir=l==='ar'?'rtl':'ltr';if(t==='dark')h.classList.add('dark');else h.classList.remove('dark');h.style.colorScheme=t;}catch(e){}})();`,
           }}
         />
       </head>
@@ -274,6 +278,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { locale } = Route.useLoaderData();
   const router = useRouter();
 
   useEffect(() => {
@@ -306,7 +311,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <LocaleProvider>
+        <LocaleProvider initialLocale={locale}>
           <RootContentWithLocale />
           <Toaster position="top-center" theme="dark" richColors />
         </LocaleProvider>
