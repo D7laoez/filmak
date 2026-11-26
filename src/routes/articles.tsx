@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/articles")({
       ],
     };
   },
-  component: ArticlesIndexPage,
+  component: ArticlesRouteComponent,
 });
 
 const CATEGORIES = [
@@ -70,6 +70,11 @@ const CATEGORIES = [
   { id: "genre-deep-dive", label_ar: "سينما عالمية", label_en: "World Cinema" },
   { id: "collections", label_ar: "أجواء ومزاج", label_en: "Mood & Vibe" },
 ];
+
+function ArticlesRouteComponent() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  return pathname.replace(/\/$/, "") === "/articles" ? <ArticlesIndexPage /> : <Outlet />;
+}
 
 function ArticlesIndexPage() {
   const { locale, dir, t } = useLocale();
