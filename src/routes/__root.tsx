@@ -360,9 +360,7 @@ function RootContentWithLocale() {
       "/messages",
     ];
     if (
-      privatePrefixes.some(
-        (prefix) => pathname === prefix || pathname.startsWith(prefix + "/"),
-      )
+      privatePrefixes.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"))
     ) {
       return;
     }
