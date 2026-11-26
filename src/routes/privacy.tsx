@@ -37,7 +37,7 @@ function PrivacyPage() {
         ["التفضيلات المحلية", "اللغة والمظهر وبعض إعدادات الواجهة قد تحفظ محليًا في متصفحك."],
         [
           "الإعلانات والتحليلات وملفات تعريف الارتباط",
-          "نستخدم Google Analytics لقياس استخدام الموقع، وقد تظهر وحدات إعلانية من شبكة Adsterra في مواضع محددة. قد تستخدم هذه الجهات ملفات تعريف الارتباط أو معرّفات وتقنيات مشابهة لجمع بيانات تقنية وقياس الإعلانات وتكرارها. لا نحمل شريط الإعلانات الاجتماعي على جميع الصفحات. يمكنك إدارة تخصيص إعلانات Google من إعداداتها، كما يمكنك ضبط ملفات تعريف الارتباط من المتصفح. تختلف خيارات الموافقة والإعلانات بحسب بلدك والقوانين المطبقة.",
+          "نسجل زيارات الموقع لأغراض القياس والحماية. قد تشمل السجلات الصفحة التي زرتها، ومصدر الإحالة بعد إزالة معاملات الرابط، وعنوان IP، والدولة والمدينة عند توفرهما، ونوع الجهاز والمتصفح ونظام التشغيل، ومعرف جلسة عشوائي. وقد نربط الزيارة بحسابك إذا كنت مسجلاً للدخول. لا تظهر هذه السجلات للزوار. نستخدم أيضاً Google Analytics لقياس الاستخدام، وقد تظهر وحدات إعلانية من شبكة Adsterra في مواضع محددة؛ وقد تستخدم هذه الجهات ملفات تعريف الارتباط أو معرّفات مشابهة. لا نحمل شريط الإعلانات الاجتماعي على جميع الصفحات. يمكنك إدارة تخصيص إعلانات Google من إعداداتها وضبط ملفات تعريف الارتباط من المتصفح. تختلف خيارات الموافقة والإعلانات بحسب بلدك والقوانين المطبقة.",
           "https://support.google.com/adsense/answer/1348695?hl=ar",
         ],
         [
@@ -64,7 +64,7 @@ function PrivacyPage() {
         ],
         [
           "Advertising, analytics and cookies",
-          "We use Google Analytics to measure site usage, and selected placements may display ads from the Adsterra network. These providers may use cookies, identifiers or similar technologies to collect technical data and measure ad delivery and frequency. We do not load a site-wide social-bar ad script. You can manage Google ad personalization in Google Ads Settings and control cookies through your browser. Consent and ad options vary by location and applicable law.",
+          "We record site visits for measurement and security. These records may include the page path, a referrer with query strings and fragments removed, IP address, country and city when available, device type, browser, operating system, and a random session identifier. A visit may be associated with your account when you are signed in. These records are not visible to visitors. We also use Google Analytics, and selected placements may display ads from the Adsterra network; these providers may use cookies or similar identifiers. We do not load a site-wide social-bar ad script. You can manage Google ad personalization in Google Ads Settings and control cookies through your browser. Consent and ad options vary by location and applicable law.",
           "https://support.google.com/adsense/answer/1348695?hl=en",
         ],
         [
