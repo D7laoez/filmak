@@ -292,9 +292,7 @@ function ContactPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder={
-                      ar
-                        ? "اكتب رسالتك أو اقتراحك هنا..."
-                        : "Type your message or inquiry here..."
+                      ar ? "اكتب رسالتك أو اقتراحك هنا..." : "Type your message or inquiry here..."
                     }
                     className="w-full bg-secondary/50 border border-border rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                   />
