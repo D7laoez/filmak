@@ -21,7 +21,10 @@ type ContactMessage = {
 type ContactQueryResult<T> = Promise<{ data: T | null; error: { message: string } | null }>;
 type ContactTable = {
   select: (columns: string) => {
-    order: (column: string, options: { ascending: boolean }) => ContactQueryResult<ContactMessage[]>;
+    order: (
+      column: string,
+      options: { ascending: boolean },
+    ) => ContactQueryResult<ContactMessage[]>;
   };
   update: (values: { status: ContactStatus }) => {
     eq: (column: "id", value: string) => Promise<{ error: { message: string } | null }>;
@@ -38,10 +41,7 @@ const labels: Record<ContactMessage["subject"], string> = {
 
 export const Route = createFileRoute("/_authenticated/_admin/messages")({
   head: () => ({
-    meta: [
-      { title: "رسائل التواصل — فلمك" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "رسائل التواصل — فلمك" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: ContactInboxPage,
 });
@@ -144,12 +144,17 @@ function ContactInboxPage() {
           <div className="rounded-2xl border border-border bg-card p-10 text-center">
             <Inbox className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
             <h2 className="font-semibold">لا توجد رسائل هنا</h2>
-            <p className="mt-1 text-sm text-muted-foreground">ستظهر الرسائل الجديدة في هذه الصفحة.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              ستظهر الرسائل الجديدة في هذه الصفحة.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {visible.map((message) => (
-              <article key={message.id} className="rounded-2xl border border-border bg-card p-5 space-y-4">
+              <article
+                key={message.id}
+                className="rounded-2xl border border-border bg-card p-5 space-y-4"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h2 className="font-bold">{message.name}</h2>
@@ -161,14 +166,23 @@ function ContactInboxPage() {
                       {message.email}
                     </a>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {labels[message.subject]} · {new Date(message.created_at).toLocaleString("ar-IQ")}
+                      {labels[message.subject]}{" · "}
+                      {new Date(message.created_at).toLocaleString("ar-IQ")}
                     </p>
                   </div>
                   <span className="rounded-full bg-secondary px-3 py-1 text-xs">
-                    {message.status === "new" ? "جديدة" : message.status === "read" ? "مقروءة" : message.status === "resolved" ? "محلولة" : "مزعجة"}
+                    {message.status === "new"
+                      ? "جديدة"
+                      : message.status === "read"
+                        ? "مقروءة"
+                        : message.status === "resolved"
+                          ? "محلولة"
+                          : "مزعجة"}
                   </span>
                 </div>
-                <p className="whitespace-pre-wrap break-words text-sm leading-7">{message.message}</p>
+                <p className="whitespace-pre-wrap break-words text-sm leading-7">
+                  {message.message}
+                </p>
                 <div className="flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">
                   <Clock3 className="h-4 w-4 text-muted-foreground" />
                   <select
@@ -176,7 +190,10 @@ function ContactInboxPage() {
                     value={message.status}
                     disabled={updateStatus.isPending}
                     onChange={(event) =>
-                      updateStatus.mutate({ id: message.id, status: event.target.value as ContactStatus })
+                      updateStatus.mutate({
+                        id: message.id,
+                        status: event.target.value as ContactStatus,
+                      })
                     }
                     className="rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs"
                   >
