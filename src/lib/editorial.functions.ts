@@ -427,12 +427,12 @@ const SEED_ARTICLES: Article[] = [
     author_name: "علي الخفاجي",
     author_role: "رئيس تحرير فلمك وناقد سينمائي",
     author_avatar: "/icon-192.png",
-    related_movie_ids: [27205, 550, 77, 1124, 745],
+    related_movie_ids: [27205, 550, 77, 1124, 745, 11324],
     related_article_slugs: ["movies-with-shocking-endings", "movies-like-interstellar"],
-    reading_time_minutes: 8,
+    reading_time_minutes: 7,
     featured: true,
     published_at: "2026-08-15T10:00:00Z",
-    updated_at: "2026-08-25T12:00:00Z",
+    updated_at: "2026-11-26T08:45:00Z",
     content_ar: `## مقدمة: سحر الإثارة النفسية
 
 تختلف أفلام الإثارة النفسية عن أفلام الرعب التقليدية أو الأكشن السريع؛ فهي لا تعتمد على الفزعات الرخيصة أو الانفجارات، بل تحفر في **الهشاشة النفسية للشخصيات**، وتجعل من عقل المشاهد نفسه شريكاً في فك اللغز.
@@ -471,7 +471,35 @@ const SEED_ARTICLES: Article[] = [
 
 1. **شاهد في بيئة هادئة:** التفاصيل الصغيرة في نظرات الشخصيات وخلفية الكادر تحمل مفاتيح اللغز.
 2. **تجنب قراءة المراجعات المليئة بالحرق مسبقاً:** متعة الاكتشاف الأول لا تتكرر.
-3. **أعد المشاهدة لاحقاً:** ستلاحظ عشرات الإشارات الذكية التي وضعها المخرج عن عمد.`,
+3. **أعد المشاهدة لاحقاً:** ستلاحظ عشرات الإشارات الذكية التي وضعها المخرج عن عمد.
+
+### 4. Memento (2000) — الذاكرة بوصفها لغزاً غير موثوق
+
+يحوّل كريستوفر نولان الذاكرة من أداة يعتمد عليها البطل إلى مصدر دائم للشك. ليونارد لا يستطيع تكوين ذكريات جديدة، ولذلك يبني حياته على صور وملاحظات ووشوم يعتقد أنها حقائق ثابتة. قوة الفيلم ليست في ترتيب مشاهده المعكوس وحده، بل في إجبار المشاهد على اختبار الطريقة التي يصنع بها أحكامه عندما تكون المعلومات ناقصة. كل مشهد يمنحك قطعة، لكنه يذكّرك في الوقت نفسه بأن القطعة قد تكون مضللة أو ناقصة السياق. لهذا يستحق الفيلم مشاهدة ثانية؛ ليس بحثاً عن مفاجأة فقط، بل لمراقبة التفاصيل التي مرّت أمامك في المرة الأولى.
+
+### 5. The Prestige (2006) — ثمن الهوس وصناعة الوهم
+
+يستخدم نولان منافسة ساحرين ليطرح سؤالاً عن الثمن الذي يدفعه الإنسان عندما تتحول الرغبة في التفوق إلى هوس. الفيلم مبني على التكرار والخداع: ما تراه ليس بالضرورة ما حدث، وما يبدو تفصيلاً عابراً قد يكون مفتاحاً لفهم البناء كله. تصميم الإنتاج والأزياء والديكورات لا يقدّم خلفية تاريخية فحسب؛ بل يجعل العالم نفسه مسرحاً للأسرار والتضحية. أكثر ما يميزه أن الصراع لا يدور حول معرفة الحيلة فقط، وإنما حول استعداد الشخصيات للتخلي عن علاقاتها وهويتها كي تحافظ على سرها. إنه اختيار ممتاز لمن يحب الألغاز التي ترتبط بالشخصيات، لا بالألعاب الذهنية وحدها.
+
+### 6. Shutter Island — الخوف من الحقيقة
+
+يختلف هذا الفيلم عن الألغاز القائمة على الاستعراض؛ فهو يبني التوتر من المكان والذاكرة والشعور بأن هناك شيئاً غير مكتمل. الجزيرة المعزولة والطقس القاسي والممرات المغلقة تجعل المشاهد محاصراً مع البطل، بينما تتغير دلالة التفاصيل كلما تقدمت القصة. أداء ليوناردو دي كابريو يعتمد على الانتقال بين الثقة والارتباك والانفعال، وهو ما يمنح المشاهد سبباً لمراجعة تفسيره للشخصية باستمرار. الأفضل أن تشاهده من دون قراءة ملخصات أو مراجعات تكشف النهاية، لأن قيمة التجربة في مراقبة التحول التدريجي في فهمك لما يجري.
+
+## لماذا تنجح الإثارة النفسية؟
+
+اللغز الجيد لا يخفي المعلومات لمجرد إرباك الجمهور؛ بل يوزعها بطريقة تجعل المشاهد يشارك في بناء المعنى. قد يقدّم المخرج معلومة صحيحة، لكنه يضعها بجوار صورة أو حوار يدفعك إلى تفسيرها بصورة خاطئة. هنا تظهر أهمية وجهة النظر: هل نرى الأحداث كما وقعت، أم كما يتذكرها شخص خائف، أو مذنب، أو يحاول حماية نفسه؟ عندما تكون الإجابة غير محسومة، يصبح المونتاج والصوت والإضاءة عناصر سردية وليست زينة شكلية.
+
+ومن علامات الفيلم النفسي المتماسك أن المفاجأة النهائية لا تلغي ما سبقها. بعد انكشاف الحقيقة، ينبغي أن تستطيع العودة ذهنياً إلى المشاهد السابقة واكتشاف أن الإشارات كانت موجودة، لكنك قرأتها من زاوية محدودة. إذا احتاجت النهاية إلى اختراع معلومات لم يلمّح إليها الفيلم، فغالباً تكون المفاجأة حيلة لا نتيجة درامية. لهذا تختلف الأعمال التي تبقى في الذاكرة عن القصص التي تعتمد على صدمة واحدة ثم تفقد قيمتها عند إعادة المشاهدة.
+
+كذلك لا يعني الغموض أن كل شيء يجب أن يكون معقداً. بعض أفضل الأفلام النفسية تنطلق من رغبة إنسانية بسيطة: شخص يريد معرفة الحقيقة، أو استعادة علاقة، أو الهروب من شعور بالذنب. التعقيد يأتي من التناقض بين ما تقوله الشخصية وما تفعله، وبين الصورة التي تقدمها عن نفسها والواقع الذي تكشفه تصرفاتها. كلما كان الدافع الإنساني واضحاً، أصبح اللغز أكثر تأثيراً.
+
+## كيف تشاهد هذه الأفلام من دون إفساد التجربة؟
+
+ابدأ بالفيلم من دون قراءة تقييمات تفصيلية أو مشاهدة مقاطع التحليل. انتبه إلى الأشياء التي تتكرر: جملة تعود بصياغة مختلفة، غرض يظهر في أكثر من مشهد، اختلاف في الإضاءة بين مكانين، أو رد فعل لا يتناسب مع الموقف. لا تحتاج إلى تدوين كل شيء؛ يكفي أن تترك لنفسك مساحة لتكوين فرضية ثم اختبارها مع تقدم الأحداث.
+
+بعد المشاهدة، امنح نفسك وقتاً قبل البحث عن تفسير جاهز. اسأل: ما الذي عرفته فعلاً؟ ما الذي افترضته؟ وأي شخصية كنت تثق بها أكثر من اللازم؟ هذه الأسئلة تجعل إعادة المشاهدة أكثر فائدة، لأنها تحولها من محاولة للعثور على الإجابة إلى دراسة لطريقة توجيه انتباهك. وإذا كنت تشاهد مع آخرين، اتفقوا مسبقاً على عدم كشف النهاية لمن لم يشاهد الفيلم.
+
+**الخلاصة:** أفضل أفلام الإثارة النفسية لا تكتفي بأن تخدعك؛ إنها تجعلك تفهم لماذا صدّقت الخدعة، ثم تمنحك أسباباً للعودة إلى القصة بعين مختلفة.`,
     content_en: `## Introduction: The Anatomy of Psychological Suspense
 
 Unlike conventional jump-scare horror or explosive action, psychological thrillers delve into **the fragile architecture of the human mind**. They weaponize paranoia, fragmented memory, and unreliable narrators to turn the audience into active detectives.
@@ -502,7 +530,35 @@ David Fincher’s adaptation of Chuck Palahniuk’s novel remains a razor-sharp 
 
 Martin Scorsese guides Leonardo DiCaprio through the gothic corridors of Ashecliffe Hospital. As storms isolate the island, reality fractures into unforgettable psychological dread.
 
-* **Key Takeaway:** Unforgettable visual symbolism and one of cinema's most haunting final questions: *"Which would be worse—to live as a monster, or to die as a good man?"*`,
+* **Key Takeaway:** Unforgettable visual symbolism and one of cinema's most haunting final questions: *"Which would be worse—to live as a monster, or to die as a good man?"*
+
+### 4. Memento (2000) — Memory as an Unreliable Map
+
+Christopher Nolan turns memory from a dependable tool into the central source of uncertainty. Leonard cannot form new memories, so he builds a system of photographs, notes, and tattoos that he treats as permanent evidence. The film's achievement is not simply its reverse chronology. It makes the audience experience the limits of judgment when information arrives without context. Each scene supplies a useful fragment while quietly raising the possibility that the fragment has been misunderstood. A second viewing is rewarding because it shifts the question from “What is the answer?” to “How did the film lead me to trust the wrong explanation?”
+
+### 5. The Prestige (2006) — Obsession and the Price of Deception
+
+A rivalry between two stage magicians becomes a study of ambition, sacrifice, and the cost of protecting a secret. Nolan structures the story around repetition and misdirection: an apparently minor detail can change the meaning of an earlier scene, while a confident explanation may conceal a larger omission. The production design does more than recreate a period setting; theatres, workshops, and private rooms become extensions of the characters' need to control what other people see. The central conflict is not merely about discovering a trick. It is about what each person is willing to surrender to remain the one who knows the secret. This is a strong choice for viewers who enjoy puzzles grounded in character and consequence.
+
+### 6. Shutter Island — The Fear of an Unwelcome Truth
+
+Unlike thrillers built primarily around clever mechanics, Shutter Island creates suspense through setting, memory, and the feeling that the world is withholding something essential. The isolated island, severe weather, and institutional corridors make the audience feel confined alongside the protagonist. Leonardo DiCaprio's performance moves between confidence, confusion, and distress, encouraging viewers to revise their reading of the character as the story progresses. The film is best approached without plot summaries or ending explanations. Its power comes from watching the meaning of familiar details change, not from knowing the destination in advance.
+
+## What Makes Psychological Suspense Work?
+
+A strong mystery does not hide information simply to confuse its audience. It distributes evidence so that viewers take part in constructing meaning. A director may show something accurate but place it beside an image, reaction, or line of dialogue that encourages the wrong interpretation. Point of view becomes essential: are we seeing events as they happened, as a frightened person remembers them, or as someone wishes to present them? When that question remains open, editing, sound, and lighting become narrative tools rather than decoration.
+
+A satisfying reveal should also preserve the value of what came before it. Once the truth is understood, viewers should be able to revisit earlier scenes and recognize that clues were present, even if they were read from a limited perspective. If an ending depends on information the film never prepared us to consider, the surprise can feel like a trick rather than a dramatic consequence. The films that reward repeat viewings make their reversals feel inevitable in retrospect without making them obvious on a first watch.
+
+Complexity alone is not the goal. Many memorable psychological thrillers begin with a simple human need: to learn the truth, repair a relationship, escape guilt, or regain control. The complexity grows from the gap between what a character says and what they do, or between the identity they present and the behavior the story gradually exposes. When the emotional motive is clear, the mystery becomes more than an intellectual exercise.
+
+## How to Watch Without Spoiling the Experience
+
+Start without reading detailed reviews or watching analysis clips. Notice recurring elements: a phrase repeated with a different meaning, an object that appears in several scenes, a shift in lighting between locations, or a reaction that feels slightly out of place. You do not need to take extensive notes. Form a tentative theory, then allow the film to test it.
+
+After the credits, resist the urge to search immediately for a definitive explanation. Ask what the film actually showed, what you assumed, and which character earned more trust than the evidence justified. Those questions make a second viewing more useful because it becomes an examination of how the story guided your attention. If you are watching with friends, agree not to reveal the ending to anyone who has not seen the film.
+
+**The takeaway:** the best psychological thrillers do more than fool the audience. They make viewers understand why the deception worked, then reward them with a different experience when they return to the story.`,
   },
   {
     id: "art-2",
