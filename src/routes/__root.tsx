@@ -359,16 +359,6 @@ function RootContentWithLocale() {
     "/messages",
   ].some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"));
 
-  const hasDedicatedAdSlot =
-    pathname === "/" ||
-    pathname === "/discover" ||
-    pathname.startsWith("/discover/") ||
-    pathname === "/free-movies" ||
-    pathname.startsWith("/free-movies/") ||
-    pathname.startsWith("/movie/") ||
-    pathname.startsWith("/tv/") ||
-    pathname.startsWith("/articles/");
-
   useEffect(() => {
     if (typeof window === "undefined" || isPrivateRoute) return;
     const socialBarSrc = "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8";
@@ -440,10 +430,15 @@ function RootContentWithLocale() {
   return (
     <>
       <TopBar />
+      {!isPrivateRoute && pathname !== "/" && (
+        <div className="max-w-7xl mx-auto px-4 pt-4">
+          <AdSlot key={`top-${pathname}`} placement={`top-${pathname}`} />
+        </div>
+      )}
       <Outlet />
-      {!isPrivateRoute && !hasDedicatedAdSlot && (
+      {!isPrivateRoute && (
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <AdSlot key={`global-${pathname}`} placement={`page-${pathname}`} />
+          <AdSlot key={`bottom-${pathname}`} placement={`bottom-${pathname}`} />
         </div>
       )}
       {/* Comprehensive Trust & Editorial Footer */}
