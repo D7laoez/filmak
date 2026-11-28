@@ -6,6 +6,7 @@ import { getTvDetails } from "@/lib/tv.functions";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
 import { CinemaPlayer } from "@/components/CinemaPlayer";
+import { AdSlot } from "@/components/AdSlot";
 import { useLocale, useT } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
 import { getRequestOrigin } from "@/lib/origin.functions";
@@ -278,13 +279,14 @@ function Content() {
           </div>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-10 space-y-8">
           <CinemaPlayer
             title={data.title}
             trailerKey={data.trailerKey}
             watch={data.watch}
             watchCountry={data.watchCountry}
           />
+          <AdSlot placement="tv-banner" />
         </div>
 
         {data.cast.length > 0 && (

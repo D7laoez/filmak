@@ -20,6 +20,7 @@ import { getRequestOrigin } from "@/lib/origin.functions";
 import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
+import { AdBlockGate } from "@/components/AdBlockGate";
 
 import { safeJsonLd } from "@/lib/seo";
 
@@ -320,6 +321,17 @@ function RootComponent() {
           // Ignore SW registration failure in restricted environments
         });
       }
+      const p = window.location.pathname;
+      if (!p.startsWith("/admin") && !p.startsWith("/auth")) {
+        const socialBarSrc = "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8";
+        if (!document.querySelector(`script[src="${socialBarSrc}"]`)) {
+          const s = document.createElement("script");
+          s.async = true;
+          s.dataset.cfasync = "false";
+          s.src = socialBarSrc;
+          document.head.appendChild(s);
+        }
+      }
     }
 
     return () => {
@@ -548,6 +560,7 @@ function RootContentWithLocale() {
         </div>
       </footer>
       <BottomNav />
+      <AdBlockGate />
     </>
   );
 }

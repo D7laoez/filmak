@@ -27,32 +27,22 @@ export function AdSlot({ placement = "banner", className, style }: AdSlotProps) 
     const target = containerRef.current;
     if (typeof window === "undefined" || !target) return;
 
-    const loadAd = () => {
-      if (target.querySelector<HTMLScriptElement>('script[data-filmak-native-ad="true"]')) return;
-      const script = document.createElement("script");
-      script.async = true;
-      script.dataset.cfasync = "false";
-      script.dataset.filmakNativeAd = "true";
-      script.src = NATIVE_SCRIPT_URL;
-      target.appendChild(script);
-    };
-
-    if (!("IntersectionObserver" in window)) {
-      loadAd();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          observer.disconnect();
-          loadAd();
-        }
-      },
-      { rootMargin: "300px" },
+    const existing = target.querySelector<HTMLScriptElement>(
+      'script[data-filmak-native-ad="true"]',
     );
-    observer.observe(target);
-    return () => observer.disconnect();
+    if (existing) existing.remove();
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.setAttribute("fetchpriority", "high");
+    script.dataset.cfasync = "false";
+    script.dataset.filmakNativeAd = "true";
+    script.src = `${NATIVE_SCRIPT_URL}?p=${encodeURIComponent(placement)}`;
+    target.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
   }, [placement]);
 
   return (

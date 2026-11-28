@@ -5,6 +5,7 @@ import { Compass, Filter, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { discoverMovies, getGenres } from "@/lib/movies.functions";
 import { useLocale } from "@/lib/i18n";
 import { Spinner } from "@/components/Spinner";
+import { AdSlot } from "@/components/AdSlot";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -242,6 +243,7 @@ function DiscoverPage() {
 
         {results.data && results.data.results.length > 0 && (
           <>
+            <AdSlot placement="discover-banner" className="mb-6" />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {results.data.results.map((m) => (
                 <Link
