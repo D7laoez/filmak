@@ -64,7 +64,7 @@ export const recommendMovies = createServerFn({ method: "POST" })
       );
 
     const normalizedPrompt = data.prompt.toLowerCase().replace(/\s+/g, " ").trim();
-    const cacheKey = createHash("sha256").update(`v2::${lang}::${normalizedPrompt}`).digest("hex");
+    const cacheKey = createHash("sha256").update(`v3::${lang}::${normalizedPrompt}`).digest("hex");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     try {
@@ -116,7 +116,12 @@ Rules: movie-only requests must use ["movie"]; series/show-only requests must us
     );
     let recommendations = await resolveAIItems(tmdbKey, aiItems, intent, lang);
 
-    if (recommendations.length < 4) {
+    if (recommendations.length < 6) {
+      const directHits = await searchDirectAndSimilar(tmdbKey, data.prompt, intent, lang);
+      recommendations = mergeUnique(recommendations, directHits);
+    }
+
+    if (recommendations.length < 8) {
       const fallback = await discoverFallback(tmdbKey, intent, lang);
       recommendations = mergeUnique(recommendations, fallback);
     }
@@ -251,11 +256,54 @@ function normalizeIntent(raw: Partial<Intent> | undefined, prompt: string): Inte
   const rawGenres = Array.isArray(raw?.genres)
     ? raw!.genres!.filter(Boolean).map(String).slice(0, 4)
     : [];
-  const wantsRomance = /رومانسي|رومانسية|حب|romantic|romance/.test(p);
-  const genres =
-    wantsRomance && !rawGenres.some((g) => normalizeGenre(g) === 10749)
-      ? [...rawGenres, "romance"]
-      : rawGenres;
+  const promptGenrePatterns: Array<[RegExp, string]> = [
+    [
+      /كارتون|كرتون|انمي|أنمي|انميشن|رسوم\s*متحركة|بيكسار|ديزني|غيبلي|cartoon|anime|animation|pixar|disney|ghibli/i,
+      "animation",
+    ],
+    [/عائلي|عائلية|اطفال|أطفال|للعائلة|family|kids/i, "family"],
+    [/رومانسي|رومانسية|حب|عشق|romantic|romance/i, "romance"],
+    [/اكشن|أكشن|قتال|مطاردة|حركة|بطل\s*خارق|مارفل|action|superhero/i, "action"],
+    [/مغامرة|مغامرات|رحلة|كنز|adventure/i, "adventure"],
+    [/كوميدي|كوميديا|مضحك|ضحك|فكاهي|comedy|funny/i, "comedy"],
+    [/رعب|مرعب|مخيف|أشباح|اشباح|زومبي|جن|horror|scary|zombie/i, "horror"],
+    [/اثارة|إثارة|تشويق|نفسي|نفسية|توتر|thriller|suspense/i, "thriller"],
+    [/غموض|لغز|تحقيق|الغاز|mystery|detective/i, "mystery"],
+    [/جريمة|مافيا|عصابات|سرقة|crime|heist|mafia/i, "crime"],
+    [/دراما|حزين|مؤثر|دموع|قصة\s*حقيقية|drama|sad|emotional/i, "drama"],
+    [
+      /خيال\s*علمي|فضاء|كواكب|سفر\s*عبر\s*الزمن|مستقبل|روبوت|sci-?fi|science\s*fiction|space|time\s*travel/i,
+      "sciencefiction",
+    ],
+    [/فانتازيا|سحر|تنين|اسطوري|أسطوري|fantasy|magic/i, "fantasy"],
+    [/وثائقي|وثائقية|حقيقي|documentary/i, "documentary"],
+    [/تاريخي|تاريخية|history|historical/i, "history"],
+    [/حرب|حروب|عسكري|war|military/i, "war"],
+    [/موسيقي|موسيقى|غنائي|music|musical/i, "music"],
+  ];
+  const genres = [...rawGenres];
+  for (const [re, genreName] of promptGenrePatterns) {
+    if (re.test(p) && !genres.some((g) => normalizeGenre(g) === GENRE_IDS[genreName])) {
+      genres.push(genreName);
+    }
+  }
+
+  let min_year = Number.isInteger(raw?.min_year) ? raw!.min_year! : null;
+  let max_year = Number.isInteger(raw?.max_year) ? raw!.max_year! : null;
+  const yearMatch = p.match(/\b(19\d{2}|20[0-3]\d)\b/);
+  if (yearMatch && !min_year && !max_year) {
+    const y = Number(yearMatch[1]);
+    min_year = y;
+    max_year = y;
+  } else if (/جديد|حديث|أحدث|2024|2025|2026|recent|new/i.test(p) && !min_year) {
+    min_year = 2022;
+  } else if (/التسعينات|90s/i.test(p) && !min_year && !max_year) {
+    min_year = 1990;
+    max_year = 1999;
+  } else if (/الثمانينات|80s/i.test(p) && !min_year && !max_year) {
+    min_year = 1980;
+    max_year = 1989;
+  }
 
   let runtimeMax = Number.isInteger(raw?.runtimeMax) ? raw!.runtimeMax! : null;
   if (/قصير(?:ة|ين)?|مختصر|short|brief/.test(p)) runtimeMax = runtimeMax ?? 100;
@@ -276,9 +324,9 @@ function normalizeIntent(raw: Partial<Intent> | undefined, prompt: string): Inte
     kinds,
     country,
     language,
-    genres,
-    min_year: Number.isInteger(raw?.min_year) ? raw!.min_year! : null,
-    max_year: Number.isInteger(raw?.max_year) ? raw!.max_year! : null,
+    genres: genres.slice(0, 3),
+    min_year,
+    max_year,
     mood: raw?.mood ?? null,
     runtimeMax,
   };
@@ -397,6 +445,123 @@ function matchesHardConstraints(it: TmdbMediaItem, kind: "movie" | "tv", intent:
   return true;
 }
 
+async function searchDirectAndSimilar(
+  key: string,
+  prompt: string,
+  intent: Intent,
+  lang: "ar" | "en",
+): Promise<Rec[]> {
+  const out: Rec[] = [];
+  const cleaned = prompt
+    .replace(
+      /(?:اريد|أريد|ابغى|ابي|اعطني|اقترح|رشح|ابحث|عن|لي|فلم|فيلم|افلام|أفلام|مسلسل|مسلسلات|يشبه|مثل)/gi,
+      " ",
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+  const query = cleaned.length >= 2 ? cleaned : prompt.trim();
+  if (!query) return out;
+
+  try {
+    const url = new URL("https://api.themoviedb.org/3/search/multi");
+    url.searchParams.set("api_key", key);
+    url.searchParams.set("language", lang === "ar" ? "ar-SA" : "en-US");
+    url.searchParams.set("query", query);
+    url.searchParams.set("include_adult", "false");
+    const r = await fetch(url.toString(), {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (r.ok) {
+      const j = (await r.json()) as {
+        results?: Array<TmdbMediaItem & { media_type?: string }>;
+      };
+      const hits = (j.results || []).filter(
+        (x) =>
+          (x.media_type === "movie" || x.media_type === "tv") &&
+          intent.kinds.includes(x.media_type) &&
+          Boolean(x.poster_path),
+      );
+      for (const hit of hits.slice(0, 6)) {
+        const kind = hit.media_type === "tv" ? "tv" : "movie";
+        out.push(
+          toRec(
+            hit,
+            kind,
+            lang === "en" ? "Direct match for your search." : "تطابق مباشر مع بحثك.",
+          ),
+        );
+      }
+      const top = hits[0];
+      if (top) {
+        const topKind = top.media_type === "tv" ? "tv" : "movie";
+        const recUrl = new URL(`https://api.themoviedb.org/3/${topKind}/${top.id}/recommendations`);
+        recUrl.searchParams.set("api_key", key);
+        recUrl.searchParams.set("language", lang === "ar" ? "ar-SA" : "en-US");
+        const recRes = await fetch(recUrl.toString(), {
+          headers: { accept: "application/json" },
+          signal: AbortSignal.timeout(8000),
+        });
+        if (recRes.ok) {
+          const recJson = (await recRes.json()) as { results?: TmdbMediaItem[] };
+          for (const sim of (recJson.results || []).slice(0, 6)) {
+            if (!sim.poster_path) continue;
+            out.push(
+              toRec(
+                sim,
+                topKind,
+                lang === "en" ? "Similar to your search." : "مشابه لما تبحث عنه.",
+              ),
+            );
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("TMDB multi-search fallback failed", e);
+  }
+
+  if (out.length < 4 && intent.kinds.includes("tv")) {
+    try {
+      const tvRes = await fetch(
+        `https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}`,
+        { signal: AbortSignal.timeout(6000) },
+      );
+      if (tvRes.ok) {
+        const tvData = (await tvRes.json()) as Array<{
+          show?: { name?: string; premiered?: string };
+        }>;
+        for (const entry of tvData.slice(0, 4)) {
+          const showName = entry.show?.name;
+          if (!showName) continue;
+          const hit = await tmdbSearchBest(
+            key,
+            "tv",
+            showName,
+            entry.show?.premiered?.slice(0, 4),
+            intent,
+          );
+          if (hit) {
+            out.push(
+              toRec(
+                hit,
+                "tv",
+                lang === "en"
+                  ? "Matched via free TVmaze search."
+                  : "نتيجة مطابقة عبر بحث المسلسلات.",
+              ),
+            );
+          }
+        }
+      }
+    } catch {
+      // Optional external fallback; ignore network failure.
+    }
+  }
+
+  return mergeUnique([], out);
+}
+
 async function discoverFallback(key: string, intent: Intent, lang: "ar" | "en"): Promise<Rec[]> {
   const out: Rec[] = [];
   const genres = intent.genres
@@ -479,19 +644,43 @@ function normalizeGenre(g: string): number | null {
   const normalizedArabic = key.replace(/[أإآ]/g, "ا");
   const aliases: Record<string, string> = {
     رعب: "horror",
+    مرعب: "horror",
+    مخيف: "horror",
     كوميديا: "comedy",
+    كوميدي: "comedy",
     مضحك: "comedy",
     اكشن: "action",
+    أكشن: "action",
     رومانسية: "romance",
     رومانسي: "romance",
     حب: "romance",
     دراما: "drama",
+    درامي: "drama",
+    حزين: "drama",
     اثارة: "thriller",
     إثارة: "thriller",
+    تشويق: "thriller",
     جريمة: "crime",
     غموض: "mystery",
     خيال: "fantasy",
+    فانتازيا: "fantasy",
     خيالعلمي: "sciencefiction",
+    كارتون: "animation",
+    كرتون: "animation",
+    انمي: "animation",
+    أنمي: "animation",
+    انميشن: "animation",
+    رسوممتحركة: "animation",
+    عائلي: "family",
+    اطفال: "family",
+    أطفال: "family",
+    مغامرة: "adventure",
+    مغامرات: "adventure",
+    وثائقي: "documentary",
+    تاريخي: "history",
+    حرب: "war",
+    موسيقى: "music",
+    موسيقي: "music",
   };
   return GENRE_IDS[aliases[g] || aliases[normalizedArabic] || ""] ?? null;
 }
@@ -594,7 +783,16 @@ async function callAIWithFallback(system: string, user: string): Promise<string>
           model: "openai/gpt-4o-mini",
         }),
     });
-  if (!providers.length) throw new Error("No AI provider is configured.");
+  // Free keyless OpenAI-compatible AI endpoint (Pollinations.ai) so AI works even with zero API keys
+  providers.push({
+    name: "pollinations",
+    run: (s, u) =>
+      callOpenAICompat(s, u, {
+        url: "https://text.pollinations.ai/openai",
+        key: "no-key",
+        model: "openai",
+      }),
+  });
   const errors: string[] = [];
   for (const p of providers) {
     try {
@@ -633,9 +831,10 @@ async function callOpenAICompat(
 ): Promise<string> {
   const res = await fetch(cfg.url, {
     method: "POST",
+    signal: AbortSignal.timeout(14000),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${cfg.key}`,
+      ...(cfg.key && cfg.key !== "no-key" ? { Authorization: `Bearer ${cfg.key}` } : {}),
       "HTTP-Referer": "https://filmak.site",
       "X-Title": "Filmak",
     },
