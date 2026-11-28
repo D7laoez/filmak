@@ -72,7 +72,7 @@ export function applySecurityAndCacheHeaders(response: Response, pathname: strin
       } else {
         headers.set(
           "Cache-Control",
-          "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
+          "public, max-age=300, s-maxage=300, stale-while-revalidate=86400",
         );
       }
     }

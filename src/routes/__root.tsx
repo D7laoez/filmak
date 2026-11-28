@@ -423,6 +423,20 @@ function RootContentWithLocale() {
       referrer = undefined;
     }
 
+    try {
+      const trackedRaw = sessionStorage.getItem("filmak_tracked_paths") ?? "[]";
+      const tracked = JSON.parse(trackedRaw) as string[];
+      if (Array.isArray(tracked) && tracked.includes(pathname)) {
+        return;
+      }
+      sessionStorage.setItem(
+        "filmak_tracked_paths",
+        JSON.stringify([...(Array.isArray(tracked) ? tracked.slice(-25) : []), pathname]),
+      );
+    } catch {
+      // Ignore sessionStorage errors in restricted environments.
+    }
+
     void import("@/lib/site-analytics.functions")
       .then(({ recordSiteVisit }) =>
         recordSiteVisit({

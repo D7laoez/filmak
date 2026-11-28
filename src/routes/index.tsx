@@ -208,10 +208,13 @@ function Home() {
   const movieGenres = useQuery({
     queryKey: ["genres", locale],
     queryFn: () => getGenres({ data: { lang: locale } }),
+    staleTime: 1000 * 60 * 60 * 24,
   });
   const tvGenres = useQuery({
     queryKey: ["tv-genres", locale],
     queryFn: () => getTvGenres({ data: { lang: locale } }),
+    enabled: tab === "tv",
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
   const trendingTv = useQuery({

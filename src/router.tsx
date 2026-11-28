@@ -14,7 +14,7 @@ export const getRouter = () => {
         // TMDB lists (trending, popular…) don't change often. Keeping data
         // fresh for 30min and cached for 24h makes navigation feel instant
         // for returning visitors and eliminates redundant refetches.
-        staleTime: 1000 * 60 * 30,
+        staleTime: 1000 * 60 * 60,
         gcTime: 1000 * 60 * 60 * 24,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
