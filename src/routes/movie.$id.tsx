@@ -156,8 +156,10 @@ export const Route = createFileRoute("/movie/$id")({
       meta: [
         { title },
         { name: "description", content: desc },
-        // TMDB-only movie pages are not index-worthy; only pages with original FILMAK editorial are indexable.
-        { name: "robots", content: monetizableEditorial ? "index, follow" : "noindex, follow" },
+        {
+          name: "robots",
+          content: movie?.id ? "index, follow, max-image-preview:large" : "noindex, follow",
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.movie" },

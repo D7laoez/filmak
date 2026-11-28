@@ -10,7 +10,7 @@ export const Route = createFileRoute("/pick")({
     meta: [
       { title: "اختارلي فيلم — فلمك" },
       { name: "description", content: "خلّ فلمك يختار لك فيلم الليلة حسب ذوقك." },
-      { name: "robots", content: "noindex, follow" },
+      { name: "robots", content: "index, follow" },
       { property: "og:title", content: "اختارلي فيلم — Filmak" },
       { property: "og:description", content: "اختيار ذكي لفيلم الليلة خلال ثوانٍ." },
       { property: "og:type", content: "website" },

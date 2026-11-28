@@ -21,7 +21,7 @@ Disallow: /tv/null
 Disallow: /movie/undefined
 Disallow: /tv/undefined
 
-# Google Search crawler: public content is crawlable; private/function endpoints and invalid media URLs are excluded.
+# Search engine crawlers: all public movie, TV, genre, article, and discovery pages are crawlable.
 User-agent: Googlebot
 Allow: /
 Disallow: /_serverFn/
@@ -39,6 +39,24 @@ Disallow: /movie/null
 Disallow: /tv/null
 Disallow: /movie/undefined
 Disallow: /tv/undefined
+
+User-agent: Bingbot
+Allow: /
+Disallow: /_serverFn/
+Disallow: /auth
+Disallow: /admin
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /_serverFn/
+Disallow: /auth
+Disallow: /admin
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /_serverFn/
+Disallow: /auth
+Disallow: /admin
 
 # AdSense crawler: public monetizable content must remain crawlable.
 User-agent: Mediapartners-Google

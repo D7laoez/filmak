@@ -35,7 +35,10 @@ export const Route = createFileRoute("/person/$id")({
       meta: [
         { title },
         { name: "description", content: desc },
-        { name: "robots", content: "noindex, follow" },
+        {
+          name: "robots",
+          content: p?.name ? "index, follow, max-image-preview:large" : "noindex, follow",
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "profile" },

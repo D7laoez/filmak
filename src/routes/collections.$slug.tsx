@@ -41,7 +41,7 @@ export const Route = createFileRoute("/collections/$slug")({
         { name: "description", content: description },
         {
           name: "robots",
-          content: c && (loaderData?.items?.length ?? 0) >= 5 ? "index, follow" : "noindex, follow",
+          content: c ? "index, follow, max-image-preview:large" : "noindex, follow",
         },
         { property: "og:title", content: title },
         { property: "og:description", content: description },

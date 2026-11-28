@@ -79,7 +79,10 @@ export const Route = createFileRoute("/tv/$id")({
       meta: [
         { title },
         { name: "description", content: desc },
-        { name: "robots", content: "noindex, follow" },
+        {
+          name: "robots",
+          content: tv?.id ? "index, follow, max-image-preview:large" : "noindex, follow",
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.tv_show" },

@@ -40,6 +40,29 @@ const COLLECTION_SLUGS = [
   "movies-like-inception",
 ];
 
+const GENRE_IDS = [
+  28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 53, 10752, 37,
+];
+
+async function fetchTmdbIds(endpoint: string, key: string): Promise<number[]> {
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3${endpoint}?api_key=${key}&language=ar-SA`,
+      {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+    if (!res.ok) return [];
+    const data = (await res.json()) as { results?: Array<{ id?: number }> };
+    return (data.results ?? [])
+      .map((item) => item.id)
+      .filter((id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0);
+  } catch {
+    return [];
+  }
+}
+
 function xmlEscape(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -98,11 +121,49 @@ export const Route = createFileRoute("/sitemap.xml")({
               ? "1.0"
               : path === "/articles" || path === "/collections" || path === "/discover"
                 ? "0.9"
-                : "0.6",
+                : "0.7",
         }));
 
+        const genreEntries: SitemapEntry[] = GENRE_IDS.map((id) => ({
+          path: `/genre/${id}`,
+          changefreq: "weekly",
+          priority: "0.8",
+        }));
+
+        const tmdbKey = process.env.TMDB_API_KEY;
+        let mediaEntries: SitemapEntry[] = [];
+        if (tmdbKey) {
+          const [trendM, popM, topM, trendTv, popTv] = await Promise.all([
+            fetchTmdbIds("/trending/movie/week", tmdbKey),
+            fetchTmdbIds("/movie/popular", tmdbKey),
+            fetchTmdbIds("/movie/top_rated", tmdbKey),
+            fetchTmdbIds("/trending/tv/week", tmdbKey),
+            fetchTmdbIds("/tv/popular", tmdbKey),
+          ]);
+          const movieIds = Array.from(new Set([...trendM, ...popM, ...topM])).slice(0, 60);
+          const tvIds = Array.from(new Set([...trendTv, ...popTv])).slice(0, 40);
+          mediaEntries = [
+            ...movieIds.map((id) => ({
+              path: `/movie/${id}`,
+              changefreq: "weekly" as const,
+              priority: "0.8",
+            })),
+            ...tvIds.map((id) => ({
+              path: `/tv/${id}`,
+              changefreq: "weekly" as const,
+              priority: "0.8",
+            })),
+          ];
+        }
+
         const seen = new Set<string>();
-        const entries = [...staticEntries, ...articleEntries, ...collectionEntries].filter((e) => {
+        const entries = [
+          ...staticEntries,
+          ...genreEntries,
+          ...articleEntries,
+          ...collectionEntries,
+          ...mediaEntries,
+        ].filter((e) => {
           if (seen.has(e.path)) return false;
           seen.add(e.path);
           return true;

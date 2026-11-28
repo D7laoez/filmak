@@ -198,6 +198,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { name: "mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
         { name: "apple-mobile-web-app-title", content: "فلمك" },
+        {
+          name: "robots",
+          content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        },
+        {
+          name: "keywords",
+          content:
+            "فلمك, Filmak, افلام, مسلسلات, مراجعات افلام, توصيات افلام بالذكاء الاصطناعي, افلام كارتون, انمي, افضل افلام 2026, استكشاف افلام",
+        },
+        { property: "og:locale", content: "ar_AR" },
+        { property: "og:locale:alternate", content: "en_US" },
         { title: "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية" },
         {
           name: "description",
