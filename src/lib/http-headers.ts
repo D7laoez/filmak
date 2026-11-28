@@ -31,13 +31,13 @@ function isPrivatePath(pathname: string): boolean {
 
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.topcreativeformat.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' data: https://fonts.gstatic.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org https://*.show-sb.com https://*.effectivegatecpm.com https://*.highperformanceformat.com https://*.topcreativeformat.com",
+  "style-src 'self' 'unsafe-inline' https:",
+  "font-src 'self' data: https:",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https://archive.org https://*.archive.org https://*.us.archive.org",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
-  "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://bancadeltempoidea.org https://*.bancadeltempoidea.org",
+  "connect-src 'self' https: wss://*.supabase.co",
+  "frame-src 'self' https:",
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",
