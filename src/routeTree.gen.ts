@@ -41,6 +41,7 @@ import { Route as MovieIdRouteImport } from './routes/movie.$id'
 import { Route as PersonIdRouteImport } from './routes/person.$id'
 import { Route as TvIdRouteImport } from './routes/tv.$id'
 import { Route as AuthenticatedAdminAdminRouteImport } from './routes/_authenticated/_admin.admin'
+import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated/_admin.messages'
 import { Route as AuthenticatedAdminSeoStatusRouteImport } from './routes/_authenticated/_admin.seo-status'
 import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
 
@@ -202,6 +203,12 @@ const AuthenticatedAdminAdminRoute = AuthenticatedAdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminMessagesRoute =
+  AuthenticatedAdminMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSeoStatusRoute =
   AuthenticatedAdminSeoStatusRouteImport.update({
     id: '/seo-status',
@@ -245,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/messages': typeof AuthenticatedAdminMessagesRoute
   '/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
@@ -279,6 +287,7 @@ export interface FileRoutesByTo {
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
   '/admin': typeof AuthenticatedAdminAdminRoute
+  '/messages': typeof AuthenticatedAdminMessagesRoute
   '/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
@@ -316,6 +325,7 @@ export interface FileRoutesById {
   '/person/$id': typeof PersonIdRoute
   '/tv/$id': typeof TvIdRoute
   '/_authenticated/_admin/admin': typeof AuthenticatedAdminAdminRoute
+  '/_authenticated/_admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/_admin/seo-status': typeof AuthenticatedAdminSeoStatusRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
 }
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/person/$id'
     | '/tv/$id'
     | '/admin'
+    | '/messages'
     | '/seo-status'
     | '/api/public/indexnow'
   fileRoutesByTo: FileRoutesByTo
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/person/$id'
     | '/tv/$id'
     | '/admin'
+    | '/messages'
     | '/seo-status'
     | '/api/public/indexnow'
   id:
@@ -422,6 +434,7 @@ export interface FileRouteTypes {
     | '/person/$id'
     | '/tv/$id'
     | '/_authenticated/_admin/admin'
+    | '/_authenticated/_admin/messages'
     | '/_authenticated/_admin/seo-status'
     | '/api/public/indexnow'
   fileRoutesById: FileRoutesById
@@ -682,6 +695,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAdminRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/_admin/messages': {
+      id: '/_authenticated/_admin/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedAdminMessagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/_admin/seo-status': {
       id: '/_authenticated/_admin/seo-status'
       path: '/seo-status'
@@ -701,11 +721,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAdminRoute: typeof AuthenticatedAdminAdminRoute
+  AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
   AuthenticatedAdminSeoStatusRoute: typeof AuthenticatedAdminSeoStatusRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAdminRoute: AuthenticatedAdminAdminRoute,
+  AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
   AuthenticatedAdminSeoStatusRoute: AuthenticatedAdminSeoStatusRoute,
 }
 

@@ -1,4 +1,8 @@
-import { hydrate as hydrateQueryClient, QueryClient } from "@tanstack/react-query";
+import {
+  hydrate as hydrateQueryClient,
+  QueryClient,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import { routeTree } from "./routeTree.gen";
@@ -36,7 +40,7 @@ export const getRouter = () => {
   if (queryRouter.options.hydrate) {
     queryRouter.options.hydrate = async (dehydrated) => {
       const state = dehydrated as {
-        dehydratedQueryClient?: { mutations: unknown[]; queries: unknown[] };
+        dehydratedQueryClient?: DehydratedState;
       };
       if (state?.dehydratedQueryClient) {
         hydrateQueryClient(queryClient, state.dehydratedQueryClient);
