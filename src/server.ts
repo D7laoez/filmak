@@ -176,7 +176,7 @@ export default {
               if (
                 secured.status === 200 &&
                 !hasSetCookie &&
-                contentType.includes("text/html") &&
+                (contentType.includes("text/html") || contentType.includes("application/xml")) &&
                 cacheControl.includes("public")
               ) {
                 setMemCache(cacheKeyUrl, entry);
