@@ -494,6 +494,9 @@ function Content() {
           watchCountry={data.watchCountry}
         />
 
+        {/* Prominent in-page NativeBanner ad slot directly below player */}
+        <AdSlot key={`movie-${id}`} placement={`movie-${id}`} className="my-4" />
+
         {/* ========================================================================= */}
         {/* PROMINENT ORIGINAL FILMAK EDITORIAL SECTION: FILMAK VERDICT & SCORES */}
         {/* ========================================================================= */}
@@ -708,15 +711,6 @@ function Content() {
             </div>
           )}
         </section>
-
-        {/* AdSense Slot (placed below the main high-value editorial verdict) */}
-        <div className="my-6">
-          <AdSlot
-            slot="1234567890"
-            editorialEligible={hasSubstantialEditorial(editorial)}
-            className="min-h-[100px]"
-          />
-        </div>
 
         {/* Watch providers */}
         {data.watch && (

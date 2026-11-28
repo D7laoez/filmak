@@ -21,6 +21,7 @@ import { ThemeProvider } from "@/lib/theme";
 import { BottomNav } from "@/components/BottomNav";
 import { TopBar } from "@/components/TopBar";
 import { AdBlockGate } from "@/components/AdBlockGate";
+import { AdSlot } from "@/components/AdSlot";
 
 import { safeJsonLd } from "@/lib/seo";
 
@@ -321,17 +322,6 @@ function RootComponent() {
           // Ignore SW registration failure in restricted environments
         });
       }
-      const p = window.location.pathname;
-      if (!p.startsWith("/admin") && !p.startsWith("/auth")) {
-        const socialBarSrc = "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8";
-        if (!document.querySelector(`script[src="${socialBarSrc}"]`)) {
-          const s = document.createElement("script");
-          s.async = true;
-          s.dataset.cfasync = "false";
-          s.src = socialBarSrc;
-          document.head.appendChild(s);
-        }
-      }
     }
 
     return () => {
@@ -356,6 +346,40 @@ function RootContentWithLocale() {
   const { t, locale, dir } = useLocale();
   const { pathname } = useLocation();
   const ar = locale === "ar";
+
+  const isPrivateRoute = [
+    "/auth",
+    "/reset-password",
+    "/callback",
+    "/favorites",
+    "/watchlist",
+    "/watched",
+    "/stats",
+    "/admin",
+    "/messages",
+  ].some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"));
+
+  const hasDedicatedAdSlot =
+    pathname === "/" ||
+    pathname === "/discover" ||
+    pathname.startsWith("/discover/") ||
+    pathname === "/free-movies" ||
+    pathname.startsWith("/free-movies/") ||
+    pathname.startsWith("/movie/") ||
+    pathname.startsWith("/tv/") ||
+    pathname.startsWith("/articles/");
+
+  useEffect(() => {
+    if (typeof window === "undefined" || isPrivateRoute) return;
+    const socialBarSrc = "https://bancadeltempoidea.org/14/1c464a300c506375f159ae1863de50f8";
+    if (!document.querySelector(`script[src="${socialBarSrc}"]`)) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.dataset.cfasync = "false";
+      s.src = socialBarSrc;
+      document.head.appendChild(s);
+    }
+  }, [pathname, isPrivateRoute]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -417,6 +441,11 @@ function RootContentWithLocale() {
     <>
       <TopBar />
       <Outlet />
+      {!isPrivateRoute && !hasDedicatedAdSlot && (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <AdSlot key={`global-${pathname}`} placement={`page-${pathname}`} />
+        </div>
+      )}
       {/* Comprehensive Trust & Editorial Footer */}
       <footer className="mt-auto border-t border-border/40 bg-card/40 py-16 px-4 pb-28 text-foreground">
         <div className="max-w-7xl mx-auto space-y-12">

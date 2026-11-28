@@ -27,6 +27,9 @@ export function AdSlot({ placement = "banner", className, style }: AdSlotProps) 
     const target = containerRef.current;
     if (typeof window === "undefined" || !target) return;
 
+    const adContainer = target.querySelector<HTMLDivElement>(`#container-${NATIVE_KEY}`);
+    if (adContainer) adContainer.innerHTML = "";
+
     const existing = target.querySelector<HTMLScriptElement>(
       'script[data-filmak-native-ad="true"]',
     );
@@ -37,7 +40,7 @@ export function AdSlot({ placement = "banner", className, style }: AdSlotProps) 
     script.setAttribute("fetchpriority", "high");
     script.dataset.cfasync = "false";
     script.dataset.filmakNativeAd = "true";
-    script.src = `${NATIVE_SCRIPT_URL}?p=${encodeURIComponent(placement)}`;
+    script.src = `${NATIVE_SCRIPT_URL}?p=${encodeURIComponent(placement)}&t=${Date.now()}`;
     target.appendChild(script);
 
     return () => {

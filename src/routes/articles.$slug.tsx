@@ -397,11 +397,9 @@ function ArticleReaderPage() {
           </section>
         )}
 
-        {/* AdSense slot placed below high-value editorial content */}
+        {/* In-page NativeBanner ad slot */}
         <div className="pt-4">
-          {monetizable ? (
-            <AdSlot slot="1234567890" editorialEligible className="min-h-[100px]" />
-          ) : null}
+          <AdSlot placement={`article-${article.slug}`} className="min-h-[100px]" />
         </div>
 
         {/* Author Bio Box */}
