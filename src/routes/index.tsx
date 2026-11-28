@@ -65,9 +65,9 @@ export const Route = createFileRoute("/")({
   head: ({ matches }) => {
     const lastMatch = matches?.[matches.length - 1];
     const searchQ = (lastMatch?.search as { q?: string } | undefined)?.q;
-    const title = "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية";
+    const title = "فلمك | Filmak — اكتشف أفلامك ومسلسلاتك بالذكاء الاصطناعي";
     const description =
-      "منصة اكتشاف وتحليل سينمائي: ترشيحات بالذكاء الاصطناعي، مراجعات نقدية أصلية، وأدلة مشاهدة لأفضل الأفلام والمسلسلات.";
+      "محتار شتشوف الليلة؟ فلمك يرشحلك أفضل الأفلام والمسلسلات والأنمي حسب مزاجك بالذكاء الاصطناعي، مع التقييمات، التريلر الرسمي، وقوائم مختارة لكل الأذواق.";
     const url = "https://filmak.site/";
     const image = "https://filmak.site/icon-512.png";
     return {

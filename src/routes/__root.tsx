@@ -171,6 +171,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       "@type": "WebSite",
       url: "https://filmak.site/",
       name: "فلمك — Filmak",
+      alternateName: ["فلمك", "Filmak"],
       inLanguage: ["ar", "en"],
       potentialAction: {
         "@type": "SearchAction",
@@ -183,10 +184,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       "@context": "https://schema.org",
       "@type": "Organization",
       name: "فلمك — Filmak",
+      alternateName: ["فلمك", "Filmak"],
       url: "https://filmak.site/",
       logo: "https://filmak.site/icon-512.png",
       description:
-        "منصة سينمائية عربية لاكتشاف وتحليل الأفلام والمسلسلات، تجمع بين أدوات الذكاء الاصطناعي وطبقة تحريرية أصلية ومختارات مشاهدة منظمة.",
+        "منصة فلمك الذكية لاكتشاف الأفلام والمسلسلات والأنمي حسب مزاجك بالذكاء الاصطناعي، مع التقييمات، التريلر الرسمي، وقوائم مشاهدة مختارة.",
     };
 
     return {
@@ -209,17 +211,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         { property: "og:locale", content: "ar_AR" },
         { property: "og:locale:alternate", content: "en_US" },
-        { title: "فلمك — Filmak · دليل أفلام ومقالات سينمائية تحريرية" },
+        { title: "فلمك | Filmak — اكتشف أفلامك ومسلسلاتك بالذكاء الاصطناعي" },
         {
           name: "description",
           content:
-            "اكتشف أفضل الأفلام والمسلسلات التي تناسب ذوقك باستخدام الذكاء الاصطناعي والمراجعات التحريرية الأصلية.",
+            "محتار شتشوف الليلة؟ فلمك يرشحلك أفضل الأفلام والمسلسلات والأنمي حسب مزاجك بالذكاء الاصطناعي، مع التقييمات، التريلر الرسمي، وقوائم مختارة لكل الأذواق.",
         },
-        { property: "og:title", content: "فلمك — Filmak" },
+        { property: "og:title", content: "فلمك | Filmak — اكتشف أفلامك ومسلسلاتك بالذكاء الاصطناعي" },
         {
           property: "og:description",
           content:
-            "منصة سينمائية ذكية لاكتشاف الأفلام والمسلسلات مع تحليلات نقدية وأدلة مشاهدة حصرية.",
+            "محتار شتشوف الليلة؟ فلمك يرشحلك أفضل الأفلام والمسلسلات والأنمي حسب مزاجك بالذكاء الاصطناعي، مع التقييمات والتريلر.",
         },
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "فلمك — Filmak" },
