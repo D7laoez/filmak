@@ -217,7 +217,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           content:
             "محتار شتشوف الليلة؟ فلمك يرشحلك أفضل الأفلام والمسلسلات والأنمي حسب مزاجك بالذكاء الاصطناعي، مع التقييمات، التريلر الرسمي، وقوائم مختارة لكل الأذواق.",
         },
-        { property: "og:title", content: "فلمك | Filmak — اكتشف أفلامك ومسلسلاتك بالذكاء الاصطناعي" },
+        {
+          property: "og:title",
+          content: "فلمك | Filmak — اكتشف أفلامك ومسلسلاتك بالذكاء الاصطناعي",
+        },
         {
           property: "og:description",
           content:
