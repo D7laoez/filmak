@@ -19,8 +19,8 @@ type AdSlotProps = {
 
 /**
  * Isolated in-page Adsterra NativeBanner_1 slot.
- * Each slot runs in its own sandboxed iframe (allow-scripts allow-same-origin, no allow-popups)
- * so multiple slots and SPA route transitions always render independently without opening new tabs.
+ * Each slot runs in its own iframe so multiple slots and SPA route transitions
+ * always render independently, while allowing intentional user clicks on ad cards to open.
  */
 export function AdSlot({ placement = "banner", className, style }: AdSlotProps) {
   const slotId = useId();
@@ -89,7 +89,7 @@ html,body{background:transparent;overflow:hidden;width:100%}
           key={placement}
           title={`ad-${placement}`}
           srcDoc={srcDoc}
-          sandbox="allow-scripts allow-same-origin"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           loading="eager"
           scrolling="no"
           className="w-full border-0 block bg-transparent"
