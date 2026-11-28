@@ -75,34 +75,13 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
         </div>
       ))}
 
-      {items.length > 1 && (
-        <div className="hidden md:flex items-center gap-2 absolute top-6 end-8 z-20">
-          <button
-            type="button"
-            onClick={ar ? nextSlide : prevSlide}
-            aria-label={ar ? "الشريحة السابقة" : "Previous slide"}
-            className="w-10 h-10 rounded-full bg-background/70 backdrop-blur-md border border-border/80 grid place-items-center text-foreground hover:border-primary/60 hover:text-primary transition cursor-pointer"
-          >
-            {ar ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-          </button>
-          <button
-            type="button"
-            onClick={ar ? prevSlide : nextSlide}
-            aria-label={ar ? "الشريحة التالية" : "Next slide"}
-            className="w-10 h-10 rounded-full bg-background/70 backdrop-blur-md border border-border/80 grid place-items-center text-foreground hover:border-primary/60 hover:text-primary transition cursor-pointer"
-          >
-            {ar ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-          </button>
-        </div>
-      )}
-
-      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
+      <div className="relative z-10 h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-10 md:pb-14">
         <div
-          className="min-h-[390px] md:min-h-[300px] max-w-2xl flex flex-col justify-start"
+          className="min-h-[340px] md:min-h-[280px] max-w-2xl flex flex-col items-start justify-end"
           key={m.id}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3 border border-primary/30 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="self-start w-fit inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold mb-3 border border-primary/30 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
             <span>{t("trending")}</span>
             <span className="text-primary/60">·</span>
             <span className="tabular-nums">
@@ -115,10 +94,16 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
           </h2>
 
           <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4 tabular-nums">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary font-bold">
-              <Star className="w-3.5 h-3.5 fill-primary" />
-              {m.rating > 0 ? m.rating.toFixed(1) : ar ? "غير متاح" : "N/A"}
-            </span>
+            {m.rating > 0 ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary font-bold">
+                <Star className="w-3.5 h-3.5 fill-primary" />
+                {m.rating.toFixed(1)}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary/80 border border-border text-foreground/80 text-xs font-semibold">
+                {ar ? "قريباً" : "Coming Soon"}
+              </span>
+            )}
             {m.year && <span className="font-medium text-foreground/80">{m.year}</span>}
           </div>
 
@@ -149,28 +134,45 @@ export function HeroCarousel({ movies }: { movies: MovieCard[] }) {
         </div>
 
         {items.length > 1 && (
-          <div
-            className="flex items-center gap-1.5 mt-6"
-            role="tablist"
-            aria-label="Featured slides"
-          >
-            {items.map((item, i) => (
+          <div className="flex items-center justify-between gap-4 mt-6">
+            <div className="flex items-center gap-1.5" role="tablist" aria-label="Featured slides">
+              {items.map((item, i) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === idx}
+                  onClick={() => setIdx(i)}
+                  aria-label={`Slide ${i + 1}: ${item.title}`}
+                  className="py-3 px-0.5 flex items-center cursor-pointer"
+                >
+                  <span
+                    className={`block h-1.5 rounded-full transition-all duration-300 ${
+                      i === idx ? "w-9 bg-primary" : "w-4 bg-foreground/25 hover:bg-foreground/55"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+
+            <div className="hidden md:flex items-center gap-2">
               <button
-                key={item.id}
                 type="button"
-                role="tab"
-                aria-selected={i === idx}
-                onClick={() => setIdx(i)}
-                aria-label={`Slide ${i + 1}: ${item.title}`}
-                className="py-3 px-0.5 flex items-center cursor-pointer"
+                onClick={ar ? nextSlide : prevSlide}
+                aria-label={ar ? "الشريحة السابقة" : "Previous slide"}
+                className="w-9 h-9 rounded-full bg-card/70 backdrop-blur-md border border-border/80 grid place-items-center text-foreground hover:border-primary/60 hover:text-primary transition cursor-pointer"
               >
-                <span
-                  className={`block h-1.5 rounded-full transition-all duration-300 ${
-                    i === idx ? "w-9 bg-primary" : "w-4 bg-foreground/25 hover:bg-foreground/55"
-                  }`}
-                />
+                {ar ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={ar ? prevSlide : nextSlide}
+                aria-label={ar ? "الشريحة التالية" : "Next slide"}
+                className="w-9 h-9 rounded-full bg-card/70 backdrop-blur-md border border-border/80 grid place-items-center text-foreground hover:border-primary/60 hover:text-primary transition cursor-pointer"
+              >
+                {ar ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         )}
       </div>
